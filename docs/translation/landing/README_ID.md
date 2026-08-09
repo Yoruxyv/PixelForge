@@ -318,7 +318,7 @@ Butuh bantuan menyiapkan layanan eksternal? Lihat [SETUP.md](../dev/SETUP_ID.md)
 ## 1) Clone
 
 ```bash
-git clone https://github.com/Dendroculus/PixelForge.git
+git clone https://github.com/Yoruxyv/PixelForge.git
 cd PixelForge
 ```
 
@@ -395,8 +395,8 @@ Dibuat dengan ❤️ oleh tim PixelForge:
 <table>
   <tr>
     <td align="center" width="180">
-      <a href="https://github.com/Dendroculus">
-        <img src="https://github.com/Dendroculus.png?size=96" width="96" alt="Hans avatar" style="border-radius: 50%;"><br/>
+      <a href="https://github.com/Yoruxyv">
+        <img src="https://github.com/Yoruxyv.png?size=96" width="96" alt="Hans avatar" style="border-radius: 50%;"><br/>
         <b>Hans</b><br/>
       </a>
         <sub><b>Lead Developer</b></sub>

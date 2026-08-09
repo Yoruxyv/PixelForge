@@ -317,7 +317,7 @@ VITE_DEBUG_API=true # production 设为 false
 ## 1) 克隆
 
 ```bash
-git clone https://github.com/Dendroculus/PixelForge.git
+git clone https://github.com/Yoruxyv/PixelForge.git
 cd PixelForge
 ```
 
@@ -393,8 +393,8 @@ npm run dev
 <table>
   <tr>
     <td align="center" width="180">
-      <a href="https://github.com/Dendroculus">
-        <img src="https://github.com/Dendroculus.png?size=96" width="96" alt="Hans avatar" style="border-radius: 50%;"><br/>
+      <a href="https://github.com/Yoruxyv">
+        <img src="https://github.com/Yoruxyv.png?size=96" width="96" alt="Hans avatar" style="border-radius: 50%;"><br/>
         <b>Hans</b><br/>
       </a>
         <sub><b>主开发者</b></sub>
