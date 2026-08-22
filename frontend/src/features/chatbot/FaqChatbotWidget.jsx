@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { IMAGES as img } from '@/config';
+import chatbotIcon from '@/assets/PixelForgeChatbot.png';
 import { FAQ_DATA, QUICK_ACTIONS, CAT_ACCENT } from './chatBotdata';
 import { WIDGET_STYLES } from './chatBotStyles';
 import { useFaqChatBot } from './useFaqChatBot';
@@ -11,6 +11,8 @@ import SearchView from './SearchView';
 import AnswerView from './AnswerView';
 import FeedbackView from './FeedbackView';
 import FabToggle from './FabToggle';
+
+const img = { chatbotIcon };
 
 /**
  * Renders FAQ chatbot container and routes chatbot views.

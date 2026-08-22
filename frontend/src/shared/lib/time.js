@@ -1,3 +1,6 @@
+/** Number of milliseconds in one day. */
+export const DAY_MS = 24 * 60 * 60 * 1000;
+
 /**
  * Checks whether a given timestamp is expired against a TTL window.
  *

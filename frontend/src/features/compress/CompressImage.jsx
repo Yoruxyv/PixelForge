@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { AppConfig } from '@/config';
 import UploadCard from '@/shared/components/upload/UploadCard';
 import ToolWorkspaceShell from '@/shared/components/workspace/ToolWorkspaceShell';
 import ToolPageWrapper from '@/shared/components/workspace/ToolPageWrapper';
@@ -15,6 +14,7 @@ import useImageCompression from './useImageCompression';
 
 /** @constant {number} DEFAULT_QUALITY - Default JPEG quality value used for compression. */
 const DEFAULT_QUALITY = 0.6;
+const COMPRESS_MAX_SIZE_MB = 15;
 
 /**
  * Page component for compressing image files entirely on the client side.
@@ -94,8 +94,8 @@ export default function CompressImage() {
                 inputId="compress-file-input"
                 inputRef={fileInputRef}
                 onChange={onFileChange}
-                helperText={`Any format up to ${AppConfig.COMPRESS_MAX_SIZE_MB}MB`}
-                maxSizeMB={AppConfig.COMPRESS_MAX_SIZE_MB}
+                helperText={`Any format up to ${COMPRESS_MAX_SIZE_MB}MB`}
+                maxSizeMB={COMPRESS_MAX_SIZE_MB}
                 hasActiveFile={Boolean(file)}
               />
               <WorkspaceFileSummary file={file} />

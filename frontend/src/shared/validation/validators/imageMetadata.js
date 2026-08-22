@@ -7,7 +7,7 @@
  * same file.
  */
 
-import { FILE_VALIDATION_CONFIG } from '@/config';
+import { FILE_VALIDATION_CONFIG } from '@/shared/config/imageValidation';
 import { ERROR_MESSAGES, invalidResult } from './errorMessages';
 
 export const IMAGE_LOAD_TIMEOUT_MS = FILE_VALIDATION_CONFIG.IMAGE_LOAD_TIMEOUT_MS;

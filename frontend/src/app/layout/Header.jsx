@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { IMAGES as img } from '@/config';
+import logoFullBlack from '@/assets/PixelForgeAI_Black.png';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
@@ -53,7 +53,7 @@ export default function Header({
       <Link to="/" className="group mb-5 relative">
         <div className="absolute inset-0 bg-white/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-700"></div>
         <img
-          src={img.darkLogo}
+          src={logoFullBlack}
           alt="Pixel Forge"
           className="relative h-10 sm:h-12 w-auto object-contain transform transition-transform duration-500 group-hover:-translate-y-1 group-hover:scale-105"
         />

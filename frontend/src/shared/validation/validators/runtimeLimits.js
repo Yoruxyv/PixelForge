@@ -12,16 +12,14 @@
  */
 
 import {
-  AppConfig as config,
-  STORAGE_KEYS,
+  FILE_LIMITS,
   FILE_VALIDATION_CONFIG,
-} from '@/config';
+} from '@/shared/config/imageValidation';
 import { apiClient } from '@/shared/api/apiClient';
 
 export const RUNTIME_LIMIT_CACHE_MS =
   FILE_VALIDATION_CONFIG.RUNTIME_LIMIT_CACHE_MS;
-export const RUNTIME_LIMIT_STORAGE_KEY =
-  STORAGE_KEYS?.RUNTIME_LIMITS || 'pf_runtime_limits';
+export const RUNTIME_LIMIT_STORAGE_KEY = 'pf_runtime_limits';
 
 /**
  * Return conservative frontend fallback limits.
@@ -34,14 +32,14 @@ export const RUNTIME_LIMIT_STORAGE_KEY =
  */
 export const getFallbackLimits = () => ({
   upload: {
-    max_file_size_mb: config.MAX_FILE_SIZE_MB,
-    max_file_size_bytes: config.MAX_FILE_SIZE_MB * 1024 * 1024,
-    max_megapixels: config.MAX_MEGAPIXELS,
-    max_pixels: config.MAX_PIXELS,
-    allowed_extensions: config.ALLOWED_EXTENSIONS,
+    max_file_size_mb: FILE_LIMITS.MAX_FILE_SIZE_MB,
+    max_file_size_bytes: FILE_LIMITS.MAX_FILE_SIZE_MB * 1024 * 1024,
+    max_megapixels: FILE_LIMITS.MAX_MEGAPIXELS,
+    max_pixels: FILE_LIMITS.MAX_PIXELS,
+    allowed_extensions: FILE_LIMITS.ALLOWED_EXTENSIONS,
   },
   result: {
-    max_result_file_size_mb: config.MAX_RESULT_FILE_SIZE_MB,
+    max_result_file_size_mb: FILE_LIMITS.MAX_RESULT_FILE_SIZE_MB,
   },
 });
 

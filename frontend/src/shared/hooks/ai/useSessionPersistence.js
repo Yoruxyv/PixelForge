@@ -8,7 +8,7 @@
 import { useEffect, useRef } from 'react';
 import { loadFileFromIDB } from '@/shared/storage/idb';
 import { clearAppSession } from '@/shared/storage/session';
-import { AppConfig as config } from '@/config';
+import { SESSION_EXPIRATION } from '@/shared/config/session';
 import { isExpired } from '@/shared/lib/time';
 
 /**
@@ -67,7 +67,7 @@ export function useSessionPersistence({
         if (
           !savedResult &&
           uploadTimestamp &&
-          isExpired(uploadTimestamp, config.UPLOAD_DRAFT_EXPIRATION_TIME)
+          isExpired(uploadTimestamp, SESSION_EXPIRATION.UPLOAD_DRAFT_MS)
         ) {
           await clearAppSession(feature);
           resetState();
@@ -84,7 +84,7 @@ export function useSessionPersistence({
         if (
           savedResult &&
           savedTimestamp &&
-          isExpired(savedTimestamp, config.RESULT_EXPIRATION_TIME)
+          isExpired(savedTimestamp, SESSION_EXPIRATION.RESULT_MS)
         ) {
           await clearAppSession(feature);
           setSelectedFile(null);
@@ -171,7 +171,7 @@ export function useSessionPersistence({
 
         if (
           uploadTimestamp &&
-          isExpired(uploadTimestamp, config.UPLOAD_DRAFT_EXPIRATION_TIME)
+          isExpired(uploadTimestamp, SESSION_EXPIRATION.UPLOAD_DRAFT_MS)
         ) {
           await clearAppSession(feature, previewUrl);
           setSelectedFile(null);

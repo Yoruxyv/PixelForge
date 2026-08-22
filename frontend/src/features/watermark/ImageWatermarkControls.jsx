@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import UploadCard from '@/shared/components/upload/UploadCard';
-import { AppConfig } from '@/config';
+import { FILE_LIMITS } from '@/shared/config/imageValidation';
 
 /**
  * Control inputs specifically for adjusting image logo watermarks (scale and opacity).
@@ -25,7 +25,7 @@ export default function ImageWatermarkControls({
         onChange={handleWatermarkImageUpload}
         helperText="Upload logo image (.png, .jpg, .webp)"
         accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-        maxSizeMB={AppConfig.MAX_FILE_SIZE_MB}
+        maxSizeMB={FILE_LIMITS.MAX_FILE_SIZE_MB}
         heightClass="h-28"
         hasActiveFile={Boolean(imgWm.url)}
       />

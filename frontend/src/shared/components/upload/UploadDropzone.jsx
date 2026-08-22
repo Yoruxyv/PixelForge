@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
-import { AppConfig as config } from '@/config';
+import { FILE_LIMITS } from '@/shared/config/imageValidation';
 import { useFileUpload } from '@/shared/hooks/useFileUpload';
 import { AcceptableImageMimeTypes } from '@/shared/lib/fileUtils';
 
-const AllowedFormatsText = config.ALLOWED_EXTENSIONS.map((e) =>
+const AllowedFormatsText = FILE_LIMITS.ALLOWED_EXTENSIONS.map((e) =>
   e.toUpperCase(),
 ).join(', ');
 
@@ -103,7 +103,7 @@ export default function UploadDropzone({
                 Upload an image by clicking, dragging, or pasting
               </p>
               <p className="text-sm mt-1.5 text-slate-600 font-medium">
-                Max {config.MAX_FILE_SIZE_MB}MB
+                Max {FILE_LIMITS.MAX_FILE_SIZE_MB}MB
               </p>
             </>
           )}

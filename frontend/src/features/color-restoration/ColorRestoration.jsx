@@ -66,6 +66,7 @@ export default function ColorRestoration() {
       setAppAlert={setAppAlert}
       featureName="colorrestore"
       featureText="color restorations"
+      resultLabel="Color Restored"
       marketingProps={marketingProps}
       onFileSelect={handleFileSelect}
       onCancel={handleCancel}

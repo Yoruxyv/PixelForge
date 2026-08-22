@@ -6,7 +6,7 @@
  * already contain enough color to be considered colorized.
  */
 
-import { FILE_VALIDATION_CONFIG } from '@/config';
+import { FILE_VALIDATION_CONFIG } from '@/shared/config/imageValidation';
 import { ERROR_MESSAGES, invalidResult } from './errorMessages';
 
 export const GRAYSCALE_SAMPLE_SIZE =

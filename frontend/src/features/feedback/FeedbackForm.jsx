@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { Turnstile } from '@marsidev/react-turnstile';
-import { AppConfig } from '@/config';
+import { DAY_MS } from '@/shared/lib/time';
 import { submitFeedback } from './feedbackService';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@.]+\.[^\s@.]+$/;
@@ -39,7 +39,7 @@ export default function FeedbackForm() {
     if (!limitHitTime) return false;
 
     const timePassed = Date.now() - parseInt(limitHitTime, 10);
-    if (timePassed < AppConfig.DAY_MS) {
+    if (timePassed < DAY_MS) {
       return true; // Still locked out
     } else {
       localStorage.removeItem(FEEDBACK_LIMIT_KEY); // Lock expired
