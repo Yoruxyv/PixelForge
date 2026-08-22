@@ -17,19 +17,19 @@ import React from 'react';
 const smartEditRoutes = [
   {
     path: '/image-editor',
-    component: React.lazy(() => import('../../features/image-editor/ImageEditor')),
+    component: React.lazy(() => import('@/features/image-editor/ImageEditor')),
   },
   {
     path: '/resize-image',
-    component: React.lazy(() => import('../../features/resize/ResizeImage')),
+    component: React.lazy(() => import('@/features/resize/ResizeImage')),
   },
   {
     path: '/crop-image',
-    component: React.lazy(() => import('../../features/crop/CropImage')),
+    component: React.lazy(() => import('@/features/crop/CropImage')),
   },
   {
     path: '/rotate-flip',
-    component: React.lazy(() => import('../../features/rotate-flip/RotateFlip')),
+    component: React.lazy(() => import('@/features/rotate-flip/RotateFlip')),
   },
 ];
 
