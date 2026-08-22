@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./shared/styles/design-system.css";
 
 .crop-workspace-scope .custom-scroll::-webkit-scrollbar {
   width: 8px;

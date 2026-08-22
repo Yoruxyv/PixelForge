@@ -198,6 +198,7 @@ consumers:
 - `hooks/`: shared upload, object URL, workspace, and AI lifecycle state;
 - `lib/`: product-neutral file, image, and time helpers;
 - `storage/`: IndexedDB and feature-scoped session persistence;
+- `styles/`: application-wide design tokens and accessibility baselines;
 - `validation/`: browser upload validation and backend-runtime-limit fallback.
 
 Code may enter `shared` only when current consumers prove that its responsibility
@@ -917,6 +918,7 @@ Developer docs:
 docs/
 ├── ARCHITECTURE.md
 ├── ADDING_AI_FEATURE.md
+├── FRONTEND_DESIGN_SYSTEM.md
 ├── TESTING.md
 ├── assets/
 │   ├── TECH_STACKS.png

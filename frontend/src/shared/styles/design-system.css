@@ -1,0 +1,136 @@
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+
+  --text-pf-display: clamp(2.5rem, 5vw, 4.75rem);
+  --text-pf-display--line-height: 1.02;
+  --text-pf-title: clamp(2rem, 3vw, 3.25rem);
+  --text-pf-title--line-height: 1.08;
+  --text-pf-heading: 1.5rem;
+  --text-pf-heading--line-height: 1.2;
+  --text-pf-body: 1rem;
+  --text-pf-body--line-height: 1.6;
+  --text-pf-small: 0.875rem;
+  --text-pf-small--line-height: 1.5;
+  --text-pf-label: 0.75rem;
+  --text-pf-label--line-height: 1.35;
+
+  --color-pf-canvas: #f4f5f7;
+  --color-pf-surface: #ffffff;
+  --color-pf-surface-subtle: #eceff3;
+  --color-pf-surface-strong: #dfe4eb;
+  --color-pf-surface-inverse: #1b2230;
+  --color-pf-ink: #1b2230;
+  --color-pf-ink-muted: #5d6778;
+  --color-pf-ink-subtle: #7b8595;
+  --color-pf-line: #d6dce5;
+  --color-pf-line-strong: #b9c2cf;
+  --color-pf-accent: #5658b9;
+  --color-pf-accent-hover: #46489f;
+  --color-pf-accent-soft: #ececfa;
+  --color-pf-focus: #3f67cf;
+  --color-pf-success: #247056;
+  --color-pf-success-soft: #e7f3ed;
+  --color-pf-warning: #93630e;
+  --color-pf-warning-soft: #fbf1d8;
+  --color-pf-danger: #ae3f4c;
+  --color-pf-danger-soft: #fae9eb;
+
+  --spacing-pf-gutter: clamp(1rem, 3vw, 2rem);
+  --spacing-pf-section: clamp(3rem, 7vw, 6rem);
+  --spacing-pf-panel: clamp(1rem, 2.5vw, 2rem);
+
+  --radius-pf-control: 0.5rem;
+  --radius-pf-card: 0.75rem;
+  --radius-pf-panel: 1rem;
+  --radius-pf-shell: 1.25rem;
+
+  --shadow-pf-card: 0 1px 2px rgb(27 34 48 / 0.08), 0 8px 24px rgb(49 58 75 / 0.07);
+  --shadow-pf-panel: 0 18px 50px rgb(49 58 75 / 0.12);
+  --shadow-pf-float: 0 24px 70px rgb(32 39 54 / 0.18);
+
+  --ease-pf-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-pf-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --container-pf-prose: 42rem;
+  --container-pf-content: 72rem;
+  --container-pf-workspace: 90rem;
+}
+
+:root {
+  color-scheme: light;
+  --pf-duration-instant: 80ms;
+  --pf-duration-fast: 160ms;
+  --pf-duration-standard: 240ms;
+  --pf-duration-slow: 360ms;
+  --pf-z-base: 0;
+  --pf-z-sticky: 20;
+  --pf-z-popover: 40;
+  --pf-z-overlay: 60;
+  --pf-z-toast: 80;
+}
+
+@layer base {
+  html {
+    min-width: 20rem;
+    min-height: 100%;
+    background: var(--color-pf-canvas);
+    color: var(--color-pf-ink);
+    font-family: var(--font-sans);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  body,
+  #root {
+    min-height: 100dvh;
+  }
+
+  body {
+    margin: 0;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible:not([data-focus-ring="none"]) {
+    outline: 3px solid color-mix(in srgb, var(--color-pf-focus) 72%, white) !important;
+    outline-offset: 3px !important;
+  }
+
+  ::selection {
+    background: var(--color-pf-accent-soft);
+    color: var(--color-pf-ink);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

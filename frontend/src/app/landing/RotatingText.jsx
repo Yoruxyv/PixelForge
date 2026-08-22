@@ -19,7 +19,7 @@ const RotatingText = React.memo(() => {
   }, [words.length]);
 
   return (
-    <span className="inline-grid place-items-center min-w-[11ch] leading-[1.2] align-middle">
+    <span className="inline-grid place-items-center leading-[1.2] align-middle">
       <AnimatePresence mode="wait" initial={false}>
         <motion.span
           key={index}
