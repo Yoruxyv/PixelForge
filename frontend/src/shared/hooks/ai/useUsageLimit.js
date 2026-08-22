@@ -116,24 +116,11 @@ export function useUsageLimit(feature = 'upscale') {
     let active = true;
     const cached = readUsageLimitCache(feature);
 
-    setUsesRemaining(cached?.usesRemaining ?? maxLimit);
-    setResetTimestamp(cached?.resetTimestamp ?? null);
-
-    if (!apiUrl) {
-      setIsLoading(false);
+    if (!apiUrl || isUsageLimitCacheFresh(cached)) {
       return () => {
         active = false;
       };
     }
-
-    if (isUsageLimitCacheFresh(cached)) {
-      setIsLoading(false);
-      return () => {
-        active = false;
-      };
-    }
-
-    setIsLoading(!cached);
 
     requestUsageSnapshot(feature, maxLimit)
       .then((snapshot) => {
