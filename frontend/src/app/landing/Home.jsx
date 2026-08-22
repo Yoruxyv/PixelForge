@@ -1,206 +1,126 @@
-import { useState, useMemo } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { NavLinks } from '../navigation/navConfig';
+import FeatureShowcase from './FeatureShowcase';
 
-import AmbientBackground from './AmbientBackground';
-import RotatingText from './RotatingText';
-import TiltCard from './TiltCard';
-import CardIcon from './CardIcon';
-import BeforeAfterSlider from './BeforeAfterSlider';
-
-const SHOWCASES = {
-  upscale: {
-    label: 'AI Upscaler',
-    before: '/demo/upscale_before.jpg',
-    after: '/demo/upscale_after.png',
+const FEATURED_TOOLS = {
+  AI: {
+    id: 'upscale',
+    image: '/demo/upscale_after.png',
+    meta: 'AI enlargement / 4× output',
+    imageClassName: 'object-contain p-8 sm:p-12',
+    frameClassName: 'aspect-[4/3] bg-pf-editorial-raised lg:col-span-7',
+    copyClassName: 'lg:col-span-5',
   },
-  rembg: {
-    label: 'Background Remover',
-    before: '/demo/rem_bg_before.jpg',
-    after: '/demo/rem_bg_after.png',
+  Edit: {
+    id: 'editor',
+    image: '/demo/res_color_after.png',
+    meta: 'Direct adjustments / live preview',
+    frameClassName: 'aspect-[16/10] lg:order-2 lg:col-span-8',
+    copyClassName: 'lg:col-span-4',
   },
-  color: {
-    label: 'Color Restorer',
-    before: '/demo/res_color_before.jpg',
-    after: '/demo/res_color_after.png',
+  Optimize: {
+    id: 'compress',
+    image: '/demo/rem_bg_before.jpg',
+    meta: 'Output control / smaller files',
+    frameClassName: 'aspect-[3/2] lg:col-span-7',
+    copyClassName: 'lg:col-span-5',
   },
-  objectremove: {
-    label: 'Object Remover',
-    before: '/demo/object_remove_before.png',
-    after: '/demo/object_remove_after.png',
+  Utilities: {
+    id: 'palette',
+    image: '/demo/object_remove_after.png',
+    meta: 'Image analysis / extracted color',
+    frameClassName: 'aspect-square sm:aspect-[4/3] lg:order-2 lg:col-span-6',
+    copyClassName: 'lg:col-span-6',
   },
 };
 
-/**
- * Main landing page component displaying image tools, showcases, and navigation categories.
- *
- * @returns {JSX.Element} Home hub interface.
- */
+/** Editorial, image-led entry point for the PixelForge workstation. */
 export default function HomeHub() {
-  const categoryKeys = useMemo(() => Object.keys(NavLinks), []);
-  const [activeTab, setActiveTab] = useState(categoryKeys[0]);
-  const currentCategory = NavLinks[activeTab];
-  const shouldReduceMotion = useReducedMotion();
-
-  const showcases = SHOWCASES;
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: shouldReduceMotion ? 0 : 0.06 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 14 },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: shouldReduceMotion
-        ? { duration: 0.18 }
-        : { type: 'spring', stiffness: 260, damping: 24 },
-    },
-  };
+  const categories = Object.values(NavLinks);
 
   return (
-    <div className="min-h-screen flex flex-col w-full relative overflow-hidden selection:bg-indigo-100 selection:text-indigo-900">
-      <AmbientBackground />
-
-      <main className="grow max-w-4xl mx-auto w-full px-4 sm:px-6 pt-14 sm:pt-16 pb-20 sm:pb-24">
-        <div className="text-center mb-10 sm:mb-12 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/50 backdrop-blur-md border border-white/60 text-slate-700 text-xs font-bold mb-6 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-            <span>The Open-Source Image Studio</span>
-          </div>
-
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-4 flex flex-wrap items-center justify-center gap-x-1 sm:gap-x-2 gap-y-1 leading-[1.15]">
-            <span>What would you like to</span>
-            <RotatingText />
-          </h1>
-
-          <p className="text-slate-600 font-medium max-w-lg mx-auto text-sm sm:text-base">
-            Select a toolkit below to enhance, edit, and optimize your images
-            with zero compression loss.
-          </p>
+    <div className="w-full flex-1 bg-pf-editorial-base text-pf-editorial-ink">
+      <section className="mx-auto max-w-pf-workspace px-pf-gutter pb-16 pt-6 sm:pb-20 lg:pb-24">
+        <div className="flex items-center justify-between border-b border-pf-editorial-line pb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-pf-editorial-muted sm:text-xs">
+          <span>PixelForge / Image workstation</span>
+          <span>Open source / 2026</span>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="w-full max-w-5xl mx-auto mb-16 relative z-10"
-        >
-          <div className="flex md:flex-wrap md:justify-center gap-4 sm:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory px-4 md:px-0 pb-4 md:pb-0 hide-scrollbar [scrollbar-width:none] [-ms-overflow-style:none]">
-            {' '}
-            {Object.entries(showcases).map(([key, data]) => (
-              <div
-                key={key}
-                className="min-w-[85%] sm:min-w-[60%] md:min-w-0 md:basis-[calc((100%-3rem)/3)] md:max-w-76 snap-center flex flex-col items-center"
-              >
-                <div className="mb-3 px-3 py-1 rounded-full bg-white/60 backdrop-blur border border-white shadow-sm flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
-                  <span className="text-xs font-bold text-slate-700">
-                    {data.label}
+        <div className="grid gap-14 pt-12 lg:grid-cols-12 lg:items-center lg:gap-8 lg:pt-16">
+          <div className="lg:col-span-4 xl:col-span-5">
+            <p className="mb-5 text-xs font-bold uppercase tracking-[0.2em] text-pf-editorial-accent">Creative image processing / 01—04</p>
+            <h1 className="max-w-3xl text-[clamp(3.5rem,6.4vw,6.75rem)] font-black leading-[0.86] tracking-[-0.065em] text-pf-editorial-ink">
+              Images,<br />forged with<br /><span className="text-pf-editorial-muted">intent.</span>
+            </h1>
+            <p className="mt-8 max-w-md text-base leading-7 text-pf-editorial-muted sm:text-lg sm:leading-8">
+              Edit, enhance, inspect, and export in a focused workstation that keeps the image—not the interface—at the center.
+            </p>
+            <Link to="/image-editor" className="mt-8 inline-flex w-fit items-center gap-3 border-b border-pf-editorial-accent pb-1 text-sm font-bold text-pf-editorial-ink transition-colors hover:text-pf-editorial-accent">
+              Enter the image editor <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+
+          <div className="lg:col-span-8 xl:col-span-7">
+            <FeatureShowcase />
+          </div>
+        </div>
+      </section>
+
+      <section id="tools" className="border-y border-pf-editorial-line bg-pf-editorial-surface py-16 sm:py-20">
+        <div className="mx-auto max-w-pf-workspace px-pf-gutter">
+          <div className="mb-10 grid gap-5 border-b border-pf-editorial-line pb-6 sm:grid-cols-2 sm:items-end">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-pf-editorial-accent">Tool library / Four categories</p>
+              <h2 className="mt-3 text-pf-title font-black tracking-[-0.04em] text-pf-editorial-ink">See the result,<br />not the promise.</h2>
+            </div>
+            <p className="max-w-md text-sm leading-6 text-pf-editorial-muted sm:justify-self-end">Start with a featured workflow or move directly to a supporting tool. No project setup required.</p>
+          </div>
+
+          {categories.map((category, categoryIndex) => {
+            const feature = FEATURED_TOOLS[category.title];
+            const featuredItem = category.items.find((item) => item.id === feature.id);
+            const supportingItems = category.items.filter((item) => item.id !== feature.id);
+            const textOrder = categoryIndex % 2 === 0 ? 'lg:order-2' : '';
+
+            return (
+              <section key={category.title} className="grid gap-8 border-t border-pf-editorial-line py-12 first:border-t-0 first:pt-2 lg:grid-cols-12 lg:items-center lg:gap-12" aria-labelledby={`tools-${categoryIndex}`}>
+                <Link to={featuredItem.to} className={`group relative overflow-hidden bg-pf-editorial-raised ${feature.frameClassName}`}>
+                  <img src={feature.image} alt={`${featuredItem.label} workflow preview`} loading="lazy" className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.015] ${feature.imageClassName || ''}`} />
+                  <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 bg-gradient-to-t from-black/80 via-black/30 to-transparent px-5 pb-5 pt-20 text-white">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/75">{feature.meta}</span>
+                    <span className="text-lg transition-transform group-hover:translate-x-1" aria-hidden="true">↗</span>
                   </span>
-                </div>
+                </Link>
 
-                <div className="w-full p-1.5 bg-white/40 backdrop-blur-md border border-white/60 rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-                  <BeforeAfterSlider
-                    beforeImage={data.before}
-                    afterImage={data.after}
-                    altText={`${data.label} comparison`}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+                <div className={`${textOrder} ${feature.copyClassName}`}>
+                  <div className="flex items-baseline gap-4">
+                    <span className="font-mono text-xs text-pf-editorial-accent">0{categoryIndex + 1}</span>
+                    <h3 id={`tools-${categoryIndex}`} className="text-sm font-bold uppercase tracking-[0.18em] text-pf-editorial-muted">{category.title}</h3>
+                  </div>
+                  <h4 className="mt-5 text-3xl font-black tracking-[-0.035em] text-pf-editorial-ink sm:text-4xl">{featuredItem.label}</h4>
+                  <p className="mt-3 max-w-md text-base leading-7 text-pf-editorial-muted">{featuredItem.desc}</p>
+                  <Link to={featuredItem.to} className="mt-6 inline-flex items-center gap-3 border-b border-pf-editorial-accent pb-1 text-sm font-bold text-pf-editorial-ink transition-colors hover:text-pf-editorial-accent">
+                    Open workflow <span aria-hidden="true">→</span>
+                  </Link>
 
-        <div className="flex justify-center mb-8 sm:mb-10 relative z-10">
-          <div className="flex items-center p-1.5 bg-white/70 md:bg-white/40 md:backdrop-blur-xl border border-white/60 rounded-full shadow-sm overflow-x-auto max-w-full hide-scrollbar">
-            {categoryKeys.map((key) => {
-              const isActive = activeTab === key;
-
-              return (
-                <button
-                  key={key}
-                  onClick={() => setActiveTab(key)}
-                  className={`relative px-5 sm:px-6 py-2.5 rounded-full text-sm font-bold transition-colors duration-300 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
-                    isActive
-                      ? 'text-indigo-600'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeTabIndicator"
-                      className="absolute inset-0 bg-white rounded-full shadow-sm border border-slate-100"
-                      transition={{
-                        type: 'spring',
-                        bounce: 0.2,
-                        duration: 0.5,
-                      }}
-                    />
-                  )}
-                  <span className="relative z-10">{NavLinks[key].title}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            variants={containerVariants}
-            initial="hidden"
-            animate="show"
-            exit={{
-              opacity: 0,
-              y: shouldReduceMotion ? 0 : -8,
-              transition: { duration: 0.18 },
-            }}
-            className="flex flex-col gap-4 relative z-10"
-          >
-            {currentCategory.items.map((item) => (
-              <TiltCard key={item.id} to={item.to} itemVariants={itemVariants}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 sm:gap-6">
-                    <CardIcon d={item.icon} isAi={item.isAi} />
-
-                    <div className="flex flex-col text-left">
-                      <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                        {item.label}
-                      </h3>
-
-                      <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed max-w-md mt-0.5 sm:mt-0">
-                        {item.desc}
-                      </p>
+                  {supportingItems.length > 0 && (
+                    <div className="mt-8 border-t border-pf-editorial-line pt-4">
+                      <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.14em] text-pf-editorial-muted">Also in {category.title}</p>
+                      <div className="flex flex-wrap gap-x-5 gap-y-3">
+                        {supportingItems.map((item) => (
+                          <Link key={item.id} to={item.to} className="text-sm font-semibold text-pf-editorial-muted transition-colors hover:text-pf-editorial-accent">
+                            {item.label} <span aria-hidden="true">↗</span>
+                          </Link>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-50 group-hover:bg-indigo-50 text-slate-400 group-hover:text-indigo-500 transition-colors shrink-0">
-                    <svg
-                      className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2.5}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </div>
+                  )}
                 </div>
-              </TiltCard>
-            ))}
-          </motion.div>
-        </AnimatePresence>
-      </main>
+              </section>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 }
