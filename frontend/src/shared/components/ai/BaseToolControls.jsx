@@ -65,7 +65,7 @@ export default function BaseToolControls({
       </div>
 
       {(isProcessing || isWaitingForToken) && (
-        <div className="w-full flex flex-col items-center justify-center">
+        <div className="flex w-full flex-col justify-center">
           <ProgressBar
             progress={progress}
             customText={
@@ -76,20 +76,22 @@ export default function BaseToolControls({
       )}
 
       {!isProcessing && !resultUrl && (
-        <div className="flex flex-col items-center justify-center gap-4 w-full">
+        <div className="flex w-full flex-col gap-4">
           {!isWaitingForToken &&
             (children || (
-              <div className="flex gap-2 w-full">
+              <div className="flex w-full flex-col-reverse gap-2 sm:flex-row">
                 <button
+                  type="button"
                   onClick={handleCancel}
-                  className="px-4 py-2.5 text-sm font-bold text-slate-600 hover:text-slate-900 hover:bg-white rounded-xl transition-all border border-transparent hover:border-slate-200"
+                  className="border border-pf-editorial-line px-4 py-3 text-sm font-bold text-pf-editorial-muted transition-colors hover:border-pf-editorial-muted hover:text-pf-editorial-ink"
                 >
-                  Cancel
+                  Reset
                 </button>
                 <button
+                  type="button"
                   onClick={handleProcess}
                   disabled={!!jobId}
-                  className="flex-1 flex items-center justify-center px-4 py-2.5 text-sm font-bold text-white bg-slate-900 rounded-xl hover:bg-slate-800 shadow-md hover:shadow-lg transition-all"
+                  className="flex flex-1 items-center justify-center bg-pf-editorial-ink px-4 py-3 text-sm font-bold text-pf-editorial-base transition-colors hover:bg-pf-editorial-accent disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {submitText}
                 </button>

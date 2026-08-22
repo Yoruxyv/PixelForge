@@ -27,39 +27,53 @@ export default function ScaleSelector({
   };
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-3 w-full sm:w-auto">
-      <div className="flex items-center bg-white rounded-lg p-1 shadow-sm border border-slate-200">
-        {[1, 2, 3, 4].map((mult) => (
-          <button
-            key={mult}
-            onClick={() => setScale(mult)}
-            disabled={isSubmitDisabled}
-            className={`px-3 py-1.5 text-sm font-bold rounded-md transition-colors ${
-              scale === mult
-                ? 'bg-slate-900 text-white'
-                : 'text-slate-600 hover:bg-slate-100'
-            } disabled:opacity-50`}
-          >
-            {mult}x
-          </button>
-        ))}
+    <div className="w-full space-y-5">
+      <div>
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-pf-editorial-muted">
+            Output scale
+          </span>
+          <span className="font-mono text-xs text-pf-editorial-accent">{scale}×</span>
+        </div>
+        <div className="grid grid-cols-4 border border-pf-editorial-line">
+          {[1, 2, 3, 4].map((mult) => (
+            <button
+              type="button"
+              key={mult}
+              onClick={() => setScale(mult)}
+              disabled={isSubmitDisabled}
+              aria-pressed={scale === mult}
+              className={`border-r border-pf-editorial-line px-2 py-2.5 text-sm font-bold transition-colors last:border-r-0 ${
+                scale === mult
+                  ? 'bg-pf-editorial-accent-soft text-pf-editorial-ink'
+                  : 'text-pf-editorial-muted hover:bg-pf-editorial-raised hover:text-pf-editorial-ink'
+              } disabled:opacity-50`}
+            >
+              {mult}x
+            </button>
+          ))}
+        </div>
       </div>
 
-      <button
-        onClick={handleCancel}
-        disabled={isProcessing}
-        className="px-5 py-2.5 text-sm font-bold text-slate-700 hover:text-slate-900 hover:bg-white/50 rounded-lg transition-colors disabled:opacity-50"
-      >
-        Cancel
-      </button>
+      <div className="flex flex-col-reverse gap-2 sm:flex-row">
+        <button
+          type="button"
+          onClick={handleCancel}
+          disabled={isProcessing}
+          className="border border-pf-editorial-line px-4 py-3 text-sm font-bold text-pf-editorial-muted transition-colors hover:border-pf-editorial-muted hover:text-pf-editorial-ink disabled:opacity-50"
+        >
+          Reset
+        </button>
 
-      <button
-        onClick={handleUpscale}
-        disabled={isSubmitDisabled}
-        className="flex items-center justify-center min-w-38.75 px-6 py-2.5 text-sm font-bold text-white bg-slate-900 rounded-lg hover:bg-slate-800 shadow-md disabled:opacity-70 disabled:cursor-not-allowed transition-all"
-      >
-        {renderButtonContent()}
-      </button>
+        <button
+          type="button"
+          onClick={handleUpscale}
+          disabled={isSubmitDisabled}
+          className="flex flex-1 items-center justify-center bg-pf-editorial-ink px-4 py-3 text-sm font-bold text-pf-editorial-base transition-colors hover:bg-pf-editorial-accent disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {renderButtonContent()}
+        </button>
+      </div>
     </div>
   );
 }

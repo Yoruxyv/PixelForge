@@ -1,22 +1,27 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import WorkspaceLayout from '@/shared/components/workspace/WorkspaceLayout';
 import UploadDropzone from '@/shared/components/upload/UploadDropzone';
-import ResultViewer from './ResultViewer';
-import WorkspaceModals from './WorkspaceModals';
-import WorkspaceLimitCard from './WorkspaceLimitCard';
-import WorkspaceMarketing from './WorkspaceMarketing';
-import StagedFileCard from './StagedFileCard';
-import ResultActions from './ResultActions';
 import { FILE_LIMITS } from '@/shared/config/imageValidation';
+import ResultActions from './ResultActions';
+import ResultViewer from './ResultViewer';
+import StagedFileCard from './StagedFileCard';
+import WorkspaceLimitCard from './WorkspaceLimitCard';
+import WorkspaceModals from './WorkspaceModals';
 
-/**
- * Reusable AI feature workspace shell for upload, processing, preview, and result actions.
- */
+const getStateLabel = ({ resultUrl, isProcessing, isWaitingForToken, selectedFile }) => {
+  if (resultUrl) return 'Result ready';
+  if (isProcessing) return 'Processing';
+  if (isWaitingForToken) return 'Verifying request';
+  if (selectedFile) return 'Ready to process';
+  return 'Awaiting image';
+};
+
+/** Image-first shell shared by PixelForge's backend AI workflows. */
 export default function AiFeatureWorkspace({
   selectedFile,
   previewUrl,
   isProcessing,
+  isWaitingForToken = false,
   resultUrl,
   jobId,
   usesRemaining,
@@ -28,162 +33,147 @@ export default function AiFeatureWorkspace({
   featureName,
   featureText,
   resultLabel = 'Processed',
-  sessionImageLabel = 'transparent',
-  marketingProps,
+  sessionImageLabel = 'processed',
   onFileSelect,
   onCancel,
   leftControls,
   supportsList = FILE_LIMITS.ALLOWED_EXTENSIONS,
   downloadPrefix = 'Result-',
-  emptyState = null,
-  rightPanelClassName = 'flex-1 min-h-105 relative rounded-2xl border border-white/50 bg-white/30 flex items-center justify-center overflow-hidden shadow-inner isolate',
-  previewImageClassName = '',
-  resultContainerClassName = 'w-full h-full rounded-2xl overflow-hidden',
   requireGrayscale = false,
   previewOverride = null,
+  canvasClassName = '',
 }) {
-  const [isResultLoaded, setIsResultLoaded] = useState(false);
+  const [loadedResultUrl, setLoadedResultUrl] = useState(null);
 
-  const showLimitCard =
-    !selectedFile &&
-    !isProcessing &&
-    !jobId &&
-    !isLoading &&
-    usesRemaining <= 0;
-  const showLoadingCard = !selectedFile && !isProcessing && !jobId && isLoading;
+  const showLimit =
+    !selectedFile && !isProcessing && !jobId && !isLoading && usesRemaining <= 0;
+  const showLoading = !selectedFile && !isProcessing && !jobId && isLoading;
+  const stateLabel = getStateLabel({
+    resultUrl,
+    isProcessing,
+    isWaitingForToken,
+    selectedFile,
+  });
+  const isResultLoaded = loadedResultUrl === resultUrl;
 
-  let rightPanelContent = null;
+  let canvasContent;
 
-  if (selectedFile) {
-    if (resultUrl) {
-      rightPanelContent = (
-        <div className={resultContainerClassName}>
-          <ResultViewer
-            originalImage={previewUrl}
-            processedImage={resultUrl}
-            onImageLoad={() => setIsResultLoaded(true)}
-            resultLabel={resultLabel}
-          />
-        </div>
-      );
-    } else {
-      rightPanelContent = previewOverride || (
-        <img
-          src={previewUrl}
-          alt="Upload preview"
-          className={previewImageClassName}
-        />
-      );
-    }
+  if (resultUrl) {
+    canvasContent = (
+      <ResultViewer
+        originalImage={previewUrl}
+        processedImage={resultUrl}
+        onImageLoad={() => setLoadedResultUrl(resultUrl)}
+        resultLabel={resultLabel}
+        canvasClassName={canvasClassName}
+      />
+    );
+  } else if (selectedFile) {
+    canvasContent = previewOverride || (
+      <img
+        src={previewUrl}
+        alt="Upload preview"
+        className={`max-h-[68vh] max-w-full object-contain transition-opacity duration-300 ${
+          isProcessing ? 'opacity-60' : 'opacity-100'
+        }`}
+      />
+    );
   } else {
-    rightPanelContent = emptyState || (
-      <div className="text-center px-4">
-        <div className="w-16 h-16 rounded-full bg-white/50 flex items-center justify-center mx-auto mb-3 shadow-sm border border-white">
-          <svg
-            className="w-8 h-8 text-slate-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
-        </div>
-        <p className="text-sm font-medium text-slate-400">Workspace is empty</p>
-      </div>
+    canvasContent = (
+      <UploadDropzone
+        onFileSelect={onFileSelect}
+        requireGrayscale={requireGrayscale}
+        variant="editorial"
+      />
     );
   }
 
   return (
-    <div className="w-full">
-      <section className="flex-1 w-full max-w-6xl mx-auto px-4 pt-6 pb-16">
-        {showLoadingCard || showLimitCard ? (
+    <div className="w-full flex-1">
+      <section className="mx-auto w-full max-w-pf-workspace px-pf-gutter pb-20 pt-6">
+        {showLoading || showLimit ? (
           <WorkspaceLimitCard
-            showLoading={showLoadingCard}
-            showLimit={showLimitCard}
+            showLoading={showLoading}
+            showLimit={showLimit}
             maxLimit={maxLimit}
             resetTimestamp={resetTimestamp}
             featureText={featureText}
           />
         ) : (
-          <WorkspaceLayout
-            leftPanel={
-              <div className="flex flex-col h-full min-h-72">
-                <div className="flex items-center gap-2 mb-5">
-                  <span className="px-2.5 py-1 rounded-md bg-indigo-100 text-indigo-700 text-[10px] font-black tracking-wider uppercase border border-indigo-200 shadow-sm">
-                    AI Powered
-                  </span>
-                </div>
+          <div className="overflow-hidden border border-pf-editorial-line bg-pf-editorial-surface">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-pf-editorial-line px-4 py-3 sm:px-6">
+              <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.18em] text-pf-editorial-muted sm:text-xs">
+                <span className="text-pf-editorial-accent">AI workflow</span>
+                <span aria-hidden="true">/</span>
+                <span>{stateLabel}</span>
+              </div>
+              <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-pf-editorial-muted">
+                {usesRemaining} of {maxLimit} uses available
+              </span>
+            </div>
 
+            <div className="grid min-h-[34rem] lg:grid-cols-[22rem_minmax(0,1fr)]">
+              <aside className="order-2 flex flex-col border-t border-pf-editorial-line bg-pf-editorial-base p-5 lg:order-1 lg:border-r lg:border-t-0 lg:p-6">
                 {!selectedFile ? (
-                  <div className="flex flex-col flex-1 justify-center pb-4">
-                    <UploadDropzone
-                      onFileSelect={onFileSelect}
-                      requireGrayscale={requireGrayscale}
-                    />
-                    {!isProcessing && !jobId && (
-                      <div className="text-center mt-5 text-sm font-medium text-slate-500">
-                        Free Uses Remaining:{' '}
-                        <span className="font-bold text-slate-700 bg-white/60 px-2 py-0.5 rounded-md border border-white/80 ml-1">
-                          {usesRemaining} / {maxLimit}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex flex-col flex-1 justify-center relative w-full py-4">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-linear-to-tr from-indigo-300/20 via-purple-300/10 to-emerald-300/20 blur-3xl rounded-full pointer-events-none -z-10" />
-
-                    <div className="relative bg-white/50 backdrop-blur-2xl border border-white/80 shadow-2xl shadow-slate-200/50 rounded-4xl p-5 sm:p-6 overflow-hidden w-full max-w-md mx-auto">
-                      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMCwwLDAsMC4wNCkiLz48L3N2Zz4=')] opacity-60 pointer-events-none" />
-
-                      <div className="relative z-10 flex flex-col gap-6">
-                        <StagedFileCard
-                          selectedFile={selectedFile}
-                          isProcessing={isProcessing}
-                          resultUrl={resultUrl}
-                        />
-
-                        <div className="bg-white/60 rounded-2xl p-4 border border-white shadow-sm">
-                          {leftControls}
-                          <ResultActions
-                            resultUrl={resultUrl}
-                            selectedFile={selectedFile}
-                            isResultLoaded={isResultLoaded}
-                            handleCancel={onCancel}
-                            downloadPrefix={downloadPrefix}
-                          />
-                        </div>
-                      </div>
+                  <div className="my-auto space-y-8">
+                    <div>
+                      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-pf-editorial-accent">
+                        01 / Source
+                      </p>
+                      <h2 className="mt-3 text-2xl font-black tracking-[-0.03em] text-pf-editorial-ink">
+                        Start with one image.
+                      </h2>
+                      <p className="mt-3 text-sm leading-6 text-pf-editorial-muted">
+                        Drop, paste, or choose a file in the canvas. Your original remains available for comparison.
+                      </p>
+                    </div>
+                    <div className="border-t border-pf-editorial-line pt-4">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-pf-editorial-muted">
+                        Accepted input
+                      </p>
+                      <p className="mt-2 font-mono text-xs uppercase tracking-[0.08em] text-pf-editorial-ink">
+                        {supportsList.join(' · ')}
+                      </p>
                     </div>
                   </div>
+                ) : (
+                  <div className="flex h-full flex-col">
+                    <StagedFileCard
+                      selectedFile={selectedFile}
+                      isProcessing={isProcessing}
+                      resultUrl={resultUrl}
+                    />
+                    <div className="mt-6 border-t border-pf-editorial-line pt-6">
+                      {leftControls}
+                      <ResultActions
+                        resultUrl={resultUrl}
+                        selectedFile={selectedFile}
+                        isResultLoaded={isResultLoaded}
+                        handleCancel={onCancel}
+                        downloadPrefix={downloadPrefix}
+                      />
+                    </div>
+                    <p className="mt-auto border-t border-pf-editorial-line pt-5 text-xs leading-5 text-pf-editorial-muted">
+                      Results are temporary. Export finished work before the session expires.
+                    </p>
+                  </div>
                 )}
-              </div>
-            }
-            rightPanel={
-              <div className={rightPanelClassName}>{rightPanelContent}</div>
-            }
-          />
-        )}
+              </aside>
 
-        <div className="mt-6 flex items-center justify-center gap-4 text-xs text-slate-600 font-medium">
-          <span>Supports:</span>
-          {supportsList.map((fmt) => (
-            <span
-              key={fmt}
-              className="px-2 py-0.5 rounded bg-white/40 border border-white/50 text-slate-600 font-mono"
-            >
-              .{fmt.toLowerCase()}
-            </span>
-          ))}
-        </div>
+              <div className={`order-1 relative flex min-h-[30rem] items-center justify-center overflow-hidden bg-pf-editorial-raised p-4 sm:p-6 lg:order-2 lg:min-h-[38rem] ${canvasClassName}`}>
+                <div className="absolute left-4 top-4 z-20 flex items-center gap-2 border border-pf-editorial-line bg-pf-editorial-base/90 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-pf-editorial-muted">
+                  <span className="h-1.5 w-1.5 bg-pf-editorial-accent" aria-hidden="true" />
+                  Canvas
+                </div>
+                <div className="relative flex h-full min-h-[26rem] w-full items-center justify-center overflow-hidden">
+                  {canvasContent}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
 
-      <WorkspaceMarketing {...marketingProps} />
       <WorkspaceModals
         appAlert={appAlert}
         setAppAlert={setAppAlert}
@@ -198,6 +188,7 @@ AiFeatureWorkspace.propTypes = {
   selectedFile: PropTypes.object,
   previewUrl: PropTypes.string,
   isProcessing: PropTypes.bool.isRequired,
+  isWaitingForToken: PropTypes.bool,
   resultUrl: PropTypes.string,
   jobId: PropTypes.string,
   usesRemaining: PropTypes.number.isRequired,
@@ -210,20 +201,12 @@ AiFeatureWorkspace.propTypes = {
   featureText: PropTypes.string.isRequired,
   resultLabel: PropTypes.string,
   sessionImageLabel: PropTypes.string,
-  marketingProps: PropTypes.shape({
-    subtitle: PropTypes.string.isRequired,
-    features: PropTypes.array.isRequired,
-    steps: PropTypes.array.isRequired,
-  }).isRequired,
   onFileSelect: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   leftControls: PropTypes.node.isRequired,
   supportsList: PropTypes.arrayOf(PropTypes.string),
   downloadPrefix: PropTypes.string,
-  emptyState: PropTypes.node,
-  rightPanelClassName: PropTypes.string,
-  previewImageClassName: PropTypes.string,
-  resultContainerClassName: PropTypes.string,
   requireGrayscale: PropTypes.bool,
   previewOverride: PropTypes.node,
+  canvasClassName: PropTypes.string,
 };
