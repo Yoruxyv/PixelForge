@@ -47,7 +47,6 @@ export default function AiFeatureWorkspace({
 
   const showLimit =
     !selectedFile && !isProcessing && !jobId && !isLoading && usesRemaining <= 0;
-  const showLoading = !selectedFile && !isProcessing && !jobId && isLoading;
   const stateLabel = getStateLabel({
     resultUrl,
     isProcessing,
@@ -91,10 +90,8 @@ export default function AiFeatureWorkspace({
   return (
     <div className="w-full flex-1">
       <section className="mx-auto w-full max-w-pf-workspace px-pf-gutter pb-20 pt-6">
-        {showLoading || showLimit ? (
+        {showLimit ? (
           <WorkspaceLimitCard
-            showLoading={showLoading}
-            showLimit={showLimit}
             maxLimit={maxLimit}
             resetTimestamp={resetTimestamp}
             featureText={featureText}
@@ -107,8 +104,13 @@ export default function AiFeatureWorkspace({
                 <span aria-hidden="true">/</span>
                 <span>{stateLabel}</span>
               </div>
-              <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-pf-editorial-muted">
-                {usesRemaining} of {maxLimit} uses available
+              <span
+                className="font-mono text-[10px] uppercase tracking-[0.12em] text-pf-editorial-muted"
+                aria-live="polite"
+              >
+                {isLoading
+                  ? 'Checking usage…'
+                  : `${usesRemaining} of ${maxLimit} uses available`}
               </span>
             </div>
 
@@ -161,10 +163,6 @@ export default function AiFeatureWorkspace({
               </aside>
 
               <div className={`order-1 relative flex min-h-[30rem] items-center justify-center overflow-hidden bg-pf-editorial-raised p-4 sm:p-6 lg:order-2 lg:min-h-[38rem] ${canvasClassName}`}>
-                <div className="absolute left-4 top-4 z-20 flex items-center gap-2 border border-pf-editorial-line bg-pf-editorial-base/90 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-pf-editorial-muted">
-                  <span className="h-1.5 w-1.5 bg-pf-editorial-accent" aria-hidden="true" />
-                  Canvas
-                </div>
                 <div className="relative flex h-full min-h-[26rem] w-full items-center justify-center overflow-hidden">
                   {canvasContent}
                 </div>

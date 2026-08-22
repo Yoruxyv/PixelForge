@@ -1,29 +1,12 @@
 import PropTypes from 'prop-types';
 import CountdownTimer from '@/shared/components/common/CountdownTimer';
 
-/** Loading and daily-quota states for AI workspaces. */
+/** Daily quota exhausted state for AI workspaces. */
 export default function WorkspaceLimitCard({
-  showLoading,
-  showLimit,
   maxLimit,
   resetTimestamp,
   featureText,
 }) {
-  if (showLoading) {
-    return (
-      <div className="flex min-h-[34rem] items-center justify-center border border-pf-editorial-line bg-pf-editorial-surface" role="status">
-        <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin border-2 border-pf-editorial-line border-t-pf-editorial-accent" />
-          <p className="mt-4 text-xs font-bold uppercase tracking-[0.16em] text-pf-editorial-muted">
-            Preparing workspace
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!showLimit) return null;
-
   return (
     <div className="grid min-h-[34rem] border border-pf-editorial-line bg-pf-editorial-surface lg:grid-cols-2">
       <div className="flex flex-col justify-between border-b border-pf-editorial-line p-8 lg:border-b-0 lg:border-r lg:p-12">
@@ -54,8 +37,6 @@ export default function WorkspaceLimitCard({
 }
 
 WorkspaceLimitCard.propTypes = {
-  showLoading: PropTypes.bool.isRequired,
-  showLimit: PropTypes.bool.isRequired,
   maxLimit: PropTypes.number.isRequired,
   resetTimestamp: PropTypes.number,
   featureText: PropTypes.string.isRequired,
