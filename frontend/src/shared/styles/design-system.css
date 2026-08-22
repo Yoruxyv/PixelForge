@@ -20,15 +20,29 @@
   --color-pf-surface: #ffffff;
   --color-pf-surface-subtle: #eceff3;
   --color-pf-surface-strong: #dfe4eb;
-  --color-pf-surface-inverse: #1b2230;
+  --color-pf-surface-inverse: #0d0e10;
+  --color-pf-surface-inverse-subtle: #15171a;
+  --color-pf-surface-inverse-strong: #1d2025;
   --color-pf-ink: #1b2230;
   --color-pf-ink-muted: #5d6778;
   --color-pf-ink-subtle: #7b8595;
   --color-pf-line: #d6dce5;
   --color-pf-line-strong: #b9c2cf;
-  --color-pf-accent: #5658b9;
-  --color-pf-accent-hover: #46489f;
-  --color-pf-accent-soft: #ececfa;
+  --color-pf-ink-inverse: #f0ede6;
+  --color-pf-ink-inverse-muted: #aaa7a0;
+  --color-pf-line-inverse: #2d3036;
+  --color-pf-editorial-base: #0d0e10;
+  --color-pf-editorial-surface: #15171a;
+  --color-pf-editorial-raised: #1d2025;
+  --color-pf-editorial-footer: #090a0c;
+  --color-pf-editorial-ink: #f0ede6;
+  --color-pf-editorial-muted: #aaa7a0;
+  --color-pf-editorial-line: #2d3036;
+  --color-pf-editorial-accent: #9185b3;
+  --color-pf-editorial-accent-soft: #2b2836;
+  --color-pf-accent: #756aa1;
+  --color-pf-accent-hover: #8b80b4;
+  --color-pf-accent-soft: #ebe8f2;
   --color-pf-focus: #3f67cf;
   --color-pf-success: #247056;
   --color-pf-success-soft: #e7f3ed;
@@ -69,6 +83,23 @@
   --pf-z-popover: 40;
   --pf-z-overlay: 60;
   --pf-z-toast: 80;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+  --color-pf-editorial-base: #f3f0e9;
+  --color-pf-editorial-surface: #e7e7e4;
+  --color-pf-editorial-raised: #dcdedc;
+  --color-pf-editorial-footer: #d4d1ca;
+  --color-pf-editorial-ink: #18191b;
+  --color-pf-editorial-muted: #676761;
+  --color-pf-editorial-line: #c8c6bf;
+  --color-pf-editorial-accent: #65598b;
+  --color-pf-editorial-accent-soft: #ddd8e8;
 }
 
 @layer base {
@@ -132,5 +163,18 @@
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@layer utilities {
+  .pf-transparency-grid {
+    background-color: var(--color-pf-editorial-raised);
+    background-image:
+      linear-gradient(45deg, color-mix(in srgb, var(--color-pf-editorial-line) 60%, transparent) 25%, transparent 25%),
+      linear-gradient(-45deg, color-mix(in srgb, var(--color-pf-editorial-line) 60%, transparent) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, color-mix(in srgb, var(--color-pf-editorial-line) 60%, transparent) 75%),
+      linear-gradient(-45deg, transparent 75%, color-mix(in srgb, var(--color-pf-editorial-line) 60%, transparent) 75%);
+    background-position: 0 0, 0 1rem, 1rem -1rem, -1rem 0;
+    background-size: 2rem 2rem;
   }
 }

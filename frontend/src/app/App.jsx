@@ -8,7 +8,7 @@
  * - Lazily render page routes with lightweight suspense loaders.
  */
 
-import { useState, Suspense } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import { legalModalData } from './layout/legalModalData';
@@ -19,6 +19,7 @@ import GlobalHeader from './layout/GlobalHeader';
 import Footer from './layout/Footer';
 import AppModals from '@/shared/components/common/AppModals';
 import FaqChatbotWidget from '@/features/chatbot/FaqChatbotWidget';
+import { readThemePreference, resolveTheme, THEME_STORAGE_KEY } from './theme';
 
 /**
  * Generic fallback shown while non-workspace pages are loading.
@@ -26,8 +27,12 @@ import FaqChatbotWidget from '@/features/chatbot/FaqChatbotWidget';
  * @returns {JSX.Element} Centered loading spinner.
  */
 const PageLoader = () => (
-  <div className="flex-1 flex items-center justify-center min-h-75 w-full z-10">
-    <div className="w-10 h-10 border-4 border-slate-300 border-t-slate-800 rounded-full animate-spin" />
+  <div
+    className="flex min-h-75 w-full flex-1 items-center justify-center"
+    role="status"
+    aria-label="Loading page"
+  >
+    <div className="h-8 w-8 animate-spin rounded-full border-3 border-pf-line-inverse border-t-pf-accent-hover" />
   </div>
 );
 
@@ -40,9 +45,13 @@ const PageLoader = () => (
  */
 const WorkspaceLoader = () => (
   <div className="w-full flex-1">
-    <section className="flex-1 w-full max-w-6xl mx-auto px-4 pt-6 pb-16">
-      <div className="w-full min-h-96 rounded-3xl border border-white/70 bg-white/50 backdrop-blur-xl shadow-xl shadow-indigo-500/5 flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-slate-300 border-t-slate-800 rounded-full animate-spin" />
+    <section className="mx-auto w-full max-w-pf-workspace flex-1 px-pf-gutter pb-16 pt-4">
+      <div
+        className="flex min-h-96 w-full items-center justify-center rounded-pf-card border border-pf-line-inverse bg-pf-surface-inverse-subtle"
+        role="status"
+        aria-label="Loading workspace"
+      >
+        <div className="h-8 w-8 animate-spin rounded-full border-3 border-pf-line-inverse border-t-pf-accent-hover" />
       </div>
     </section>
   </div>
@@ -54,6 +63,10 @@ const WorkspaceLoader = () => (
  * @returns {JSX.Element} Fully routed application shell.
  */
 export default function App() {
+  const [themePreference, setThemePreference] = useState(readThemePreference);
+  const [prefersDark, setPrefersDark] = useState(() =>
+    window.matchMedia('(prefers-color-scheme: dark)').matches,
+  );
   const [modalState, setModalState] = useState({
     isOpen: false,
     type: 'privacy',
@@ -64,16 +77,30 @@ export default function App() {
     setModalState((prev) => ({ ...prev, isOpen: false }));
 
   const activeModalData = legalModalData[modalState.type];
+  const theme = resolveTheme(themePreference, prefersDark);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const updateSystemTheme = (event) => setPrefersDark(event.matches);
+    mediaQuery.addEventListener('change', updateSystemTheme);
+    return () => mediaQuery.removeEventListener('change', updateSystemTheme);
+  }, []);
+
+  const changeTheme = (preference) => {
+    setThemePreference(preference);
+    localStorage.setItem(THEME_STORAGE_KEY, preference);
+  };
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-linear-to-br from-[#EEAECA] to-[#94BBE9] text-slate-800 flex flex-col overflow-x-hidden selection:bg-white/40">
-        <Navbar />
+      <div data-theme={theme} className="flex min-h-screen flex-col bg-pf-editorial-base text-pf-editorial-ink selection:bg-pf-editorial-accent-soft">
+        <Navbar
+          theme={theme}
+          themePreference={themePreference}
+          onThemeChange={changeTheme}
+        />
 
-        <main className="flex-1 min-h-0 relative w-full flex flex-col">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-150 bg-white/40 blur-3xl rounded-full pointer-events-none -z-10" />
-          <div className="absolute top-100 right-0 w-100 h-100 bg-white/30 blur-3xl rounded-full pointer-events-none -z-10" />
-
+        <main className="relative flex min-h-0 w-full flex-1 flex-col">
           <GlobalHeader />
 
           <Suspense fallback={<PageLoader />}>
@@ -101,7 +128,7 @@ export default function App() {
 
         <FaqChatbotWidget />
 
-        <div className="mt-auto w-full relative z-50">
+        <div className="relative mt-auto w-full">
           <Footer openModal={openModal} />
         </div>
 

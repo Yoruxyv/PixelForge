@@ -24,7 +24,7 @@ export default function ToolStateWrapper({
 }) {
   if (!file) {
     return (
-      <div className="bg-white/40 backdrop-blur-2xl p-2 rounded-2xl border border-white/50 shadow-xl shadow-slate-900/5 max-w-2xl mx-auto">
+      <div className="mx-auto max-w-2xl rounded-pf-panel border border-pf-line bg-pf-surface p-2 shadow-pf-card">
         <UploadDropzone onFileSelect={onFileSelect} />
       </div>
     );
@@ -32,8 +32,8 @@ export default function ToolStateWrapper({
 
   if (error) {
     return (
-      <div className="bg-white/50 backdrop-blur-2xl p-8 rounded-2xl shadow-xl border border-rose-100/60 max-w-2xl mx-auto text-center flex flex-col items-center">
-        <div className="w-16 h-16 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mb-4 shadow-sm border border-rose-200">
+      <div className="mx-auto flex max-w-2xl flex-col items-center rounded-pf-panel border border-pf-danger/30 bg-pf-danger-soft p-8 text-center shadow-pf-card">
+        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-pf-control border border-pf-danger/30 text-pf-danger">
           <svg
             className="w-8 h-8"
             fill="none"
@@ -48,13 +48,13 @@ export default function ToolStateWrapper({
             ></path>
           </svg>
         </div>
-        <h3 className="text-2xl font-black text-slate-800 mb-2">
+        <h3 className="mb-2 text-2xl font-black text-pf-ink">
           Something went wrong
         </h3>
-        <p className="text-rose-600 font-medium mb-6">{error}</p>
+        <p className="mb-6 font-medium text-pf-danger">{error}</p>
         <button
           onClick={onReset}
-          className="px-8 py-3 text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-colors shadow-sm"
+          className="rounded-pf-control border border-pf-line-strong bg-pf-surface px-6 py-3 text-sm font-bold text-pf-ink transition-colors hover:bg-pf-surface-subtle"
         >
           Try Again
         </button>
@@ -64,9 +64,9 @@ export default function ToolStateWrapper({
 
   if (isProcessing) {
     return (
-      <div className="bg-white/40 backdrop-blur-2xl p-12 rounded-2xl border border-white/50 shadow-xl shadow-slate-900/5 max-w-md mx-auto flex flex-col items-center justify-center">
-        <div className="w-12 h-12 border-4 border-slate-300 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
-        <p className="text-slate-600 font-bold animate-pulse">
+      <div className="mx-auto flex max-w-md flex-col items-center justify-center rounded-pf-panel border border-pf-line bg-pf-surface p-10 shadow-pf-card" role="status">
+        <div className="mb-4 h-10 w-10 animate-spin rounded-full border-3 border-pf-line border-t-pf-accent"></div>
+        <p className="font-bold text-pf-ink-muted">
           {processingText}
         </p>
       </div>

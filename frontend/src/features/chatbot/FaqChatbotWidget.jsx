@@ -61,7 +61,7 @@ export default function FaqChatbotWidget() {
     <>
       <style dangerouslySetInnerHTML={{ __html: WIDGET_STYLES }} />
       <div
-        className="fixed right-4 sm:right-5 flex flex-col items-end z-999 fw text-slate-800"
+        className="fw fixed right-4 z-[var(--pf-z-toast)] flex flex-col items-end text-pf-ink sm:right-5"
         style={{
           bottom:
             'calc(var(--footer-safe-offset, 16px) + env(safe-area-inset-bottom))',
@@ -74,12 +74,7 @@ export default function FaqChatbotWidget() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 18, scale: 0.96 }}
               transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-              className="mb-3 w-95 max-w-[calc(100vw-24px)] h-[78vh] max-h-170 min-h-130 rounded-3xl overflow-hidden flex flex-col shadow-2xl"
-              style={{
-                background:
-                  'linear-gradient(to bottom right, #EEAECA, #94BBE9)',
-                border: '1px solid rgba(255,255,255,0.6)',
-              }}
+              className="mb-3 flex h-[78vh] min-h-130 w-95 max-w-[calc(100vw-24px)] max-h-170 flex-col overflow-hidden rounded-pf-panel border border-pf-line bg-pf-canvas shadow-pf-float"
             >
               <ChatbotHeader
                 img={img}
@@ -144,7 +139,7 @@ export default function FaqChatbotWidget() {
           )}
         </AnimatePresence>
 
-        <FabToggle isOpen={isOpen} setIsOpen={setIsOpen} img={img} />
+        <FabToggle isOpen={isOpen} setIsOpen={setIsOpen} />
       </div>
     </>
   );

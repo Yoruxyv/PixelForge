@@ -27,16 +27,16 @@ export default function UploadDropzone({
   });
 
   const getDropzoneStateClasses = () => {
-    if (isDragging) return 'border-slate-800 bg-white/60 scale-[1.02]';
-    if (error) return 'border-rose-400 bg-rose-50/50 hover:bg-rose-50';
-    return 'border-white/60 bg-white/30 hover:border-white hover:bg-white/50';
+    if (isDragging) return 'border-pf-accent bg-pf-accent-soft';
+    if (error) return 'border-pf-danger bg-pf-danger-soft';
+    return 'border-pf-line-strong bg-pf-surface hover:border-pf-accent hover:bg-pf-accent-soft/30';
   };
 
   return (
     <button
       type="button"
       aria-label="Upload image file"
-      className={`w-full border-2 border-dashed rounded-xl p-10 sm:p-16 text-center cursor-pointer transition-all duration-300 ease-in-out ${getDropzoneStateClasses()}`}
+      className={`w-full cursor-pointer rounded-pf-control border border-dashed p-8 text-center transition-colors sm:p-10 ${getDropzoneStateClasses()}`}
       onDragOver={handlers.onDragOver}
       onDragLeave={handlers.onDragLeave}
       onDrop={handlers.onDrop}
@@ -53,12 +53,12 @@ export default function UploadDropzone({
 
       <div className="flex flex-col items-center justify-center space-y-4 pointer-events-none">
         <div
-          className={`w-14 h-14 rounded-2xl shadow-sm border flex items-center justify-center transition-colors duration-300
-          ${error ? 'bg-rose-100 border-rose-200 text-rose-600' : 'bg-white border-white/50 text-slate-700'}`}
+          className={`flex h-12 w-12 items-center justify-center rounded-pf-control border transition-colors
+          ${error ? 'bg-pf-danger-soft border-pf-danger/30 text-pf-danger' : 'bg-pf-accent-soft border-pf-line text-pf-accent'}`}
         >
           {error ? (
             <svg
-              className="w-7 h-7 animate-bounce"
+              className="h-6 w-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -72,7 +72,7 @@ export default function UploadDropzone({
             </svg>
           ) : (
             <svg
-              className="w-7 h-7"
+              className="h-6 w-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -90,20 +90,20 @@ export default function UploadDropzone({
         <div>
           {error ? (
             <>
-              <p className="font-bold text-base sm:text-lg text-rose-600 max-w-100 mx-auto leading-snug px-4">
+              <p className="mx-auto max-w-100 px-4 text-base font-bold leading-snug text-pf-danger sm:text-lg">
                 {error}
               </p>
-              <p className="text-sm mt-2 text-rose-500 font-medium">
-                Strictly {AllowedFormatsText} only!
+              <p className="mt-2 text-sm font-medium text-pf-danger">
+                Supported formats: {AllowedFormatsText}
               </p>
             </>
           ) : (
             <>
-              <p className="font-bold text-lg text-slate-800">
-                Upload an image by clicking, dragging, or pasting
+              <p className="text-lg font-bold text-pf-ink">
+                Drop, paste, or choose an image
               </p>
-              <p className="text-sm mt-1.5 text-slate-600 font-medium">
-                Max {FILE_LIMITS.MAX_FILE_SIZE_MB}MB
+              <p className="mt-1.5 text-sm font-medium text-pf-ink-muted">
+                {AllowedFormatsText} · Max {FILE_LIMITS.MAX_FILE_SIZE_MB}MB
               </p>
             </>
           )}

@@ -24,7 +24,7 @@ export default function GlobalHeader() {
   const currentConfig = headerConfig[location.pathname] || headerConfig['*'];
 
   return (
-    <div className="pt-4 px-6 max-w-6xl mx-auto w-full relative z-10">
+    <div className="mx-auto w-full max-w-pf-workspace px-pf-gutter pt-6">
       <Header {...currentConfig} />
     </div>
   );

@@ -38,10 +38,10 @@ export default function UploadCard({
   });
 
   let cardStateClass =
-    'border-indigo-200 bg-white/40 hover:bg-white/70 hover:border-indigo-400';
-  let iconWrapClass = 'bg-white border-white/50 text-indigo-500';
-  let titleClass = 'text-slate-700 group-hover:text-indigo-600';
-  let helperClass = 'text-slate-500';
+    'border-pf-line-strong bg-pf-surface hover:border-pf-accent hover:bg-pf-accent-soft/30';
+  let iconWrapClass = 'bg-pf-accent-soft border-pf-line text-pf-accent';
+  let titleClass = 'text-pf-ink group-hover:text-pf-accent';
+  let helperClass = 'text-pf-ink-muted';
 
   let uploadStatusText = hasActiveFile
     ? 'Replace image'
@@ -50,14 +50,14 @@ export default function UploadCard({
 
   if (error) {
     cardStateClass =
-      'border-rose-300 bg-rose-50/50 hover:border-rose-400 hover:bg-rose-50/60';
-    iconWrapClass = 'bg-rose-100 border-rose-200 text-rose-600';
-    titleClass = 'text-rose-600 group-hover:text-rose-600';
-    helperClass = 'text-rose-500';
+      'border-pf-danger bg-pf-danger-soft hover:border-pf-danger';
+    iconWrapClass = 'bg-pf-danger-soft border-pf-danger/30 text-pf-danger';
+    titleClass = 'text-pf-danger group-hover:text-pf-danger';
+    helperClass = 'text-pf-danger';
     uploadStatusText = error;
     displayHelperText = 'Please try another file';
   } else if (isDragging) {
-    cardStateClass = 'border-indigo-500 bg-indigo-50/80 scale-[1.02]';
+    cardStateClass = 'border-pf-accent bg-pf-accent-soft';
     uploadStatusText = 'Drop to upload';
   }
 
@@ -122,11 +122,11 @@ export default function UploadCard({
       onDragOver={handlers.onDragOver}
       onDragLeave={handlers.onDragLeave}
       onDrop={handlers.onDrop}
-      className={`group relative flex w-full ${heightClass} flex-col items-center justify-center rounded-2xl border-2 border-dashed shadow-sm transition-all cursor-pointer hover:shadow-md ${cardStateClass} ${className}`}
+      className={`group relative flex w-full ${heightClass} cursor-pointer flex-col items-center justify-center rounded-pf-control border border-dashed transition-colors ${cardStateClass} ${className}`}
     >
       <div className="flex flex-col items-center justify-center px-4 pt-5 pb-6 text-center pointer-events-none">
         <div
-          className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl border transition-colors ${iconWrapClass}`}
+          className={`mb-3 flex h-10 w-10 items-center justify-center rounded-pf-control border transition-colors ${iconWrapClass}`}
         >
           {renderIcon()}
         </div>
