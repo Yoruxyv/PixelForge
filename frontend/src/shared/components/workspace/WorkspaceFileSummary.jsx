@@ -17,10 +17,10 @@ export default function WorkspaceFileSummary({ file }) {
         initial={{ opacity: 0, y: 10, height: 0 }}
         animate={{ opacity: 1, y: 0, height: 'auto' }}
         exit={{ opacity: 0, height: 0 }}
-        className="flex flex-col mt-2"
+        className="mt-3 flex flex-col"
       >
-        <div className="flex items-center gap-3 overflow-hidden rounded-xl border border-white/60 bg-white/80 p-3 shadow-sm backdrop-blur-sm mt-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-500 border border-indigo-100/50">
+        <div className="flex items-center gap-3 overflow-hidden border-y border-pf-editorial-line py-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-pf-control border border-pf-editorial-line text-pf-editorial-accent">
             <svg
               className="h-5 w-5"
               fill="none"
@@ -37,15 +37,15 @@ export default function WorkspaceFileSummary({ file }) {
           </div>
 
           <div className="flex min-w-0 flex-1 flex-col">
-            <span className="truncate text-sm font-bold text-slate-700">
+            <span className="truncate text-sm font-semibold text-pf-editorial-ink">
               {file.name}
             </span>
-            <span className="text-xs font-semibold text-slate-400">
+            <span className="font-mono text-[0.65rem] uppercase tracking-wider text-pf-editorial-muted">
               {bytesToMB(file.size)} MB
             </span>
           </div>
 
-          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 text-emerald-500 shadow-sm">
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center text-pf-success" aria-label="Image ready">
             <svg
               className="h-3.5 w-3.5"
               fill="none"

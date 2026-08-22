@@ -10,13 +10,15 @@ import PropTypes from 'prop-types';
  */
 export default function TextStyleToggles({ isBold, isItalic, isUnderline, onToggle }) {
   const getBtnClass = (isActive) => 
-    `rounded-md text-sm transition-colors ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-600 hover:bg-slate-100'}`;
+    `rounded-pf-control text-sm transition-colors ${isActive ? 'bg-pf-editorial-accent-soft text-pf-editorial-accent' : 'text-pf-editorial-muted hover:bg-pf-editorial-raised hover:text-pf-editorial-ink'}`;
 
   return (
-    <div className="grid h-9 grid-cols-3 gap-1 rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
+    <div className="grid h-9 grid-cols-3 gap-1 border border-pf-editorial-line bg-pf-editorial-base p-1">
       <button
         type="button"
         onPointerDown={(e) => { e.preventDefault(); onToggle('b'); }}
+        aria-pressed={isBold}
+        aria-label="Bold watermark text"
         className={`${getBtnClass(isBold)} font-bold`}
       >
         B
@@ -24,6 +26,8 @@ export default function TextStyleToggles({ isBold, isItalic, isUnderline, onTogg
       <button
         type="button"
         onPointerDown={(e) => { e.preventDefault(); onToggle('i'); }}
+        aria-pressed={isItalic}
+        aria-label="Italic watermark text"
         className={getBtnClass(isItalic)}
       >
         <span className="italic">I</span>
@@ -31,6 +35,8 @@ export default function TextStyleToggles({ isBold, isItalic, isUnderline, onTogg
       <button
         type="button"
         onPointerDown={(e) => { e.preventDefault(); onToggle('u'); }}
+        aria-pressed={isUnderline}
+        aria-label="Underline watermark text"
         className={getBtnClass(isUnderline)}
       >
         <span className="underline">U</span>

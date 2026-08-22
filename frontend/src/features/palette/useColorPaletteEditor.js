@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import {
   clamp,
   makeInitialPoints,
+  nudgePoint,
   resizePoints,
 } from './paletteMath';
 
@@ -174,6 +175,28 @@ export function useColorPaletteEditor({
     [movePointFromClient],
   );
 
+  const onPointKeyDown = useCallback((event, id) => {
+    const directions = {
+      ArrowLeft: [-1, 0],
+      ArrowRight: [1, 0],
+      ArrowUp: [0, -1],
+      ArrowDown: [0, 1],
+    };
+    const direction = directions[event.key];
+    if (!direction) return;
+
+    event.preventDefault();
+    const step = event.shiftKey ? 0.05 : 0.01;
+    setActivePointId(id);
+    setPoints((previous) =>
+      previous.map((point) =>
+        point.id === id
+          ? nudgePoint(point, direction[0] * step, direction[1] * step)
+          : point,
+      ),
+    );
+  }, []);
+
   useEffect(() => {
     if (activePointId == null || !previewUrl) return undefined;
 
@@ -208,6 +231,7 @@ export function useColorPaletteEditor({
     handlePaletteCountChange,
     handleVariationChange,
     onPointPointerDown,
+    onPointKeyDown,
     updateImageRect,
     resetEditor,
   };

@@ -24,7 +24,7 @@ export default function WorkspaceActionRow({
   secondaryDisabled = false,
   primaryType = 'button',
   secondaryType = 'button',
-  className = 'flex gap-3',
+  className = 'flex flex-col gap-3 sm:flex-row',
 }) {
   return (
     <div className={className}>
@@ -32,7 +32,7 @@ export default function WorkspaceActionRow({
         type={primaryType}
         onClick={onPrimaryClick}
         disabled={primaryDisabled}
-        className="inline-flex flex-1 items-center justify-center rounded-xl bg-indigo-600 px-5 py-3.5 text-sm font-bold text-white transition-all hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none mt-2"
+        className="inline-flex flex-1 items-center justify-center rounded-pf-control bg-pf-editorial-accent px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-pf-accent-hover disabled:cursor-not-allowed disabled:opacity-45"
       >
         {primaryLabel}
       </button>
@@ -42,7 +42,7 @@ export default function WorkspaceActionRow({
           type={secondaryType}
           onClick={onSecondaryClick}
           disabled={secondaryDisabled}
-          className="inline-flex items-center justify-center rounded-xl border border-slate-200/60 bg-white/50 px-5 py-3.5 text-sm font-bold text-slate-600 shadow-sm transition-all hover:bg-white hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center justify-center rounded-pf-control border border-pf-editorial-line bg-transparent px-5 py-3 text-sm font-semibold text-pf-editorial-muted transition-colors hover:border-pf-editorial-muted hover:text-pf-editorial-ink disabled:cursor-not-allowed disabled:opacity-45"
         >
           {secondaryLabel}
         </button>

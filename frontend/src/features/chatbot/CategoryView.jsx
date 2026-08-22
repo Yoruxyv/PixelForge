@@ -20,38 +20,36 @@ export default function CategoryView({ activeCategory, CAT_ACCENT, handleBack, s
   const accent = CAT_ACCENT[activeCategory.id] ?? CAT_ACCENT['getting-started'];
 
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-4">
       <BackButton onClick={handleBack} />
 
-      <div
-        className="rounded-xl p-3 flex items-center gap-3"
-        style={{ background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.6)' }}
-      >
+      <div className="flex items-center gap-3 border-b border-pf-editorial-line pb-4">
         <div
-          className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0 text-white"
-          style={{ background: accent.bg, boxShadow: `0 4px 12px ${accent.glow}` }}
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-pf-control border border-pf-editorial-line text-sm grayscale-[35%]"
+          style={{ background: accent.bg }}
         >
           {activeCategory.icon}
         </div>
         <div>
-          <p className="text-sm font-semibold text-slate-800">{activeCategory.title}</p>
-          <p className="text-[11px] mt-0.5 text-slate-500">{activeCategory.description}</p>
+          <p className="text-sm font-semibold text-pf-editorial-ink">{activeCategory.title}</p>
+          <p className="mt-0.5 text-[11px] text-pf-editorial-muted">{activeCategory.description}</p>
         </div>
       </div>
 
-      {activeCategory.questions.map((qa, idx) => (
-        <motion.button
-          key={qa.id || qa.q} 
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: idx * 0.05, ease: 'easeOut' }} 
-          onClick={() => startAnswerFlow(qa)}
-          className="w-full p-3.5 rounded-xl text-left text-sm transition-all text-slate-700"
-          style={{ background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.6)' }}
-        >
-          {qa.q}
-        </motion.button>
-      ))}
+      <div className="overflow-hidden border-y border-pf-editorial-line bg-pf-editorial-line">
+        {activeCategory.questions.map((qa, idx) => (
+          <motion.button
+            key={qa.id || qa.q}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: idx * 0.05, ease: 'easeOut' }}
+            onClick={() => startAnswerFlow(qa)}
+            className="flex w-full items-center justify-between gap-3 bg-pf-editorial-surface p-3.5 text-left text-sm text-pf-editorial-ink transition-colors hover:bg-pf-editorial-raised"
+          >
+            {qa.q}<span className="text-pf-editorial-muted" aria-hidden="true">→</span>
+          </motion.button>
+        ))}
+      </div>
     </div>
   );
 }

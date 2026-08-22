@@ -60,8 +60,7 @@ export default function CropEditor({
 
   return (
     <div
-      className="crop-workspace-scope bg-[#0f172a] rounded-2xl shadow-2xl border border-slate-800 flex flex-col w-full max-w-6xl mx-auto overflow-hidden relative text-left"
-      style={{ height: 'calc(100vh - 60px)', minHeight: '600px' }}
+      className="crop-workspace-scope relative mx-auto flex h-[calc(100dvh-11rem)] min-h-[36rem] max-h-[52rem] w-full max-w-6xl flex-col overflow-hidden rounded-pf-card border border-pf-editorial-line bg-pf-editorial-footer text-left"
     >
       <CropHeader
         cropSizeLabel={cropSizeLabel}
@@ -70,7 +69,7 @@ export default function CropEditor({
         applyCrop={applyCrop}
       />
 
-      <div className="flex-1 min-h-0 w-full relative bg-slate-950/50 flex flex-col overflow-hidden">
+      <div className="relative flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-pf-editorial-footer">
         <Magnifier
           containerClassName={`flex-1 w-full h-full p-4 sm:p-8 ${
             fitMode === 'fit'
@@ -87,17 +86,17 @@ export default function CropEditor({
               <FitModeToggle
                 isFitMode={fitMode === 'fit'}
                 onToggle={handleToggleFitMode}
-                className="p-2.5 bg-slate-800/90 backdrop-blur rounded-lg border border-slate-700 shadow-lg text-slate-300 hover:text-white hover:bg-slate-700 hover:border-slate-500 transition-all"
+                className="rounded-pf-control border border-pf-editorial-line bg-pf-editorial-surface p-2.5 text-pf-editorial-muted transition-colors hover:border-pf-editorial-muted hover:text-pf-editorial-ink"
                 fitTitle="Fit to Screen"
                 fillTitle="Switch to Scroll Mode for tall images"
               />
               <ZoomButton
                 isZoomed={isZoomed}
                 onToggle={toggleZoom}
-                className={`p-2.5 backdrop-blur rounded-lg border shadow-lg transition-all ${
+                className={`rounded-pf-control border p-2.5 transition-colors ${
                   isZoomed
-                    ? 'bg-indigo-600 border-indigo-500 text-white hover:bg-indigo-500'
-                    : 'bg-slate-800/90 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700 hover:border-slate-500'
+                    ? 'border-pf-editorial-accent bg-pf-editorial-accent text-white'
+                    : 'border-pf-editorial-line bg-pf-editorial-surface text-pf-editorial-muted hover:border-pf-editorial-muted hover:text-pf-editorial-ink'
                 }`}
               />
             </div>

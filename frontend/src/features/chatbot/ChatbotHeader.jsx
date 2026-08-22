@@ -22,44 +22,30 @@ export default function ChatbotHeader({
   handleClose,
 }) {
   return (
-    <div
-      className="relative shrink-0 p-4 pb-4 overflow-hidden"
-      style={{
-        background: 'rgba(255,255,255,0.4)',
-        backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid rgba(255,255,255,0.3)',
-      }}
-    >
+    <header className="relative shrink-0 border-b border-pf-editorial-line bg-pf-editorial-base p-4">
       <div className="relative flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="relative shrink-0">
-            <div
-              className="absolute -inset-0.5 rounded-full"
-              style={{ background: 'linear-gradient(135deg, #7c3aed, #d946ef)', opacity: 0.8 }}
-            />
+          <div className="shrink-0">
             <img
               src={img.chatbotIcon}
               alt="PixelForge Assistant"
-              className="relative w-10 h-10 rounded-full object-cover z-10"
-            />
-            <span
-              className="fw-online absolute bottom-0 right-0 z-20 w-2.5 h-2.5 rounded-full"
-              style={{ background: '#34d399', border: '2px solid #ffffff' }}
+              className="h-9 w-9 rounded-pf-control border border-pf-editorial-line object-cover opacity-80 saturate-50"
             />
           </div>
           <div className="min-w-2">
-            <h3 className="fw-display text-sm font-bold leading-tight text-slate-800 truncate tracking-tight">
+            <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-pf-editorial-accent">Help desk</p>
+            <h2 className="fw-display truncate text-sm font-bold leading-tight tracking-tight text-pf-editorial-ink">
               PixelForge Assistant
-            </h3>
+            </h2>
           </div>
         </div>
 
         <button
           onClick={handleClose}
-          className="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center transition-all bg-white/40 hover:bg-white/60 border border-white/50"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-pf-control border border-pf-editorial-line bg-transparent text-pf-editorial-muted transition-colors hover:bg-pf-editorial-raised hover:text-pf-editorial-ink"
           aria-label="Close chatbot"
         >
-          <svg className="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -75,15 +61,10 @@ export default function ChatbotHeader({
           }}
           onBlur={() => setSearchFocused(false)}
           placeholder="Ask anything about PixelForge..."
-          className="w-full rounded-2xl text-sm pl-10 pr-14 py-2.5 outline-none text-slate-800 transition-all placeholder:text-slate-500"
-          style={{
-            background: 'rgba(255,255,255,0.6)',
-            border: searchFocused ? '1px solid rgba(139,92,246,0.7)' : '1px solid rgba(255,255,255,0.8)',
-            boxShadow: searchFocused ? '0 0 0 3px rgba(124,58,237,0.15)' : 'none',
-          }}
+          className={`w-full rounded-pf-control border bg-pf-editorial-surface py-2.5 pl-10 pr-14 text-sm text-pf-editorial-ink outline-none transition-colors placeholder:text-pf-editorial-muted ${searchFocused ? 'border-pf-editorial-accent' : 'border-pf-editorial-line'}`}
         />
         <svg
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-slate-400"
+          className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-pf-editorial-muted"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -96,13 +77,13 @@ export default function ChatbotHeader({
               setQuery('');
               setView('home');
             }}
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-all text-slate-600 bg-white/50 hover:bg-white/80"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 border-l border-pf-editorial-line px-2.5 py-1 text-[10px] font-semibold text-pf-editorial-muted transition-colors hover:text-pf-editorial-ink"
           >
             Clear
           </button>
         )}
       </div>
-    </div>
+    </header>
   );
 }
 

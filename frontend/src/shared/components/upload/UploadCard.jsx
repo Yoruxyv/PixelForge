@@ -38,10 +38,10 @@ export default function UploadCard({
   });
 
   let cardStateClass =
-    'border-pf-line-strong bg-pf-surface hover:border-pf-accent hover:bg-pf-accent-soft/30';
-  let iconWrapClass = 'bg-pf-accent-soft border-pf-line text-pf-accent';
-  let titleClass = 'text-pf-ink group-hover:text-pf-accent';
-  let helperClass = 'text-pf-ink-muted';
+    'border-pf-editorial-line bg-pf-editorial-base hover:border-pf-editorial-accent hover:bg-pf-editorial-raised';
+  let iconWrapClass = 'border-pf-editorial-line text-pf-editorial-accent';
+  let titleClass = 'text-pf-editorial-ink group-hover:text-pf-editorial-accent';
+  let helperClass = 'text-pf-editorial-muted';
 
   let uploadStatusText = hasActiveFile
     ? 'Replace image'
@@ -57,7 +57,7 @@ export default function UploadCard({
     uploadStatusText = error;
     displayHelperText = 'Please try another file';
   } else if (isDragging) {
-    cardStateClass = 'border-pf-accent bg-pf-accent-soft';
+    cardStateClass = 'border-pf-editorial-accent bg-pf-editorial-accent-soft';
     uploadStatusText = 'Drop to upload';
   }
 
@@ -83,7 +83,7 @@ export default function UploadCard({
     if (hasActiveFile) {
       return (
         <svg
-          className={`h-5 w-5 transition-transform ${isDragging ? '-rotate-180 text-indigo-600' : 'group-hover:-rotate-180'} duration-500`}
+          className={`h-5 w-5 transition-transform ${isDragging ? '-rotate-180 text-pf-editorial-accent' : 'group-hover:-rotate-180'} duration-500`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -100,7 +100,7 @@ export default function UploadCard({
 
     return (
       <svg
-        className={`h-6 w-6 transition-transform ${isDragging ? 'scale-110 text-indigo-600' : 'group-hover:scale-110'}`}
+        className={`h-6 w-6 transition-transform ${isDragging ? 'scale-110 text-pf-editorial-accent' : 'group-hover:scale-110'}`}
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"

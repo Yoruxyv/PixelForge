@@ -34,3 +34,16 @@ export function loadImage(url) {
     image.src = url;
   });
 }
+
+/**
+ * Keeps a keyboard-moved watermark inside the same bounds used for dragging.
+ * @param {{x:number, y:number}} position
+ * @param {{left:number, right:number, top:number, bottom:number}} bounds
+ * @returns {{x:number, y:number}}
+ */
+export function constrainOverlayPosition(position, bounds) {
+  return {
+    x: Math.max(bounds.left, Math.min(bounds.right, position.x)),
+    y: Math.max(bounds.top, Math.min(bounds.bottom, position.y)),
+  };
+}

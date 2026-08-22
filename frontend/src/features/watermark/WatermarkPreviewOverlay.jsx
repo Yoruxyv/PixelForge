@@ -47,6 +47,7 @@ TrashIcon.propTypes = {
  * @param {boolean} props.isSelected
  * @param {Function} props.onSelect
  * @param {Function} props.onDelete
+ * @param {Function} props.onNudge
  * @returns {JSX.Element}
  */
 export default function WatermarkPreviewOverlay({
@@ -60,6 +61,7 @@ export default function WatermarkPreviewOverlay({
   isSelected,
   onSelect,
   onDelete,
+  onNudge,
 }) {
   const showActions = isSelected;
   const hasText = activeTab === 'text';
@@ -67,6 +69,27 @@ export default function WatermarkPreviewOverlay({
   const maxSafeWidth = imageRect
     ? Math.max(50, imageRect.left + imageRect.width - overlayPos.x - 8)
     : '100%';
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Delete' || event.key === 'Backspace') {
+      event.preventDefault();
+      onDelete();
+      return;
+    }
+
+    const directions = {
+      ArrowLeft: [-1, 0],
+      ArrowRight: [1, 0],
+      ArrowUp: [0, -1],
+      ArrowDown: [0, 1],
+    };
+    const direction = directions[event.key];
+    if (!direction) return;
+
+    event.preventDefault();
+    const step = event.shiftKey ? 10 : 2;
+    onNudge(direction[0] * step, direction[1] * step);
+  };
 
   const renderTextWatermark = () => {
     const lines = parseWatermarkTextLines(
@@ -115,7 +138,11 @@ export default function WatermarkPreviewOverlay({
       initial={overlayPos}
       animate={overlayPos}
       onPointerDown={onSelect}
-      className={`absolute cursor-move z-50 ${isSelected ? 'ring-2 ring-indigo-500 bg-white/20' : 'hover:ring-1 hover:ring-slate-400 hover:bg-white/10'}`}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="group"
+      aria-label="Watermark overlay. Use arrow keys to move it and Delete to remove it."
+      className={`absolute z-50 cursor-move ${isSelected ? 'bg-white/20 ring-2 ring-pf-editorial-accent' : 'hover:bg-white/10 hover:ring-1 hover:ring-pf-editorial-muted'}`}
       style={{ padding: 0, left: 0, top: 0 }}
     >
       {showActions && (
@@ -168,4 +195,5 @@ WatermarkPreviewOverlay.propTypes = {
   isSelected: PropTypes.bool.isRequired,
   onSelect: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
+  onNudge: PropTypes.func.isRequired,
 };

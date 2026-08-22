@@ -18,9 +18,9 @@ export default function ColorPaletteControls({
   return (
     <>
       <div className={`mb-4 flex flex-col justify-center transition-opacity ${disabled ? 'pointer-events-none opacity-40' : 'opacity-100'}`}>
-        <label className="mb-4 flex w-full items-center justify-between text-left text-sm font-bold text-slate-700">
+        <label className="mb-4 flex w-full items-center justify-between text-left text-sm font-semibold text-pf-editorial-ink">
           <span>Colors to Extract</span>
-          <span className="rounded-md bg-indigo-50 px-2 py-0.5 text-indigo-600">{paletteCount}</span>
+          <span className="font-mono text-pf-editorial-accent">{paletteCount}</span>
         </label>
         <div className="px-1 pt-1">
           <input
@@ -30,9 +30,10 @@ export default function ColorPaletteControls({
             step="1"
             value={paletteCount}
             onChange={onCountChange}
-            className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-indigo-100 accent-indigo-600"
+            aria-label="Colors to extract"
+            className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-pf-editorial-line accent-pf-editorial-accent"
           />
-          <div className="mt-2 flex w-full justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          <div className="mt-2 flex w-full justify-between text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-pf-editorial-muted">
             <span>Basic</span>
             <span>Detailed</span>
           </div>
@@ -40,9 +41,9 @@ export default function ColorPaletteControls({
       </div>
 
       <div className={`mb-6 flex flex-col justify-center transition-opacity ${disabled ? 'pointer-events-none opacity-40' : 'opacity-100'}`}>
-        <label className="mb-4 flex w-full items-center justify-between text-left text-sm font-bold text-slate-700">
+        <label className="mb-4 flex w-full items-center justify-between text-left text-sm font-semibold text-pf-editorial-ink">
           <span>Picked palettes</span>
-          <span className="rounded-md bg-indigo-50 px-2 py-0.5 text-indigo-600">{paletteVariation}</span>
+          <span className="font-mono text-pf-editorial-accent">{paletteVariation}</span>
         </label>
         <div className="px-1 pt-1">
           <input
@@ -52,7 +53,8 @@ export default function ColorPaletteControls({
             step="1"
             value={paletteVariation}
             onChange={onVariationChange}
-            className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-indigo-100 accent-indigo-600"
+            aria-label="Palette variation"
+            className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-pf-editorial-line accent-pf-editorial-accent"
           />
         </div>
       </div>

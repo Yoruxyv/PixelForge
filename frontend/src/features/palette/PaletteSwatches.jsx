@@ -32,7 +32,7 @@ export default function PaletteSwatches({
 }) {
   if (paletteStyle === 'square') {
     return (
-      <div className="flex h-14 w-full overflow-hidden rounded-xl border border-slate-200/60 bg-white shadow-sm">
+      <div className="flex h-14 w-full overflow-hidden rounded-pf-control border border-pf-editorial-line bg-pf-editorial-base">
         {palette.map((item, i) => (
           <motion.button
             key={`palette-block-${item.id}`}
@@ -43,7 +43,8 @@ export default function PaletteSwatches({
               backgroundColor: { duration: 0.15, ease: "linear" }
             }}
             onClick={() => onCopy(item.hex)}
-            className="group relative flex-1 transition-all duration-300 ease-in-out hover:flex-[1.5] focus:outline-none"
+            aria-label={`Copy ${item.hex.toUpperCase()}`}
+            className="group relative flex-1 transition-all duration-300 ease-in-out hover:flex-[1.5]"
             title={`Copy ${item.hex.toUpperCase()}`}
           >
             <div className="absolute inset-0 flex items-center justify-center bg-black/10 opacity-0 backdrop-blur-[2px] transition-all duration-300 group-hover:opacity-100">
@@ -75,7 +76,8 @@ export default function PaletteSwatches({
             backgroundColor: { duration: 0.15, ease: "linear" }
           }}
           onClick={() => onCopy(item.hex)}
-          className="group relative h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-slate-200/70 shadow-sm transition-transform hover:scale-110 focus:outline-none"
+          aria-label={`Copy ${item.hex.toUpperCase()}`}
+          className="group relative h-11 w-11 rounded-full border border-pf-editorial-line transition-transform hover:scale-110 sm:h-12 sm:w-12"
           title={`Copy ${item.hex.toUpperCase()}`}
         >
           <span className="absolute inset-0 grid place-items-center">

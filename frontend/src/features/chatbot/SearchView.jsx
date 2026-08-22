@@ -17,21 +17,20 @@ export default function SearchView({ query, setQuery, filteredResults, handleBac
 
   if (!query) {
     content = (
-      <div className="rounded-xl p-3.5 text-sm text-slate-500" style={{ background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.6)' }}>
+      <div className="border-y border-pf-editorial-line bg-pf-editorial-base p-3.5 text-sm text-pf-editorial-muted">
         Start typing to search FAQs…
       </div>
     );
   } else if (filteredResults.length === 0) {
     content = (
-      <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.6)' }}>
-        <p className="text-sm text-slate-600">No matches. Try:</p>
+      <div className="border-y border-pf-editorial-line bg-pf-editorial-base p-4">
+        <p className="text-sm text-pf-editorial-muted">No matches. Try:</p>
         <div className="flex gap-2 mt-2.5 flex-wrap">
           {['upscale', 'background', 'privacy'].map((s) => (
             <button
               key={s}
               onClick={() => setQuery(s)}
-              className="text-xs px-2.5 py-1 rounded-full transition-all text-purple-800"
-              style={{ background: 'rgba(124,58,237,0.13)', border: '1px solid rgba(124,58,237,0.3)' }}
+              className="rounded-pf-control border border-pf-editorial-line bg-pf-editorial-surface px-2.5 py-1 text-xs text-pf-editorial-muted transition-colors hover:border-pf-editorial-accent hover:text-pf-editorial-ink"
             >
               {s}
             </button>
@@ -47,11 +46,10 @@ export default function SearchView({ query, setQuery, filteredResults, handleBac
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: idx * 0.04 }}
         onClick={() => startAnswerFlow(item)}
-        className="w-full p-3.5 rounded-xl text-left transition-all"
-        style={{ background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.6)' }}
+        className="w-full border-b border-pf-editorial-line bg-pf-editorial-surface p-3.5 text-left transition-colors hover:bg-pf-editorial-raised"
       >
-        <p className="text-[11px] mb-1 text-slate-500">{item.icon} {item.category}</p>
-        <p className="text-sm font-medium text-slate-800">{item.q}</p>
+        <p className="mb-1 text-[11px] text-pf-editorial-muted">{item.icon} {item.category}</p>
+        <p className="text-sm font-medium text-pf-editorial-ink">{item.q}</p>
       </motion.button>
     ));
   }

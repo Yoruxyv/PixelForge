@@ -34,7 +34,7 @@ export default function ImageWatermarkControls({
         <div>
           <label
             htmlFor="wm-scale"
-            className="mb-1.5 block text-xs font-bold text-slate-700 uppercase tracking-wide"
+            className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.14em] text-pf-editorial-muted"
           >
             Scale
           </label>
@@ -48,16 +48,16 @@ export default function ImageWatermarkControls({
             onChange={(e) =>
               setImgWm((prev) => ({ ...prev, scale: Number(e.target.value) }))
             }
-            className="h-1.5 w-full appearance-none rounded-lg bg-indigo-100 accent-indigo-600"
+            className="h-1.5 w-full appearance-none rounded-lg bg-pf-editorial-line accent-pf-editorial-accent"
           />
         </div>
         <div>
           <label
             htmlFor="wm-opacity"
-            className="mb-1.5 flex items-center justify-between text-xs font-bold text-slate-700 uppercase tracking-wide"
+            className="mb-1.5 flex items-center justify-between text-xs font-semibold uppercase tracking-[0.14em] text-pf-editorial-muted"
           >
             <span>Opacity</span>
-            <span className="text-indigo-600">
+            <span className="font-mono text-pf-editorial-accent">
               {Math.round(imgWm.opacity * 100)}%
             </span>
           </label>
@@ -71,7 +71,7 @@ export default function ImageWatermarkControls({
             onChange={(e) =>
               setImgWm((prev) => ({ ...prev, opacity: Number(e.target.value) }))
             }
-            className="h-1.5 w-full appearance-none rounded-lg bg-indigo-100 accent-indigo-600"
+            className="h-1.5 w-full appearance-none rounded-lg bg-pf-editorial-line accent-pf-editorial-accent"
           />
         </div>
       </div>

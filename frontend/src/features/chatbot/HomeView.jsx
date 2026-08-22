@@ -13,50 +13,22 @@ import PropTypes from 'prop-types';
  */
 export default function HomeView({ FAQ_DATA, QUICK_ACTIONS, CAT_ACCENT, openFromQuickAction, openCategory }) {
   return (
-    <div className="space-y-2.5">
-      <div
-        className="rounded-2xl p-4"
-        style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4))',
-          border: '1px solid rgba(255,255,255,0.8)',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
-        }}
-      >
-        <p className="text-sm font-semibold text-slate-800">Hey there 👋</p>
-        <p className="text-xs mt-1 leading-relaxed text-slate-600">
+    <div className="space-y-5">
+      <div className="border-b border-pf-editorial-line pb-4">
+        <p className="text-sm font-semibold text-pf-editorial-ink">How can we help?</p>
+        <p className="mt-1 max-w-72 text-xs leading-relaxed text-pf-editorial-muted">
           Need help with PixelForge? Ask anything, pick a topic, or use a quick action below.
         </p>
       </div>
 
-      <div
-        className="rounded-2xl p-3.5"
-        style={{ background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.6)' }}
-      >
-        <p className="text-[10px] font-bold tracking-[0.12em] uppercase mb-2.5 text-slate-500">Quick Actions</p>
-        <div className="flex flex-wrap gap-2">
+      <div>
+        <p className="mb-2.5 font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-pf-editorial-muted">Quick actions</p>
+        <div className="flex flex-wrap gap-1.5">
           {QUICK_ACTIONS.map((action) => (
             <button
               key={action.id}
               onClick={() => openFromQuickAction(action)}
-              className="
-                text-[11px]
-                font-medium
-                text-left
-                px-3
-                py-1.5
-                rounded-full
-                transition-all
-                duration-200
-                hover:scale-105
-                hover:shadow-sm
-                hover:opacity-80
-                active:scale-95
-              "
-              style={{
-                color: '#5b21b6',
-                background: 'rgba(124,58,237,0.12)',
-                border: '1px solid rgba(124,58,237,0.28)',
-              }}
+              className="rounded-pf-control border border-pf-editorial-line bg-pf-editorial-base px-2.5 py-1.5 text-left text-[11px] font-medium text-pf-editorial-muted transition-colors hover:border-pf-editorial-accent hover:text-pf-editorial-ink active:bg-pf-editorial-accent-soft"
             >
               {action.text}
             </button>
@@ -64,7 +36,7 @@ export default function HomeView({ FAQ_DATA, QUICK_ACTIONS, CAT_ACCENT, openFrom
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="overflow-hidden border-y border-pf-editorial-line bg-pf-editorial-line">
         {FAQ_DATA.map((cat, i) => {
           const accent = CAT_ACCENT[cat.id] ?? CAT_ACCENT['getting-started'];
           return (
@@ -74,20 +46,20 @@ export default function HomeView({ FAQ_DATA, QUICK_ACTIONS, CAT_ACCENT, openFrom
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.055, ease: [0.22, 1, 0.36, 1] }}
-              className="w-full p-3 rounded-2xl text-left transition-all hover:opacity-90 active:scale-[0.98]"
-              style={{ background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.6)' }}
+              className="w-full bg-pf-editorial-surface p-3 text-left transition-colors hover:bg-pf-editorial-raised active:bg-pf-editorial-accent-soft"
             >
               <div className="flex items-center gap-3">
                 <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 text-white"
-                  style={{ background: accent.bg, boxShadow: `0 4px 14px ${accent.glow}` }}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-pf-control border border-pf-editorial-line text-sm grayscale-[35%]"
+                  style={{ background: accent.bg }}
                 >
                   {cat.icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-slate-800 truncate">{cat.title}</p>
-                  <p className="text-[11px] truncate mt-0.5 text-slate-500">{cat.description}</p>
+                  <p className="truncate text-sm font-semibold text-pf-editorial-ink">{cat.title}</p>
+                  <p className="mt-0.5 truncate text-[11px] text-pf-editorial-muted">{cat.description}</p>
                 </div>
+                <span className="text-pf-editorial-muted" aria-hidden="true">→</span>
               </div>
             </motion.button>
           );

@@ -28,23 +28,22 @@ export default function WorkspaceResultDownload({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mt-3 shrink-0 flex flex-col gap-3"
+      className="mt-3 flex shrink-0 flex-col gap-3"
     >
       {originalFile && resultBlob && (
-        <div className="overflow-hidden rounded-xl border border-white/60 bg-white/60 p-1.5 shadow-sm backdrop-blur-sm">
-          <div className="flex w-full items-center justify-between rounded-lg border border-slate-100 bg-white px-4 py-2.5">
+        <div className="flex w-full items-center justify-between border-y border-pf-editorial-line px-1 py-3">
             <div className="flex flex-col">
-              <span className="mb-0.5 text-[9px] font-black uppercase tracking-widest text-slate-400">
+              <span className="mb-0.5 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-pf-editorial-muted">
                 Original
               </span>
-              <span className="text-sm font-bold text-slate-500">
+              <span className="font-mono text-sm font-semibold text-pf-editorial-ink">
                 {bytesToMB(originalSize)} MB
               </span>
             </div>
 
-            <div className="flex flex-col items-center justify-center px-4">
+            <div className="flex items-center justify-center px-4 text-pf-editorial-muted" aria-hidden="true">
               <svg
-                className="h-4 w-4 text-slate-300"
+                className="h-4 w-4"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -54,27 +53,25 @@ export default function WorkspaceResultDownload({
                   strokeLinejoin="round"
                   strokeWidth={2.5}
                   d="M14 5l7 7m0 0l-7 7m7-7H3"
-                  stroke="#999999"
                 />
               </svg>
             </div>
 
             <div className="flex flex-col text-right">
-              <span className="mb-0.5 text-[9px] font-black uppercase tracking-widest text-emerald-500">
-                New Size
+              <span className="mb-0.5 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-pf-editorial-accent">
+                Output
               </span>
-              <span className="text-sm font-bold text-emerald-500">
+              <span className="font-mono text-sm font-semibold text-pf-editorial-ink">
                 {bytesToMB(newSize)} MB
               </span>
             </div>
-          </div>
         </div>
       )}
 
       <a
         href={resultUrl}
         download={downloadName}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-3.5 text-sm font-bold text-white transition-all hover:bg-emerald-400 hover:shadow-lg hover:shadow-emerald-500/20"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-pf-control bg-pf-editorial-accent px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-pf-accent-hover"
       >
         <svg
           className="h-5 w-5"

@@ -82,7 +82,13 @@ export default function WatermarkAdder() {
     <ToolPageWrapper>
       <ToolWorkspaceShell
         minHeight="min-h-96"
-        leftHeader={<ClientSideHeader />}
+        leftHeader={
+          <ClientSideHeader
+            category="Edit / 05"
+            title="Watermark setup"
+            description="Place styled text or a logo directly on the image, then export a flattened copy."
+          />
+        }
         leftBody={
           <div className="space-y-4">
             {!file ? (
@@ -141,9 +147,10 @@ export default function WatermarkAdder() {
           />
         }
         rightHeader={
-          <h3 className="text-sm font-medium text-slate-700">
-            Preview Workspace
-          </h3>
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-sm font-semibold text-pf-editorial-ink">Placement preview</h2>
+            <span className="font-mono text-[0.65rem] uppercase tracking-wider text-pf-editorial-muted">{activeTab} overlay</span>
+          </div>
         }
         rightBody={
           <div className="absolute inset-0 flex flex-col">
@@ -174,6 +181,7 @@ export default function WatermarkAdder() {
                     isSelected={isOverlaySelected}
                     onSelect={() => actions.setIsOverlaySelected(true)}
                     onDelete={actions.handleDeleteSelected}
+                    onNudge={actions.nudgeOverlay}
                   />
                 </>
               )}

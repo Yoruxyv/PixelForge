@@ -43,7 +43,7 @@ export default function RichTextWatermarkInput({
   const renderBackdropText = () => {
     if (!textWm.text) {
       return (
-        <span className="text-slate-400">
+        <span className="text-pf-editorial-muted">
           Enter watermark text{'\n'}Press Enter for new line
         </span>
       );
@@ -84,12 +84,12 @@ export default function RichTextWatermarkInput({
       <style>{CustomStyles}</style>
       <label
         htmlFor="watermark-text"
-        className="mb-1.5 block text-xs font-bold text-slate-700 uppercase tracking-wide"
+        className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.14em] text-pf-editorial-muted"
       >
         Watermark Text
       </label>
 
-      <div className="relative w-full h-24 rounded-lg border border-slate-200 bg-white shadow-sm focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-100 text-sm font-semibold text-slate-700">
+      <div className="relative h-24 w-full rounded-pf-control border border-pf-editorial-line bg-pf-editorial-base text-sm font-semibold text-pf-editorial-ink focus-within:border-pf-editorial-accent">
         <div
           ref={backdropRef}
           aria-hidden="true"
@@ -109,7 +109,7 @@ export default function RichTextWatermarkInput({
           onClick={onInteraction}
           onScroll={handleScroll}
           spellCheck={false}
-          className="rich-text-input absolute inset-0 w-full h-full p-3 resize-none bg-transparent text-transparent caret-slate-900 outline-none custom-textarea-scroll"
+          className="rich-text-input custom-textarea-scroll absolute inset-0 h-full w-full resize-none bg-transparent p-3 text-transparent caret-pf-editorial-ink outline-none"
           style={{ lineHeight: '1.5rem', fontFamily: 'inherit' }}
         />
       </div>

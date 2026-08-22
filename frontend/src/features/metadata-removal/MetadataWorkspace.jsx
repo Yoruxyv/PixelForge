@@ -1,23 +1,22 @@
 /**
  * Metadata removal workspace page.
  *
- * Lets users upload an image, remove embedded metadata client-side, preview the
- * cleaned result, and download the sanitized file.
+ * Lets users inspect detected image metadata, remove it locally, and download
+ * the cleaned file without changing the processor contract.
  */
 
-import { useObjectUrlCleanup } from '@/shared/hooks/useObjectUrlCleanup';
 import { useMemo } from 'react';
+import ToolPageWrapper from '@/shared/components/workspace/ToolPageWrapper';
 import ToolStateWrapper from '@/shared/components/workspace/ToolStateWrapper';
+import ClientSideHeader from '@/shared/components/workspace/ClientSideHeader';
+import { useObjectUrlCleanup } from '@/shared/hooks/useObjectUrlCleanup';
+import { bytesToMB } from '@/shared/lib/fileUtils';
 import { useMetadataProcessor } from './useMetadataProcessor';
 
 const formatKey = (key) =>
-  key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
+  key.replace(/([A-Z])/g, ' $1').replace(/^./, (character) => character.toUpperCase());
 
-/**
- * Render the metadata removal workspace.
- *
- * @returns {JSX.Element} Rendered UI.
- */
+/** @returns {JSX.Element} */
 export default function MetadataWorkspace() {
   const {
     selectedFile,
@@ -36,174 +35,134 @@ export default function MetadataWorkspace() {
   );
   useObjectUrlCleanup(trackedUrls);
 
+  const metadataRows = useMemo(
+    () =>
+      Object.entries(metadata || {}).filter(
+        ([, value]) => typeof value === 'string' || typeof value === 'number',
+      ),
+    [metadata],
+  );
+
   return (
-    <div className="w-full">
-      <section className="max-w-6xl mx-auto px-6 pt-4 pb-16 text-center relative z-10">
+    <ToolPageWrapper>
+      <section className="mx-auto w-full max-w-6xl">
+        <div className="mb-6 max-w-xl">
+          <ClientSideHeader
+            category="Utilities / 01"
+            title="Privacy scan"
+            description="Inspect embedded image data, strip it locally, and download a clean copy ready to share."
+          />
+        </div>
+
         <ToolStateWrapper
           file={selectedFile}
           error={null}
           isProcessing={isProcessing}
-          processingText="Scanning pixels for hidden data..."
+          processingText="Scanning the image for embedded data..."
           onFileSelect={handleFileSelect}
           onReset={handleCancel}
         >
-          {/* GUARD: Only evaluate this UI if a file exists and processing is done */}
-          {selectedFile &&
-            !isProcessing &&
-            (isClean ? (
-              <div className="bg-white/50 backdrop-blur-2xl p-8 rounded-2xl shadow-xl border border-emerald-100/60 max-w-2xl mx-auto text-center flex flex-col items-center">
-                <div className="w-16 h-16 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mb-4 shadow-sm border border-emerald-200">
-                  <svg
-                    className="w-8 h-8"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    ></path>
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-black text-slate-800 mb-2">
-                  Already Clean!
-                </h3>
-                <p className="text-slate-600 font-medium mb-6">
-                  We scanned the file, and no EXIF data, location tags, or
-                  hidden metadata were found. It is already safe to share.
+          {selectedFile && !isProcessing && isClean ? (
+            <div className="grid overflow-hidden rounded-pf-card border border-pf-editorial-line bg-pf-editorial-surface lg:grid-cols-[1.1fr_0.9fr]">
+              <figure className="flex min-h-96 items-center justify-center bg-pf-editorial-footer p-5">
+                <img src={previewUrl} alt="Uploaded preview" className="max-h-[32rem] w-full object-contain" />
+              </figure>
+              <div className="flex flex-col justify-center border-t border-pf-editorial-line p-pf-panel lg:border-l lg:border-t-0">
+                <span className="mb-4 font-mono text-[0.65rem] uppercase tracking-[0.18em] text-pf-success">
+                  Scan complete · 0 fields found
+                </span>
+                <h2 className="text-3xl font-semibold tracking-[-0.03em] text-pf-editorial-ink">
+                  No embedded metadata
+                </h2>
+                <p className="mt-3 text-sm leading-6 text-pf-editorial-muted">
+                  This file does not contain readable EXIF, location, or camera fields. No new copy is needed.
                 </p>
-
-                <div className="bg-white/50 rounded-xl p-2 border border-white/40 mb-8 w-full max-w-sm h-48 flex justify-center shadow-inner">
-                  <img
-                    src={previewUrl}
-                    alt="Original"
-                    className="h-full w-auto object-contain rounded-lg"
-                  />
-                </div>
-
+                <dl className="mt-8 grid grid-cols-2 border-y border-pf-editorial-line py-4">
+                  <div>
+                    <dt className="text-[0.6rem] uppercase tracking-wider text-pf-editorial-muted">File</dt>
+                    <dd className="mt-1 truncate text-sm font-semibold text-pf-editorial-ink">{selectedFile.name}</dd>
+                  </div>
+                  <div className="text-right">
+                    <dt className="text-[0.6rem] uppercase tracking-wider text-pf-editorial-muted">Size</dt>
+                    <dd className="mt-1 font-mono text-sm text-pf-editorial-ink">{bytesToMB(selectedFile.size)} MB</dd>
+                  </div>
+                </dl>
                 <button
+                  type="button"
                   onClick={handleCancel}
-                  className="w-full sm:w-auto px-8 py-3 text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-colors shadow-sm"
+                  className="mt-6 rounded-pf-control border border-pf-editorial-line px-5 py-3 text-sm font-semibold text-pf-editorial-muted transition-colors hover:border-pf-editorial-muted hover:text-pf-editorial-ink"
                 >
-                  Scan Another Image
+                  Scan another image
                 </button>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-left">
-                <div className="bg-white/50 backdrop-blur-2xl p-6 rounded-2xl shadow-xl border border-white/60 flex flex-col h-full">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-bold text-slate-800">
-                      Original File
-                    </h3>
-                    <span className="text-xs font-bold bg-rose-100 text-rose-600 px-2 py-1 rounded-md uppercase tracking-wider">
-                      Has Metadata
-                    </span>
-                  </div>
+            </div>
+          ) : null}
 
-                  <div className="bg-white/50 rounded-xl p-2 border border-white/40 flex justify-center mb-6 h-48 shrink-0 shadow-inner">
-                    <img
-                      src={previewUrl}
-                      alt="Original"
-                      className="h-full w-auto object-contain rounded-lg"
-                    />
-                  </div>
-
-                  <div className="grow bg-white/60 rounded-xl border border-white/80 p-4 overflow-y-auto max-h-75 custom-scrollbar shadow-inner">
-                    <h4 className="text-xs font-extrabold text-slate-900 bg-slate-100 uppercase tracking-widest text-center mb-4 py-2 px-4 rounded-lg border-b border-slate-200/60">
-                      Extracted EXIF Data
-                    </h4>
-                    <div className="space-y-2">
-                      {/* Added fallback to empty object to prevent crash if metadata is undefined */}
-                      {Object.entries(metadata || {})
-                        .filter(
-                          ([val]) =>
-                            typeof val === 'string' || typeof val === 'number',
-                        )
-                        .map(([key, val]) => (
-                          <div
-                            key={key}
-                            className="flex justify-between items-center text-sm border-b border-slate-200/60 pb-1 last:border-0"
-                          >
-                            <span className="text-slate-500 font-medium">
-                              {formatKey(key)}
-                            </span>
-                            <span
-                              className="text-slate-800 font-semibold text-right max-w-[50%] truncate"
-                              title={String(val)}
-                            >
-                              {String(val)}
-                            </span>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
+          {selectedFile && !isProcessing && !isClean ? (
+            <div className="grid overflow-hidden rounded-pf-card border border-pf-editorial-line bg-pf-editorial-surface lg:grid-cols-2">
+              <article className="flex min-h-0 flex-col p-pf-panel">
+                <div className="mb-4 flex items-baseline justify-between gap-4">
+                  <h2 className="text-lg font-semibold text-pf-editorial-ink">Original file</h2>
+                  <span className="font-mono text-[0.65rem] uppercase tracking-wider text-pf-danger">
+                    {metadataRows.length} fields
+                  </span>
                 </div>
-
-                <div className="bg-white/50 backdrop-blur-2xl p-6 rounded-2xl shadow-xl border border-white/60 flex flex-col h-full">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-bold text-slate-800">
-                      Cleaned File
-                    </h3>
-                    <span className="text-xs font-bold bg-emerald-100 text-emerald-700 px-2 py-1 rounded-md uppercase tracking-wider">
-                      Metadata Stripped
-                    </span>
-                  </div>
-
-                  <div className="bg-white/50 rounded-xl p-2 border border-white/40 flex justify-center mb-6 h-48 shrink-0 shadow-inner">
-                    <img
-                      src={strippedUrl}
-                      alt="Stripped"
-                      className="h-full w-auto object-contain rounded-lg"
-                    />
-                  </div>
-
-                  <div className="grow flex flex-col justify-center items-center text-center px-4 space-y-4">
-                    <div className="w-16 h-16 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mb-2 shadow-sm border border-emerald-200">
-                      <svg
-                        className="w-8 h-8"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        ></path>
-                      </svg>
-                    </div>
-                    <h4 className="text-xl font-black text-slate-800">
-                      100% Clean & Private
-                    </h4>
-                    <p className="text-sm text-slate-600 font-medium">
-                      All hidden location data, camera settings, and tracking
-                      timestamps have been permanently removed.
-                    </p>
-                  </div>
-
-                  <div className="flex gap-3 mt-6 pt-4 border-t border-slate-200/50">
-                    <button
-                      onClick={handleCancel}
-                      className="flex-1 py-3 text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-colors shadow-sm"
-                    >
-                      Scan Another Image
-                    </button>
-                    <a
-                      href={strippedUrl}
-                      download={`Cleaned-${selectedFile.name}`}
-                      className="flex-2 flex justify-center items-center py-3 text-sm font-bold text-white bg-slate-900 rounded-xl hover:bg-slate-800 transition-all shadow-md"
-                    >
-                      Download Clean Image
-                    </a>
-                  </div>
+                <figure className="flex h-60 items-center justify-center rounded-pf-control border border-pf-editorial-line bg-pf-editorial-footer p-3">
+                  <img src={previewUrl} alt="Original preview" className="h-full w-full object-contain" />
+                </figure>
+                <div className="mt-5 min-h-0 flex-1 border-t border-pf-editorial-line pt-4">
+                  <h3 className="mb-3 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-pf-editorial-muted">
+                    Detected metadata
+                  </h3>
+                  <dl className="max-h-64 overflow-y-auto pr-2">
+                    {metadataRows.map(([key, value]) => (
+                      <div key={key} className="grid grid-cols-[minmax(7rem,0.8fr)_minmax(0,1.2fr)] gap-4 border-b border-pf-editorial-line py-2 text-sm">
+                        <dt className="text-pf-editorial-muted">{formatKey(key)}</dt>
+                        <dd className="truncate text-right font-mono text-xs text-pf-editorial-ink" title={String(value)}>
+                          {String(value)}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
                 </div>
-              </div>
-            ))}
+              </article>
+
+              <article className="flex flex-col border-t border-pf-editorial-line bg-pf-editorial-base p-pf-panel lg:border-l lg:border-t-0">
+                <div className="mb-4 flex items-baseline justify-between gap-4">
+                  <h2 className="text-lg font-semibold text-pf-editorial-ink">Cleaned output</h2>
+                  <span className="font-mono text-[0.65rem] uppercase tracking-wider text-pf-success">Metadata stripped</span>
+                </div>
+                <figure className="flex h-60 items-center justify-center rounded-pf-control border border-pf-editorial-line bg-pf-editorial-footer p-3">
+                  <img src={strippedUrl} alt="Cleaned output" className="h-full w-full object-contain" />
+                </figure>
+                <div className="flex flex-1 flex-col justify-center py-8">
+                  <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-pf-editorial-accent">Ready to share</p>
+                  <h3 className="mt-2 text-2xl font-semibold tracking-[-0.02em] text-pf-editorial-ink">A clean local copy</h3>
+                  <p className="mt-2 max-w-md text-sm leading-6 text-pf-editorial-muted">
+                    The generated image keeps its visible pixels while removing the detected embedded fields.
+                  </p>
+                </div>
+                <div className="grid gap-3 border-t border-pf-editorial-line pt-5 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="rounded-pf-control border border-pf-editorial-line px-5 py-3 text-sm font-semibold text-pf-editorial-muted transition-colors hover:border-pf-editorial-muted hover:text-pf-editorial-ink"
+                  >
+                    Scan another
+                  </button>
+                  <a
+                    href={strippedUrl}
+                    download={`Cleaned-${selectedFile.name}`}
+                    className="flex items-center justify-center rounded-pf-control bg-pf-editorial-accent px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-pf-accent-hover"
+                  >
+                    Download clean image
+                  </a>
+                </div>
+              </article>
+            </div>
+          ) : null}
         </ToolStateWrapper>
       </section>
-    </div>
+    </ToolPageWrapper>
   );
 }

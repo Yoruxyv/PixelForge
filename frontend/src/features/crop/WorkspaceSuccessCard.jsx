@@ -15,7 +15,7 @@ import PropTypes from 'prop-types';
  * @returns {JSX.Element}
  */
 export default function WorkspaceSuccessCard({
-  title = 'Task Successful!',
+  title = 'Task complete',
   description = 'Your file is ready to use.',
   resultUrl,
   downloadName,
@@ -32,37 +32,21 @@ export default function WorkspaceSuccessCard({
   );
 
   return (
-    <div className="bg-white/50 backdrop-blur-2xl p-8 rounded-2xl shadow-xl border border-indigo-100/60 max-w-2xl mx-auto text-center flex flex-col items-center">
-      <style>{`
-        .result-scroll::-webkit-scrollbar {
-          width: 6px;
-        }
-        .result-scroll::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .result-scroll::-webkit-scrollbar-thumb {
-          background: rgba(99, 102, 241, 0.6); 
-          border-radius: 20px;
-        }
-        .result-scroll::-webkit-scrollbar-thumb:hover {
-          background: rgba(67, 56, 202, 1); 
-        }
-      `}</style>
-
-      <div className="w-16 h-16 bg-indigo-100 text-indigo-500 rounded-full flex items-center justify-center mb-4 shadow-sm border border-indigo-200">
+    <div className="mx-auto flex max-w-3xl flex-col items-center border-y border-pf-editorial-line py-8 text-center">
+      <div className="mb-4 flex h-12 w-12 items-center justify-center text-pf-editorial-accent">
         {icon || DefaultIcon}
       </div>
       
-      <h3 className="text-2xl font-black text-slate-800 mb-2">{title}</h3>
-      <p className="text-slate-600 font-medium mb-6">{description}</p>
+      <h3 className="mb-2 text-2xl font-semibold text-pf-editorial-ink">{title}</h3>
+      <p className="mb-6 text-pf-editorial-muted">{description}</p>
 
       {resultUrl && (
-        <div className="bg-white/50 rounded-xl border border-white/40 mb-8 w-full max-w-sm overflow-hidden shadow-inner flex flex-col items-center">
+        <div className="mb-8 flex w-full max-w-xl flex-col items-center overflow-hidden rounded-pf-control border border-pf-editorial-line bg-pf-editorial-footer">
            <div className={`w-full ${imageContainerStyle}`}>
               <img 
                 src={resultUrl} 
                 alt="Result preview" 
-                className="w-full h-auto rounded-lg block shadow-sm" 
+                className="block h-auto w-full"
               />
            </div>
         </div>
@@ -71,14 +55,14 @@ export default function WorkspaceSuccessCard({
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-2 w-full">
         <button
           onClick={onReset}
-          className="w-full sm:w-40 py-2.5 text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-colors shadow-sm"
+          className="w-full rounded-pf-control border border-pf-editorial-line bg-transparent py-2.5 text-sm font-semibold text-pf-editorial-muted transition-colors hover:border-pf-editorial-muted hover:text-pf-editorial-ink sm:w-40"
         >
           {resetText}
         </button>
         <a
           href={resultUrl}
           download={downloadName}
-          className="w-full sm:w-48 flex justify-center items-center py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 transition-all shadow-md shadow-indigo-200"
+          className="flex w-full items-center justify-center rounded-pf-control bg-pf-editorial-accent py-2.5 text-sm font-semibold text-white transition-colors hover:bg-pf-accent-hover sm:w-48"
         >
           {downloadText}
         </a>

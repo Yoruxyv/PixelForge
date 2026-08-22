@@ -45,8 +45,8 @@ export default function TextWatermarkControls({
             }
             label="Font Family"
             transform="none"
-            labelClassName="mb-1.5 block text-xs font-bold text-slate-700 uppercase tracking-wide"
-            buttonClassName="flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-3 h-9 text-sm font-semibold text-slate-700 shadow-sm outline-none transition-all hover:bg-slate-50 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+            labelClassName="mb-1.5 block text-xs font-semibold uppercase tracking-[0.14em] text-pf-editorial-muted"
+            buttonClassName="h-9 w-full rounded-pf-control border border-pf-editorial-line bg-pf-editorial-base px-3 text-sm font-semibold text-pf-editorial-ink outline-none transition-colors hover:border-pf-editorial-muted"
             getOptionStyle={(opt) => ({ fontFamily: opt })}
           />
         </div>

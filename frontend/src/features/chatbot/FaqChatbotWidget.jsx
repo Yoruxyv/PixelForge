@@ -61,7 +61,7 @@ export default function FaqChatbotWidget() {
     <>
       <style dangerouslySetInnerHTML={{ __html: WIDGET_STYLES }} />
       <div
-        className="fw fixed right-4 z-[var(--pf-z-toast)] flex flex-col items-end text-pf-ink sm:right-5"
+        className="fw fixed right-4 z-[var(--pf-z-toast)] flex flex-col items-end text-pf-editorial-ink sm:right-5"
         style={{
           bottom:
             'calc(var(--footer-safe-offset, 16px) + env(safe-area-inset-bottom))',
@@ -74,7 +74,7 @@ export default function FaqChatbotWidget() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 18, scale: 0.96 }}
               transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-              className="mb-3 flex h-[78vh] min-h-130 w-95 max-w-[calc(100vw-24px)] max-h-170 flex-col overflow-hidden rounded-pf-panel border border-pf-line bg-pf-canvas shadow-pf-float"
+              className="mb-3 flex h-[78vh] min-h-130 w-95 max-w-[calc(100vw-24px)] max-h-170 flex-col overflow-hidden rounded-pf-card border border-pf-editorial-line bg-pf-editorial-surface shadow-pf-float"
             >
               <ChatbotHeader
                 img={img}
@@ -88,7 +88,7 @@ export default function FaqChatbotWidget() {
 
               <div
                 ref={bodyRef}
-                className="flex-1 overflow-y-auto fw-scroll px-3 py-3"
+                className="flex-1 overflow-y-auto bg-pf-editorial-surface px-4 py-4 fw-scroll"
               >
                 {view === 'home' && (
                   <HomeView
@@ -130,9 +130,9 @@ export default function FaqChatbotWidget() {
                 )}
               </div>
 
-              <div className="shrink-0 h-11 px-4 flex items-center justify-between">
-                <span className="text-[11px] text-slate-500 font-medium">
-                  Powered by PixelForge AI
+              <div className="flex h-10 shrink-0 items-center border-t border-pf-editorial-line px-4">
+                <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-pf-editorial-muted">
+                  Support / PixelForge
                 </span>
               </div>
             </motion.div>
