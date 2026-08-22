@@ -1,0 +1,140 @@
+name: Quality
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  frontend-quality:
+    name: Frontend quality
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Test
+        run: npm run test -- --run
+      - name: Build
+        run: npm run build
+
+  backend-quality:
+    name: Backend quality
+    runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: test
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pixelforge_test
+      AZURE_CONNECTION_STRING: ""
+      CLOUDFLARE_TURNSTILE_SECRET_KEY: ""
+      DISCORD_WEBHOOK_URL: ""
+      REPLICATE_API_TOKEN: ""
+      ALLOWED_ORIGINS: http://localhost:5173
+      LOG_TO_FILE: "false"
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/requirements-dev.txt
+      - name: Install dependencies
+        run: python -m pip install -r requirements-dev.txt
+      - name: Ruff lint
+        run: ruff check --no-fix .
+      - name: Pytest
+        run: pytest
+
+  backend-baseline:
+    name: Backend formatting and typing baseline (non-blocking)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/requirements-dev.txt
+      - name: Install dependencies
+        run: python -m pip install -r requirements-dev.txt
+      - name: Ruff format check
+        continue-on-error: true
+        run: ruff format --check .
+      - name: Mypy
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        run: mypy
+
+  backend-compatibility:
+    name: Backend compatibility (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    env:
+      ENVIRONMENT: test
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pixelforge_test
+      AZURE_CONNECTION_STRING: ""
+      CLOUDFLARE_TURNSTILE_SECRET_KEY: ""
+      DISCORD_WEBHOOK_URL: ""
+      REPLICATE_API_TOKEN: ""
+      ALLOWED_ORIGINS: http://localhost:5173
+      LOG_TO_FILE: "false"
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt pytest==9.1.1
+      - name: Test
+        run: pytest
+
+  quality-gate:
+    name: Quality gate
+    if: ${{ always() }}
+    needs: [frontend-quality, backend-quality, backend-compatibility]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm required checks passed
+        env:
+          FRONTEND: ${{ needs.frontend-quality.result }}
+          BACKEND: ${{ needs.backend-quality.result }}
+          COMPATIBILITY: ${{ needs.backend-compatibility.result }}
+        run: '[[ "$FRONTEND" == success && "$BACKEND" == success && "$COMPATIBILITY" == success ]]'

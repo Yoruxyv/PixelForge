@@ -1,7 +1,9 @@
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+fix = false
 
+[tool.ruff.lint]
 select = [
   "E",  # pycodestyle (errors)
   "F",  # pyflakes (unused vars, imports, etc.)
@@ -14,8 +16,38 @@ ignore = [
   "I001",  # import sorting (handled by formatter usually)
 ]
 
-fix = true
-
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra"
+
+[tool.mypy]
+python_version = "3.13"
+files = [
+  "api",
+  "app",
+  "core",
+  "database",
+  "domain",
+  "limiter",
+  "provider",
+  "repository",
+  "services",
+  "tests",
+  "utils",
+  "main.py",
+  "run.py",
+]
+plugins = ["pydantic.mypy"]
+check_untyped_defs = true
+no_implicit_optional = true
+show_error_codes = true
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = ["asyncpg", "filetype"]
+ignore_missing_imports = true

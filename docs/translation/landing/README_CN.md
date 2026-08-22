@@ -46,115 +46,45 @@ PixelForge 最初是一个单一用途的 AI 超分辨率工具，后来逐步�
 
 1. 🔍 **图像超分（AI）** — Real-ESRGAN 画质增强
 
-<details>
-  <summary><b>🎥 点击查看预览</b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/61cff1c1-69f2-4707-9cef-025cee09298f">
-</details>
 
 2. 🧍 **移除背景（AI）** — 干净提取主体
 
-<details>
-  <summary><b>🎥 点击查看预览</b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/d22a42c6-ad5d-41b6-8f83-419aba47d09f">
-</details>
 
 3. 🎨 **恢复颜色（AI）** — 修复灰度与褪色照片
 
-<details>
-  <summary><b>🎥 点击查看预览</b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/68491a17-057d-49cf-b1a2-03cbc2f5f9ca">
-</details>
 
 4. 🎨 **Object Remover（AI）** — 涂抹不需要的物体并将其干净移除
 
-<details>
-  <summary><b>🎥 点击查看预览</b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/3c68ed8b-dad1-4f88-b1d7-873455ecd3ee">
-</details>
 
 5. 🎛️ **图像编辑器** — 亮度、对比度、饱和度、模糊、暗角
 
-<details>
-  <summary><b>🎥 点击查看预览</b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/a2e1db98-212e-4801-afa5-3d0d548925df">
-</details>
 
 6. 📐 **调整图像尺寸** — 自定义尺寸、锁定比例、预设尺寸
 
-<details>
-  <summary><b>🎥 点击查看预览</b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/169353e7-1916-44e5-bfe0-5075bbf4fa8e">
-</details>
 
 7. 🔄 **旋转与翻转** — 快速变换控制
 
-<details>
-  <summary><b>🎥 点击查看预览</b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/a1dda108-f6dd-4a7c-9002-6db21ef25d49">
-</details>
 
 8. 🗜️ **压缩图像** — 通过质量控制减小文件体积
 
-<details>
-  <summary><b>🎥 点击查看预览</b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/25a7f82c-8550-4e0e-8d4c-9a4420d646d9">
-</details>
 
 9. 🔁 **格式转换** — PNG / JPG / WEBP
 
-<details>
-  <summary><b>🎥 点击查看预览</b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/3d353e7a-b614-4bdc-b549-e8a092a41621">
-</details>
 
 10. 🧹 **移除元数据** — 清理 EXIF 数据
 
-<details>
-  <summary><b>🎥 点击查看预览</b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/3b06be04-1020-4b0e-aad8-7aff77e76f58">
-</details>
 
 11. 🎯 **调色板提取器** — 可拖拽的取样点
 
-<details>
-  <summary><b>🎥 点击查看预览</b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/da8a8267-428f-4c02-8abb-4029305511d6">
-</details>
 
 12. 🏷️ **添加水印** — 文本/图片水印与实时预览
 
-<details>
-  <summary><b>🎥 点击查看预览</b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/928bb069-7643-4a0c-b6e5-1056706547f6">
-</details>
 
 13. ✂️ **裁剪图像** — 自由裁剪或使用预设比例
 
-<details>
-  <summary><b>🎥 点击查看预览</b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/717edf23-64d5-4673-bffa-21b10fec7ca9">
-</details>
 
 14. 🤖 **聊天机器人** — 交互式 FAQ 助手，可快速解答问题并提供平台使用引导
 
-<details>
-  <summary><b>🎥 点击查看预览</b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/90083dfb-915a-43f1-a2b3-d9fbefc10bdd">
-</details>
 
 15. 📝 **反馈系统** — 收集用户建议、改进意见与问题报告
 
@@ -377,7 +307,7 @@ npm run dev
 - [PixelForge 测试](../dev/TESTING_ZH.md) ([EN](../../TESTING.md), [ID](../dev/TESTING_ID.md))
 
 开发者辅助脚本：
-- [Total Line Counter](scripts/dev/get_total_lines.ps1) — 交互式 Windows PowerShell 脚本，可按文件夹、文件扩展名和项目区域统计代码行数。
+- [Total Line Counter](../../../scripts/dev/get_total_lines.ps1) — 交互式 Windows PowerShell 脚本，可按文件夹、文件扩展名和项目区域统计代码行数。
 
 > 本地 PowerShell 脚本和 `.bat` 辅助文件仅面向 Windows 开发环境。
 

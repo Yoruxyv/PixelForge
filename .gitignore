@@ -258,3 +258,6 @@ tech_stacks_generator.html
 
 # logs
 logs/
+
+.agents/
+skills-lock.json

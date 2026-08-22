@@ -1,0 +1,39 @@
+name: Links
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: links-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    name: Links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check documentation links
+        uses: lycheeverse/lychee-action@v2.9.0
+        with:
+          args: >-
+            --root-dir .
+            --no-progress
+            --max-retries 3
+            './README.md'
+            './SETUP.md'
+            './CONTRIBUTING.md'
+            './SECURITY.md'
+            './docs/**/*.md'
+            './.github/**/*.md'
+          fail: true
+          jobSummary: true
