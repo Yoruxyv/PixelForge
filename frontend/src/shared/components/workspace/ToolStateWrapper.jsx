@@ -24,16 +24,16 @@ export default function ToolStateWrapper({
 }) {
   if (!file) {
     return (
-      <div className="mx-auto max-w-2xl rounded-pf-panel border border-pf-line bg-pf-surface p-2 shadow-pf-card">
-        <UploadDropzone onFileSelect={onFileSelect} />
+      <div className="mx-auto max-w-2xl border-y border-pf-editorial-line py-6">
+        <UploadDropzone onFileSelect={onFileSelect} variant="editorial" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="mx-auto flex max-w-2xl flex-col items-center rounded-pf-panel border border-pf-danger/30 bg-pf-danger-soft p-8 text-center shadow-pf-card">
-        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-pf-control border border-pf-danger/30 text-pf-danger">
+      <div className="mx-auto flex max-w-2xl flex-col items-center border-y border-pf-danger/30 bg-pf-danger-soft p-8 text-center">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center border border-pf-danger/30 text-pf-danger">
           <svg
             className="w-8 h-8"
             fill="none"
@@ -48,13 +48,13 @@ export default function ToolStateWrapper({
             ></path>
           </svg>
         </div>
-        <h3 className="mb-2 text-2xl font-black text-pf-ink">
+        <h3 className="mb-2 text-2xl font-semibold text-pf-editorial-ink">
           Something went wrong
         </h3>
         <p className="mb-6 font-medium text-pf-danger">{error}</p>
         <button
           onClick={onReset}
-          className="rounded-pf-control border border-pf-line-strong bg-pf-surface px-6 py-3 text-sm font-bold text-pf-ink transition-colors hover:bg-pf-surface-subtle"
+          className="rounded-pf-control border border-pf-editorial-line bg-transparent px-6 py-3 text-sm font-semibold text-pf-editorial-ink transition-colors hover:border-pf-editorial-muted"
         >
           Try Again
         </button>
@@ -64,9 +64,9 @@ export default function ToolStateWrapper({
 
   if (isProcessing) {
     return (
-      <div className="mx-auto flex max-w-md flex-col items-center justify-center rounded-pf-panel border border-pf-line bg-pf-surface p-10 shadow-pf-card" role="status">
-        <div className="mb-4 h-10 w-10 animate-spin rounded-full border-3 border-pf-line border-t-pf-accent"></div>
-        <p className="font-bold text-pf-ink-muted">
+      <div className="mx-auto flex max-w-md flex-col items-center justify-center border-y border-pf-editorial-line p-10" role="status">
+        <div className="mb-4 h-10 w-10 animate-spin rounded-full border-2 border-pf-editorial-line border-t-pf-editorial-accent"></div>
+        <p className="font-semibold text-pf-editorial-muted">
           {processingText}
         </p>
       </div>

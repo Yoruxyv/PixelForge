@@ -18,7 +18,7 @@ export default function WorkspaceErrorAlert({ error, className = 'mb-2' }) {
           exit={{ opacity: 0, height: 0 }}
           className={`${className} overflow-hidden`}
         >
-          <div className="rounded-xl border border-rose-200 bg-rose-50/80 px-4 py-3 text-sm font-medium text-rose-700 shadow-sm backdrop-blur-sm">
+          <div className="rounded-pf-control border border-pf-danger/40 bg-pf-danger-soft px-4 py-3 text-sm font-medium text-pf-danger" role="alert">
             {error}
           </div>
         </motion.div>

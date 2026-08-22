@@ -56,7 +56,13 @@ export default function ImageEditor() {
     <ToolPageWrapper>
       <ToolWorkspaceShell
         minHeight="min-h-96"
-        leftHeader={<ClientSideHeader />}
+        leftHeader={
+          <ClientSideHeader
+            category="Edit / 01"
+            title="Adjustments"
+            description="Tune light, color, and tone with a live local preview, then export the finished image."
+          />
+        }
         leftBody={
           <div className="space-y-6">
             {!file ? (
@@ -86,34 +92,37 @@ export default function ImageEditor() {
         leftFooter={
           <div className="flex gap-2 w-full">
             <button
+              type="button"
               onClick={handleReset}
               disabled={!file || isProcessing}
-              className={`rounded-xl px-4 py-2.5 text-sm font-bold transition-colors ${
+              className={`rounded-pf-control px-4 py-2.5 text-sm font-semibold transition-colors ${
                 !file || isProcessing
-                  ? 'text-slate-300 cursor-not-allowed bg-transparent'
-                  : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                  ? 'cursor-not-allowed text-pf-editorial-muted opacity-40'
+                  : 'text-pf-editorial-muted hover:bg-pf-editorial-raised hover:text-pf-editorial-ink'
               }`}
             >
               Edit Another
             </button>
             <button
+              type="button"
               onClick={resetFilters}
               disabled={!file || isProcessing}
-              className={`rounded-xl px-4 py-2.5 text-sm font-bold transition-colors ${
+              className={`rounded-pf-control px-4 py-2.5 text-sm font-semibold transition-colors ${
                 !file || isProcessing
-                  ? 'text-slate-300 cursor-not-allowed bg-transparent'
-                  : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                  ? 'cursor-not-allowed text-pf-editorial-muted opacity-40'
+                  : 'text-pf-editorial-muted hover:bg-pf-editorial-raised hover:text-pf-editorial-ink'
               }`}
             >
               Reset Filters
             </button>
             <button
+              type="button"
               onClick={applyFilters}
               disabled={!canProcess}
-              className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition-all ${
+              className={`flex-1 rounded-pf-control px-4 py-2.5 text-sm font-semibold text-white transition-colors ${
                 canProcess
-                  ? 'bg-indigo-600 hover:bg-indigo-500 shadow-md hover:shadow-lg'
-                  : 'bg-indigo-300 cursor-not-allowed'
+                  ? 'bg-pf-editorial-accent hover:bg-pf-accent-hover'
+                  : 'cursor-not-allowed bg-pf-editorial-accent opacity-40'
               }`}
             >
               {isProcessing ? 'Exporting...' : 'Export Image'}
@@ -121,12 +130,13 @@ export default function ImageEditor() {
           </div>
         }
         rightHeader={
-          <h3 className="text-sm font-medium text-slate-700">
-            Preview Workspace
-          </h3>
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-sm font-semibold text-pf-editorial-ink">Live preview</h2>
+            <span className="font-mono text-[0.65rem] uppercase tracking-wider text-pf-editorial-muted">Local render</span>
+          </div>
         }
         rightBody={
-          <div className="absolute inset-2 flex flex-col bg-slate-100 rounded-xl overflow-hidden shadow-inner group">
+          <div className="group absolute inset-2 flex flex-col overflow-hidden rounded-pf-control bg-pf-editorial-footer">
             <PreviewImageBox
               previewUrl={displayUrl}
               resultUrl={null}
@@ -153,10 +163,10 @@ export default function ImageEditor() {
                       <ZoomButton
                         isZoomed={isZoomed}
                         onToggle={toggleZoom}
-                        className={`p-2 backdrop-blur rounded-lg border shadow-sm transition-colors ${
+                        className={`rounded-pf-control border p-2 transition-colors ${
                           isZoomed
-                            ? 'bg-indigo-600 border-indigo-600 text-white hover:bg-indigo-700'
-                            : 'bg-white/90 border-slate-200 text-slate-600 hover:text-indigo-600 hover:bg-white'
+                            ? 'border-pf-editorial-accent bg-pf-editorial-accent text-white'
+                            : 'border-pf-editorial-line bg-pf-editorial-surface text-pf-editorial-muted hover:text-pf-editorial-ink'
                         }`}
                       />
                     </div>

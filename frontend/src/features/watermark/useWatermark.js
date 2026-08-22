@@ -1,6 +1,10 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useWorkspaceFile } from '@/shared/hooks/useWorkspaceFile';
-import { calculateImageRect, loadImage } from './watermarkMath';
+import {
+  calculateImageRect,
+  constrainOverlayPosition,
+  loadImage,
+} from './watermarkMath';
 import { renderWatermarkToBlob } from './watermarkRender';
 import {
   WatermarkDefaultImage,
@@ -117,6 +121,20 @@ export function useWatermark() {
       bottom: maxY,
     };
   }, [imageRect, overlaySize]);
+
+  const nudgeOverlay = useCallback(
+    (deltaX, deltaY) => {
+      setOverlayPos((position) =>
+        constrainOverlayPosition(
+          { x: position.x + deltaX, y: position.y + deltaY },
+          dragBounds,
+        ),
+      );
+      setIsOverlaySelected(true);
+      cleanupResult();
+    },
+    [cleanupResult, dragBounds],
+  );
 
   /**
    * @param {Event} e
@@ -262,6 +280,7 @@ export function useWatermark() {
       handleWatermarkImageUpload,
       handleRemoveWatermarkImage,
       handleDeleteSelected,
+      nudgeOverlay,
       applyWatermark,
       handleReset,
     },

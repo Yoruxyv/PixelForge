@@ -39,13 +39,13 @@ export default function ResizeControls({
     <div
       className={`space-y-6 transition-opacity duration-300 ${disabled ? 'pointer-events-none opacity-40' : 'opacity-100'}`}
     >
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+      <div className="border-y border-pf-editorial-line py-4">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="block text-xs font-bold text-slate-700 uppercase tracking-wide">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-pf-editorial-muted">
             Custom Dimensions
           </h3>
           {origWidth > 0 && (
-            <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md">
+            <span className="font-mono text-[0.6rem] uppercase tracking-wider text-pf-editorial-muted">
               Original: {origWidth} x {origHeight}
             </span>
           )}
@@ -55,7 +55,7 @@ export default function ResizeControls({
           <div className="flex-1 relative">
             <label
               htmlFor="targetWidth"
-              className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 absolute -top-2 left-2 bg-white px-1"
+              className="mb-1 block text-[0.6rem] font-semibold uppercase tracking-wider text-pf-editorial-muted"
             >
               Width
             </label>
@@ -67,20 +67,23 @@ export default function ResizeControls({
               min="1"
               max={MaxDimension}
               placeholder="Width"
-              className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 pr-8"
+              className="h-10 w-full rounded-pf-control border border-pf-editorial-line bg-pf-editorial-base px-3 pr-8 text-sm font-semibold text-pf-editorial-ink outline-none transition-colors hover:border-pf-editorial-muted"
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">
+            <span className="pointer-events-none absolute bottom-2.5 right-3 text-xs font-semibold text-pf-editorial-muted">
               px
             </span>
           </div>
 
           <button
+            type="button"
             onClick={onToggleLock}
             title={lockAspect ? 'Unlock Aspect Ratio' : 'Lock Aspect Ratio'}
+            aria-label={lockAspect ? 'Unlock aspect ratio' : 'Lock aspect ratio'}
+            aria-pressed={lockAspect}
             className={`shrink-0 flex items-center justify-center w-10 h-10 rounded-lg transition-all ${
               lockAspect
-                ? 'bg-indigo-100 text-indigo-600 shadow-inner'
-                : 'bg-slate-50 border border-slate-200 text-slate-400 hover:text-indigo-500 hover:bg-slate-100'
+                ? 'bg-pf-editorial-accent-soft text-pf-editorial-accent'
+                : 'border border-pf-editorial-line bg-pf-editorial-base text-pf-editorial-muted hover:text-pf-editorial-ink'
             }`}
           >
             {lockAspect ? (
@@ -105,7 +108,7 @@ export default function ResizeControls({
           <div className="flex-1 relative">
             <label
               htmlFor="targetHeight"
-              className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 absolute -top-2 left-2 bg-white px-1"
+              className="mb-1 block text-[0.6rem] font-semibold uppercase tracking-wider text-pf-editorial-muted"
             >
               Height
             </label>
@@ -117,16 +120,16 @@ export default function ResizeControls({
               min="1"
               max={MaxDimension}
               placeholder="Height"
-              className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 pr-8"
+              className="h-10 w-full rounded-pf-control border border-pf-editorial-line bg-pf-editorial-base px-3 pr-8 text-sm font-semibold text-pf-editorial-ink outline-none transition-colors hover:border-pf-editorial-muted"
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">
+            <span className="pointer-events-none absolute bottom-2.5 right-3 text-xs font-semibold text-pf-editorial-muted">
               px
             </span>
           </div>
         </div>
 
-        <div className="mt-5 pt-4 border-t border-slate-100">
-          <h3 className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-3">
+        <div className="mt-5 border-t border-pf-editorial-line pt-4">
+          <h3 className="mb-3 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-pf-editorial-muted">
             Quick Presets
           </h3>
           <div className="grid grid-cols-2 gap-2">
@@ -140,17 +143,17 @@ export default function ResizeControls({
                   onClick={() => onApplyPreset(preset.width, preset.height)}
                   className={`flex flex-col items-start px-3 py-2 rounded-lg border transition-all ${
                     isSelected
-                      ? 'bg-indigo-50 border-indigo-300 shadow-sm'
-                      : 'bg-slate-50 border-slate-200 hover:bg-white hover:border-indigo-200 hover:shadow-sm'
+                      ? 'border-pf-editorial-accent bg-pf-editorial-accent-soft'
+                      : 'border-pf-editorial-line bg-pf-editorial-base hover:border-pf-editorial-muted'
                   }`}
                 >
                   <span
-                    className={`text-xs font-bold ${isSelected ? 'text-indigo-700' : 'text-slate-700'}`}
+                    className={`text-xs font-semibold ${isSelected ? 'text-pf-editorial-accent' : 'text-pf-editorial-ink'}`}
                   >
                     {preset.label}
                   </span>
                   <span
-                    className={`text-[10px] font-semibold mt-0.5 ${isSelected ? 'text-indigo-500' : 'text-slate-400'}`}
+                    className="mt-0.5 font-mono text-[0.6rem] text-pf-editorial-muted"
                   >
                     {preset.width} × {preset.height} px
                   </span>
@@ -170,14 +173,9 @@ ResizeControls.propTypes = {
   targetWidth: PropTypes.string.isRequired,
   targetHeight: PropTypes.string.isRequired,
   lockAspect: PropTypes.bool.isRequired,
-  isProcessing: PropTypes.bool.isRequired,
-  canProcess: PropTypes.bool.isRequired,
-  previewRatio: PropTypes.number.isRequired,
   onWidthChange: PropTypes.func.isRequired,
   onHeightChange: PropTypes.func.isRequired,
   onToggleLock: PropTypes.func.isRequired,
   onApplyPreset: PropTypes.func.isRequired,
-  onApplyResize: PropTypes.func.isRequired,
-  onReset: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
 };

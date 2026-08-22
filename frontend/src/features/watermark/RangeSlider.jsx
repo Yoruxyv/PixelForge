@@ -15,9 +15,9 @@ import PropTypes from 'prop-types';
 export default function RangeSlider({ id, label, value, min, max, step = 1, onChange, displayValue }) {
   return (
     <div>
-      <label htmlFor={id} className="mb-1.5 flex items-center justify-between text-xs font-bold text-slate-700 uppercase tracking-wide">
+      <label htmlFor={id} className="mb-1.5 flex items-center justify-between text-xs font-semibold uppercase tracking-[0.14em] text-pf-editorial-muted">
         <span>{label}</span>
-        <span className="text-indigo-600">{displayValue}</span>
+        <span className="font-mono text-pf-editorial-accent">{displayValue}</span>
       </label>
       <input
         id={id}
@@ -27,7 +27,7 @@ export default function RangeSlider({ id, label, value, min, max, step = 1, onCh
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="h-1.5 w-full appearance-none rounded-lg bg-indigo-100 accent-indigo-600"
+        className="h-1.5 w-full appearance-none rounded-lg bg-pf-editorial-line accent-pf-editorial-accent"
       />
     </div>
   );

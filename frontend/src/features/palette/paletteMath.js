@@ -8,6 +8,19 @@
 export const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
 /**
+ * Moves a normalized sampling point while keeping it inside the image.
+ * @param {{id: number, x: number, y: number}} point
+ * @param {number} deltaX
+ * @param {number} deltaY
+ * @returns {{id: number, x: number, y: number}}
+ */
+export const nudgePoint = (point, deltaX, deltaY) => ({
+  ...point,
+  x: clamp(point.x + deltaX, 0.02, 0.98),
+  y: clamp(point.y + deltaY, 0.02, 0.98),
+});
+
+/**
  * Generates a deterministic pseudo-random number based on a seed.
  * @param {number} seed 
  * @returns {number}

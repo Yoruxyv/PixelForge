@@ -1,6 +1,8 @@
 import { useRef, useCallback } from 'react';
 import { useWorkspaceFile } from '@/shared/hooks/useWorkspaceFile';
 import ToolStateWrapper from '@/shared/components/workspace/ToolStateWrapper';
+import ToolPageWrapper from '@/shared/components/workspace/ToolPageWrapper';
+import ClientSideHeader from '@/shared/components/workspace/ClientSideHeader';
 import WorkspaceSuccessCard from './WorkspaceSuccessCard';
 import CropEditor from './CropEditor';
 import { useImageCrop } from './useImageCrop';
@@ -77,20 +79,21 @@ export default function CropImage() {
   );
 
   return (
-    <div className="w-full">
+    <ToolPageWrapper>
       <input
         type="file"
         ref={fileInputRef}
         className="hidden"
         onChange={onFileChange}
       />
-      <section
-        className={
-          isFocusMode
-            ? 'w-full mx-auto px-4 sm:px-6 pt-4 pb-6 relative z-10'
-            : 'max-w-6xl mx-auto px-6 pt-4 pb-16 text-center relative z-10'
-        }
-      >
+      <section className={`relative z-10 mx-auto w-full ${isFocusMode ? '' : 'max-w-6xl'}`}>
+        <div className="mb-6 max-w-xl">
+          <ClientSideHeader
+            category="Edit / 04"
+            title="Crop setup"
+            description="Set a precise frame, choose an aspect ratio, and export only the composition you need."
+          />
+        </div>
         <ToolStateWrapper
           file={file}
           error={error}
@@ -101,7 +104,7 @@ export default function CropImage() {
         >
           {resultUrl ? (
             <WorkspaceSuccessCard
-              title="Crop Successful!"
+              title="Crop ready"
               description="Your image is ready to use."
               resultUrl={resultUrl}
               downloadName={downloadName}
@@ -133,6 +136,6 @@ export default function CropImage() {
           )}
         </ToolStateWrapper>
       </section>
-    </div>
+    </ToolPageWrapper>
   );
 }

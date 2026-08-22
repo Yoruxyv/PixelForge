@@ -69,7 +69,13 @@ export default function ResizeImage() {
     <ToolPageWrapper>
       <ToolWorkspaceShell
         minHeight="min-h-96"
-        leftHeader={<ClientSideHeader />}
+        leftHeader={
+          <ClientSideHeader
+            category="Edit / 02"
+            title="Output dimensions"
+            description="Set exact output dimensions, lock the ratio, or start from a practical preset."
+          />
+        }
         leftBody={
           <div className="space-y-6">
             {!file ? (
@@ -110,21 +116,24 @@ export default function ResizeImage() {
           />
         }
         rightHeader={
-          <h3 className="text-sm font-medium text-slate-700">
-            Preview Workspace
-          </h3>
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-sm font-semibold text-pf-editorial-ink">Output preview</h2>
+            <span className="font-mono text-[0.65rem] uppercase tracking-wider text-pf-editorial-muted">
+              {targetWidth && targetHeight ? `${targetWidth} × ${targetHeight} px` : 'Awaiting image'}
+            </span>
+          </div>
         }
         rightBody={
-          <div className="absolute inset-2 flex flex-col bg-white rounded-xl">
+          <div className="absolute inset-2 flex flex-col rounded-pf-control bg-pf-editorial-footer">
             <PreviewImageBox
               previewUrl={showLiveStage ? null : previewUrl}
               resultUrl={resultUrl}
               resultAlt="Resized output preview"
             >
               {showLiveStage && (
-                <div className="absolute inset-0 flex items-center justify-center p-3 pointer-events-none bg-white">
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-pf-editorial-footer p-3">
                   <div
-                    className="relative max-w-full max-h-full border border-slate-200 bg-white rounded-md overflow-hidden"
+                    className="relative max-h-full max-w-full overflow-hidden rounded-pf-control border border-pf-editorial-line bg-pf-editorial-raised"
                     style={{
                       aspectRatio: `${previewRatio}`,
                       width: 'min(100%, calc(100% - 8px))',

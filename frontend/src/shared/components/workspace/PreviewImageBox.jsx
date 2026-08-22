@@ -27,7 +27,7 @@ export default function PreviewImageBox({
   onImageLoad,
   previewClassName = 'opacity-70 transition-all duration-200',
   processingClassName = 'scale-105 opacity-60 blur-[1px] grayscale-[0.1] transition-all duration-200',
-  containerClassName = 'relative flex-1 min-h-0 w-full rounded-pf-panel border border-pf-line bg-pf-surface-inverse overflow-hidden touch-none flex items-center justify-center',
+  containerClassName = 'relative flex-1 min-h-0 w-full rounded-pf-control border border-pf-editorial-line bg-pf-editorial-footer overflow-hidden touch-none flex items-center justify-center',
   containerRef,
   children,
 }) {

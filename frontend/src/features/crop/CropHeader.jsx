@@ -15,11 +15,11 @@ export default function CropHeader({
   applyCrop,
 }) {
   return (
-    <div className="flex-none flex items-center justify-between px-6 py-4 bg-slate-900 border-b border-slate-800 shadow-sm z-10">
+    <header className="z-10 flex flex-none items-center justify-between border-b border-pf-editorial-line bg-pf-editorial-surface px-5 py-4 sm:px-6">
       <div className="flex items-center gap-4">
-        <h2 className="text-white font-bold text-lg">Focus Crop</h2>
+        <h2 className="text-lg font-semibold text-pf-editorial-ink">Focus crop</h2>
         {cropSizeLabel && (
-          <span className="hidden sm:inline-block px-2.5 py-1 rounded-md bg-slate-800 text-indigo-400 text-[10px] font-black tracking-wider uppercase border border-slate-700">
+          <span className="hidden font-mono text-[0.65rem] uppercase tracking-wider text-pf-editorial-accent sm:inline-block">
             {cropSizeLabel}
           </span>
         )}
@@ -27,19 +27,19 @@ export default function CropHeader({
       <div className="flex items-center gap-4">
         <button
           onClick={onCancel}
-          className="text-sm font-bold text-slate-400 hover:text-white transition-colors"
+          className="text-sm font-semibold text-pf-editorial-muted transition-colors hover:text-pf-editorial-ink"
         >
           Cancel
         </button>
         <button
           onClick={applyCrop}
           disabled={!canApply}
-          className="px-6 py-2.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+          className="rounded-pf-control bg-pf-editorial-accent px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-pf-accent-hover disabled:cursor-not-allowed disabled:opacity-45"
         >
           Apply Crop
         </button>
       </div>
-    </div>
+    </header>
   );
 }
 

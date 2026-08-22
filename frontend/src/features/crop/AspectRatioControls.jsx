@@ -9,18 +9,20 @@ import PropTypes from 'prop-types';
  */
 export default function AspectRatioControls({ aspect, onApplyAspect, options }) {
   return (
-    <div className="flex-none bg-slate-900 border-t border-slate-800 p-4 sm:p-5 overflow-x-auto z-10">
-      <div className="flex items-center justify-center gap-2 sm:gap-3 min-w-max mx-auto px-2">
+    <div className="z-10 flex-none overflow-x-auto border-t border-pf-editorial-line bg-pf-editorial-surface p-4">
+      <div className="mx-auto flex min-w-max items-center justify-center gap-2 px-2">
         {options.map((option) => {
           const isSelected = aspect === option.value;
           return (
             <button
               key={option.label}
+              type="button"
               onClick={() => onApplyAspect(option.value)}
-              className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+              aria-pressed={isSelected}
+              className={`rounded-pf-control border px-4 py-2.5 text-xs font-semibold transition-colors sm:text-sm ${
                 isSelected
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/50 scale-105'
-                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700/50'
+                  ? 'border-pf-editorial-accent bg-pf-editorial-accent-soft text-pf-editorial-accent'
+                  : 'border-pf-editorial-line bg-pf-editorial-base text-pf-editorial-muted hover:border-pf-editorial-muted hover:text-pf-editorial-ink'
               }`}
             >
               {option.label}

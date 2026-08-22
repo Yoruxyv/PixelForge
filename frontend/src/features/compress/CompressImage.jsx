@@ -86,7 +86,13 @@ export default function CompressImage() {
     <ToolPageWrapper>
       <ToolWorkspaceShell
         minHeight="min-h-96"
-        leftHeader={<ClientSideHeader />}
+        leftHeader={
+          <ClientSideHeader
+            category="Optimize / 01"
+            title="Compression settings"
+            description="Balance JPEG quality and file weight, compare the real sizes, and download the optimized output."
+          />
+        }
         leftBody={
           <>
             <div className="mb-4">
@@ -102,9 +108,9 @@ export default function CompressImage() {
             </div>
 
             <div className="mb-4 flex flex-col justify-center">
-              <label className="mb-4 flex w-full items-center justify-between text-sm font-bold text-slate-700">
+              <label htmlFor="compression-range" className="mb-4 flex w-full items-center justify-between text-sm font-semibold text-pf-editorial-ink">
                 <span>Compression Level</span>
-                <span className="text-indigo-600">
+                <span className="font-mono text-pf-editorial-accent">
                   {Math.round((1 - quality) * 100)}%
                 </span>
               </label>
@@ -118,10 +124,10 @@ export default function CompressImage() {
                   step="0.05"
                   value={1 - quality}
                   onChange={(e) => setQuality(1 - Number(e.target.value))}
-                  className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-indigo-100 accent-indigo-600"
+                  className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-pf-editorial-line accent-pf-editorial-accent"
                 />
 
-                <div className="mt-2 flex w-full justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <div className="mt-2 flex w-full justify-between text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-pf-editorial-muted">
                   <span>High Quality</span>
                   <span>Small File</span>
                 </div>
@@ -141,14 +147,14 @@ export default function CompressImage() {
           />
         }
         rightHeader={
-          <h3 className="flex items-center justify-between text-sm font-bold text-slate-800">
-            Preview Workspace
+          <h2 className="flex items-center justify-between gap-4 text-sm font-semibold text-pf-editorial-ink">
+            Output preview
             {resultBlob && savingsPercent > 0 && (
-              <span className="rounded-md border border-emerald-200 bg-emerald-100/50 px-2 py-1 text-xs font-semibold text-emerald-600">
+              <span className="font-mono text-[0.65rem] uppercase tracking-wider text-pf-success">
                 Saved {savingsPercent}%
               </span>
             )}
-          </h3>
+          </h2>
         }
         rightBody={
           <div className="absolute inset-2 flex flex-col">

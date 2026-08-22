@@ -57,6 +57,7 @@ export default function ColorPalette() {
     handlePaletteCountChange,
     handleVariationChange,
     onPointPointerDown,
+    onPointKeyDown,
     updateImageRect,
     resetEditor,
   } = useColorPaletteEditor({
@@ -101,7 +102,13 @@ export default function ColorPalette() {
     <ToolPageWrapper>
       <ToolWorkspaceShell
         minHeight="min-h-96"
-        leftHeader={<ClientSideHeader />}
+        leftHeader={
+          <ClientSideHeader
+            category="Utilities / 02"
+            title="Sampling controls"
+            description="Move sampling points over the image, refine the variation, and copy colors directly."
+          />
+        }
         leftBody={
           <>
             {!file && (
@@ -135,17 +142,18 @@ export default function ColorPalette() {
                   className="mb-4 flex flex-col"
                 >
                   <div className="mb-2 flex items-center justify-between gap-3">
-                    <h3 className="text-sm font-bold text-slate-700">
+                    <h3 className="text-sm font-semibold text-pf-editorial-ink">
                       Palette
                     </h3>
-                    <div className="inline-flex rounded-lg border border-slate-200 bg-white p-1 text-[11px] font-bold">
+                    <div className="inline-flex border border-pf-editorial-line bg-pf-editorial-base p-1 text-[0.65rem] font-semibold">
                       <button
                         type="button"
                         onClick={() => setPaletteStyle('square')}
-                        className={`px-2.5 py-1 rounded-md transition ${
+                        aria-pressed={paletteStyle === 'square'}
+                        className={`rounded-pf-control px-2.5 py-1 transition-colors ${
                           paletteStyle === 'square'
-                            ? 'bg-indigo-600 text-white'
-                            : 'text-slate-600 hover:bg-slate-100'
+                            ? 'bg-pf-editorial-accent text-white'
+                            : 'text-pf-editorial-muted hover:bg-pf-editorial-raised hover:text-pf-editorial-ink'
                         }`}
                       >
                         Square
@@ -153,10 +161,11 @@ export default function ColorPalette() {
                       <button
                         type="button"
                         onClick={() => setPaletteStyle('circle')}
-                        className={`px-2.5 py-1 rounded-md transition ${
+                        aria-pressed={paletteStyle === 'circle'}
+                        className={`rounded-pf-control px-2.5 py-1 transition-colors ${
                           paletteStyle === 'circle'
-                            ? 'bg-indigo-600 text-white'
-                            : 'text-slate-600 hover:bg-slate-100'
+                            ? 'bg-pf-editorial-accent text-white'
+                            : 'text-pf-editorial-muted hover:bg-pf-editorial-raised hover:text-pf-editorial-ink'
                         }`}
                       >
                         Circle
@@ -186,7 +195,7 @@ export default function ColorPalette() {
               <button
                 onClick={handleReset}
                 disabled={isProcessing}
-                className="inline-flex w-full items-center justify-center rounded-xl border border-slate-200/60 bg-white/50 px-5 py-3.5 text-sm font-bold text-slate-600 shadow-sm transition-all hover:bg-white hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex w-full items-center justify-center rounded-pf-control border border-pf-editorial-line bg-transparent px-5 py-3 text-sm font-semibold text-pf-editorial-muted transition-colors hover:border-pf-editorial-muted hover:text-pf-editorial-ink disabled:cursor-not-allowed disabled:opacity-45"
               >
                 Upload Another Image
               </button>
@@ -194,9 +203,10 @@ export default function ColorPalette() {
           </div>
         }
         rightHeader={
-          <h3 className="flex items-center justify-between text-sm font-bold text-slate-800">
-            Preview Workspace
-          </h3>
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-sm font-semibold text-pf-editorial-ink">Sampling canvas</h2>
+            <span className="font-mono text-[0.65rem] uppercase tracking-wider text-pf-editorial-muted">{paletteCount} points</span>
+          </div>
         }
         rightBody={
           <div className="absolute inset-2 flex flex-col">
@@ -215,6 +225,7 @@ export default function ColorPalette() {
                     <motion.button
                       key={`picker-${p.id}`}
                       onPointerDown={(e) => onPointPointerDown(e, p.id)}
+                      onKeyDown={(event) => onPointKeyDown(event, p.id)}
                       className="absolute -translate-x-1/2 -translate-y-1/2 cursor-grab rounded-full border-2 border-white/90 shadow-[0_0_0_1px_rgba(15,23,42,0.55)] active:cursor-grabbing"
                       initial={false}
                       animate={{
@@ -229,8 +240,8 @@ export default function ColorPalette() {
                         mass: 0.8,
                       }}
                       style={{ width: 22, height: 22 }}
-                      title={hex.toUpperCase()}
-                      aria-label={`Move color picker ${i + 1}`}
+                      title={`${hex.toUpperCase()} · Use arrow keys to move`}
+                      aria-label={`Move color picker ${i + 1}. Use arrow keys to adjust its position.`}
                     />
                   );
                 })}

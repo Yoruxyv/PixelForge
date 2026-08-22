@@ -113,7 +113,13 @@ export default function ConvertFormat() {
     <ToolPageWrapper>
       <ToolWorkspaceShell
         minHeight="min-h-96"
-        leftHeader={<ClientSideHeader />}
+        leftHeader={
+          <ClientSideHeader
+            category="Optimize / 02"
+            title="Output settings"
+            description="Choose a new image format and quality while keeping the source available for another conversion."
+          />
+        }
         leftBody={
           <>
             <div className="mb-4">
@@ -127,22 +133,22 @@ export default function ConvertFormat() {
               <WorkspaceFileSummary file={file} />
             </div>
 
-            <div className="mb-4 grid grid-cols-2 gap-6">
+            <div className="mb-4 grid grid-cols-1 gap-5 sm:grid-cols-2">
               <FormatDropdown
                 value={targetFormat}
                 options={FILE_LIMITS.ALLOWED_EXTENSIONS}
                 onChange={setTargetFormat}
                 label="Convert To"
-                buttonClassName="flex w-full items-center justify-between rounded-xl border border-white/60 bg-white/60 px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm outline-none transition-all hover:bg-white/80 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                buttonClassName="w-full rounded-pf-control border border-pf-editorial-line bg-pf-editorial-base px-3 py-2.5 text-sm font-semibold text-pf-editorial-ink outline-none transition-colors hover:border-pf-editorial-muted"
                 optionClassName="font-bold"
               />
 
               <div
                 className={`flex flex-col justify-center transition-opacity duration-300 ${targetFormat === 'png' ? 'pointer-events-none opacity-30' : 'opacity-100'}`}
               >
-                <label className="mb-2 flex w-full items-center justify-between text-sm font-bold text-slate-700">
+                <label htmlFor="quality-range" className="mb-2 flex w-full items-center justify-between text-sm font-semibold text-pf-editorial-ink">
                   <span>Quality</span>
-                  <span className="text-indigo-600">
+                  <span className="font-mono text-pf-editorial-accent">
                     {Math.round(quality * 100)}%
                   </span>
                 </label>
@@ -155,7 +161,7 @@ export default function ConvertFormat() {
                     step="0.01"
                     value={quality}
                     onChange={(e) => setQuality(Number(e.target.value))}
-                    className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-indigo-100 accent-indigo-600"
+                    className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-pf-editorial-line accent-pf-editorial-accent"
                   />
                 </div>
               </div>
@@ -174,14 +180,14 @@ export default function ConvertFormat() {
           />
         }
         rightHeader={
-          <h3 className="flex items-center justify-between text-sm font-bold text-slate-800">
-            Preview Workspace
+          <h2 className="flex items-center justify-between gap-4 text-sm font-semibold text-pf-editorial-ink">
+            Output preview
             {resultBlob && (
-              <span className="rounded-md border border-emerald-200 bg-emerald-100/50 px-2 py-1 text-xs font-semibold text-emerald-600">
+              <span className="font-mono text-[0.65rem] uppercase tracking-wider text-pf-success">
                 Ready: {bytesToMB(resultBlob.size)} MB
               </span>
             )}
-          </h3>
+          </h2>
         }
         rightBody={
           <div className="absolute inset-2 flex flex-col">
@@ -199,7 +205,7 @@ export default function ConvertFormat() {
                 <a
                   href={resultUrl}
                   download={downloadName}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-3.5 text-sm font-bold text-white transition-all hover:bg-emerald-400 hover:shadow-lg hover:shadow-emerald-500/20"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-pf-control bg-pf-editorial-accent px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-pf-accent-hover"
                 >
                   Download {targetFormat.toUpperCase()}
                 </a>

@@ -74,7 +74,13 @@ export default function RotateFlip() {
     <ToolPageWrapper>
       <ToolWorkspaceShell
         minHeight="min-h-96"
-        leftHeader={<ClientSideHeader />}
+        leftHeader={
+          <ClientSideHeader
+            category="Edit / 03"
+            title="Transform controls"
+            description="Correct orientation and mirror an image with an immediate local preview."
+          />
+        }
         leftBody={
           <div className="space-y-6">
             {!workspaceState.file ? (
@@ -110,9 +116,12 @@ export default function RotateFlip() {
           />
         }
         rightHeader={
-          <h3 className="text-sm font-medium text-slate-700">
-            Preview Workspace
-          </h3>
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-sm font-semibold text-pf-editorial-ink">Transform preview</h2>
+            <span className="font-mono text-[0.65rem] uppercase tracking-wider text-pf-editorial-muted">
+              {rotation}° · {flipH === -1 ? 'H flip' : 'H normal'} · {flipV === -1 ? 'V flip' : 'V normal'}
+            </span>
+          </div>
         }
         rightBody={
           <div className="absolute inset-2 flex flex-col">
@@ -122,7 +131,7 @@ export default function RotateFlip() {
               resultAlt="Transformed output preview"
             >
               {workspaceState.previewUrl && !workspaceState.resultUrl && (
-                <div className="absolute inset-0 z-10 bg-white flex items-center justify-center overflow-hidden rounded-xl">
+                <div className="absolute inset-0 z-10 flex items-center justify-center overflow-hidden rounded-pf-control bg-pf-editorial-footer">
                   <img
                     src={workspaceState.previewUrl}
                     alt="Live CSS Preview"
