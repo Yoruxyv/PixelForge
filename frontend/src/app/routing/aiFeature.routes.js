@@ -18,24 +18,24 @@ import React from 'react';
 const aiFeatureRoutes = [
   {
     path: '/upscale',
-    component: React.lazy(() => import('../../features/upscale/UpscaleImage')),
+    component: React.lazy(() => import('@/features/upscale/UpscaleImage')),
   },
   {
     path: '/remove-bg',
     component: React.lazy(() =>
-      import('../../features/background-removal/RemoveBackground')
+      import('@/features/background-removal/RemoveBackground')
     ),
   },
   {
     path: '/color-restoration',
     component: React.lazy(() =>
-      import('../../features/color-restoration/ColorRestoration')
+      import('@/features/color-restoration/ColorRestoration')
     ),
   },
   {
     path: '/object-remove',
     component: React.lazy(() =>
-      import('../../features/object-removal/ObjectRemover')
+      import('@/features/object-removal/ObjectRemover')
     ),
   },
 ];

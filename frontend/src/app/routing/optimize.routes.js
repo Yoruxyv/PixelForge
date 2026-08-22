@@ -18,16 +18,16 @@ import React from 'react';
 const optimizeRoutes = [
   {
     path: '/compress-image',
-    component: React.lazy(() => import('../../features/compress/CompressImage')),
+    component: React.lazy(() => import('@/features/compress/CompressImage')),
   },
   {
     path: '/convert-format',
-    component: React.lazy(() => import('../../features/convert/ConvertFormat')),
+    component: React.lazy(() => import('@/features/convert/ConvertFormat')),
   },
   {
     path: '/metadata',
     component: React.lazy(() =>
-      import('../../features/metadata-removal/MetadataWorkspace')
+      import('@/features/metadata-removal/MetadataWorkspace')
     ),
   },
 ];
