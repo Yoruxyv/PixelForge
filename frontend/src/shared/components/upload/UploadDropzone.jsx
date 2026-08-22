@@ -19,6 +19,7 @@ const AllowedFormatsText = FILE_LIMITS.ALLOWED_EXTENSIONS.map((e) =>
 export default function UploadDropzone({
   onFileSelect,
   requireGrayscale = false,
+  variant = 'default',
 }) {
   const { isDragging, error, inputRef, handlers } = useFileUpload({
     onFileSelect,
@@ -27,16 +28,34 @@ export default function UploadDropzone({
   });
 
   const getDropzoneStateClasses = () => {
+    if (variant === 'editorial') {
+      if (isDragging)
+        return 'border-pf-editorial-accent bg-pf-editorial-accent-soft';
+      if (error) return 'border-pf-danger bg-pf-danger-soft';
+      return 'border-pf-editorial-line bg-transparent hover:border-pf-editorial-accent hover:bg-pf-editorial-surface';
+    }
+
     if (isDragging) return 'border-pf-accent bg-pf-accent-soft';
     if (error) return 'border-pf-danger bg-pf-danger-soft';
     return 'border-pf-line-strong bg-pf-surface hover:border-pf-accent hover:bg-pf-accent-soft/30';
   };
 
+  let iconClasses = 'bg-pf-accent-soft border-pf-line text-pf-accent';
+  if (variant === 'editorial') {
+    iconClasses =
+      'border-pf-editorial-line bg-pf-editorial-surface text-pf-editorial-accent';
+  }
+  if (error) {
+    iconClasses = 'bg-pf-danger-soft border-pf-danger/30 text-pf-danger';
+  }
+
   return (
     <button
       type="button"
       aria-label="Upload image file"
-      className={`w-full cursor-pointer rounded-pf-control border border-dashed p-8 text-center transition-colors sm:p-10 ${getDropzoneStateClasses()}`}
+      className={`flex w-full cursor-pointer items-center justify-center rounded-pf-control border border-dashed p-8 text-center transition-colors sm:p-10 ${
+        variant === 'editorial' ? 'min-h-[26rem]' : ''
+      } ${getDropzoneStateClasses()}`}
       onDragOver={handlers.onDragOver}
       onDragLeave={handlers.onDragLeave}
       onDrop={handlers.onDrop}
@@ -54,7 +73,7 @@ export default function UploadDropzone({
       <div className="flex flex-col items-center justify-center space-y-4 pointer-events-none">
         <div
           className={`flex h-12 w-12 items-center justify-center rounded-pf-control border transition-colors
-          ${error ? 'bg-pf-danger-soft border-pf-danger/30 text-pf-danger' : 'bg-pf-accent-soft border-pf-line text-pf-accent'}`}
+          ${iconClasses}`}
         >
           {error ? (
             <svg
@@ -99,10 +118,22 @@ export default function UploadDropzone({
             </>
           ) : (
             <>
-              <p className="text-lg font-bold text-pf-ink">
+              <p
+                className={`text-lg font-bold ${
+                  variant === 'editorial'
+                    ? 'text-pf-editorial-ink'
+                    : 'text-pf-ink'
+                }`}
+              >
                 Drop, paste, or choose an image
               </p>
-              <p className="mt-1.5 text-sm font-medium text-pf-ink-muted">
+              <p
+                className={`mt-1.5 text-sm font-medium ${
+                  variant === 'editorial'
+                    ? 'text-pf-editorial-muted'
+                    : 'text-pf-ink-muted'
+                }`}
+              >
                 {AllowedFormatsText} · Max {FILE_LIMITS.MAX_FILE_SIZE_MB}MB
               </p>
             </>
@@ -116,4 +147,5 @@ export default function UploadDropzone({
 UploadDropzone.propTypes = {
   onFileSelect: PropTypes.func.isRequired,
   requireGrayscale: PropTypes.bool,
+  variant: PropTypes.oneOf(['default', 'editorial']),
 };

@@ -25,16 +25,24 @@ export default function ProgressBar({ progress, customText }) {
   const displayText = customText || getStatusLabel(progress);
 
   return (
-    <div className="w-full space-y-2">
-      <div className="flex justify-between items-center gap-2 text-[10px] sm:text-xs font-bold text-slate-700 px-1">
+    <div className="w-full space-y-3" role="status" aria-live="polite">
+      <div className="flex items-start justify-between gap-3 text-xs font-semibold text-pf-editorial-muted">
         <span className="whitespace-nowrap">{displayText}</span>
-        <span className="shrink-0">{Math.round(progress)}%</span>
+        <span className="shrink-0 font-mono text-pf-editorial-ink">
+          {Math.round(progress)}%
+        </span>
       </div>
-      <div className="w-full bg-white/50 rounded-full h-2.5 border border-white/40 shadow-inner">
-        <div 
-          className="bg-slate-800 h-2.5 rounded-full transition-all duration-300 ease-out shadow-sm" 
+      <div
+        className="h-1 w-full bg-pf-editorial-line"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow={Math.round(progress)}
+      >
+        <div
+          className="h-1 bg-pf-editorial-accent transition-[width] duration-300 ease-out"
           style={{ width: `${progress}%` }}
-        ></div>
+        />
       </div>
     </div>
   );

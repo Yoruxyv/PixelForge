@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import PropTypes from 'prop-types';
 
 /**
@@ -12,6 +12,7 @@ import PropTypes from 'prop-types';
  */
 export default function AppModals({ isOpen, onClose, title, children }) {
   const dialogRef = useRef(null);
+  const titleId = useId();
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -48,7 +49,7 @@ export default function AppModals({ isOpen, onClose, title, children }) {
   return (
     <dialog
       ref={dialogRef}
-      aria-labelledby="modal-title"
+      aria-labelledby={titleId}
       className="m-0 p-0 border-0 bg-transparent max-w-none max-h-none w-screen h-screen fixed inset-0 z-100"
     >
       <div className="fixed inset-0 flex items-center justify-center p-4">
@@ -60,13 +61,13 @@ export default function AppModals({ isOpen, onClose, title, children }) {
         />
 
         <div
-          className="legal-panel relative bg-white/90 backdrop-blur-xl border border-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden"
+          className="legal-panel relative flex max-h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-pf-card border border-pf-editorial-line bg-pf-editorial-surface shadow-pf-float"
         >
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200/60 bg-white/50">
-            <h2 id="modal-title" className="text-xl font-bold text-slate-800">{title}</h2>
+          <div className="flex items-center justify-between border-b border-pf-editorial-line px-6 py-4">
+            <h2 id={titleId} className="text-xl font-bold text-pf-editorial-ink">{title}</h2>
             <button
               onClick={onClose}
-              className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+              className="rounded-pf-control p-2 text-pf-editorial-muted transition-colors hover:bg-pf-editorial-raised hover:text-pf-editorial-ink"
               aria-label="Close dialog"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,14 +76,14 @@ export default function AppModals({ isOpen, onClose, title, children }) {
             </button>
           </div>
 
-          <div className="px-6 py-6 overflow-y-auto text-slate-700 space-y-4 text-sm leading-relaxed">
+          <div className="space-y-4 overflow-y-auto px-6 py-6 text-sm leading-relaxed text-pf-editorial-muted">
             {children}
           </div>
 
-          <div className="px-6 py-4 border-t border-slate-200/60 bg-slate-50/50 flex justify-end">
+          <div className="flex justify-end border-t border-pf-editorial-line bg-pf-editorial-raised px-6 py-4">
             <button
               onClick={onClose}
-              className="px-5 py-2 bg-slate-800 text-white font-medium rounded-lg hover:bg-slate-900 transition-colors shadow-sm focus:ring-2 focus:ring-slate-400 focus:outline-none"
+              className="rounded-pf-control bg-pf-editorial-ink px-5 py-2 font-bold text-pf-editorial-base transition-colors hover:bg-pf-editorial-accent"
             >
               Got it
             </button>

@@ -41,27 +41,22 @@ export default function WorkspaceModals({
   const processingFailureMessage =
     appAlert.message ||
     localStorage.getItem(`${storageKeys.ALERT}_message`) ||
-    'Your image could not be processed. Please try a smaller image or lower upscale setting.';
+    'Your image could not be processed. Try a smaller source image or start a new request.';
 
   return (
     <>
       <AppModals
         isOpen={appAlert.show && appAlert.type === 'potato'}
         onClose={closeAndClear}
-        title="Whoa, slow down! 👀"
+        title="Processing in progress"
       >
         <div className="space-y-1.5 text-left">
-          <p className="font-semibold text-slate-800 text-base">
-            We&apos;re working on it!
+          <p className="text-base font-semibold text-pf-editorial-ink">
+            Your image is still being processed.
           </p>
           <p>
-            Please wait as your image is being processed on our potato server{' '}
-            {"(●'◡'●)"}
-          </p>
-          <p>
-            Since this is a free, open-source project, we are trying to save
-            costs. Refreshing the page won&apos;t speed up the AI, but it might
-            make our server cry.
+            Keep this workspace open while PixelForge completes the request.
+            Refreshing the page will not make it finish sooner.
           </p>
         </div>
       </AppModals>
@@ -69,45 +64,42 @@ export default function WorkspaceModals({
       <AppModals
         isOpen={appAlert.show && appAlert.type === 'dos'}
         onClose={closeAndClear}
-        title="Processing Failed ❌"
+        title="Service unavailable"
       >
         <div className="space-y-1.5 text-left">
-          <p className="font-semibold text-rose-600 text-base mb-2">
-            Image failed to process.
+          <p className="mb-2 text-base font-semibold text-pf-danger">
+            PixelForge could not start this request.
           </p>
           <p>
-            Sorry our servers are currently busy and cannot process your request
-            at the moment.
+            The processing service is currently busy. Your source image has not
+            been changed.
           </p>
-          <p>Please try again, we&apos;re really trying our best! 🥲</p>
+          <p>Please try again in a moment.</p>
         </div>
       </AppModals>
 
       <AppModals
         isOpen={appAlert.show && appAlert.type === 'processing_failed'}
         onClose={closeAndClear}
-        title="Processing Failed ❌"
+        title="Processing failed"
       >
         <div className="space-y-1.5 text-left">
-          <p className="font-semibold text-rose-600 text-base mb-2">
+          <p className="mb-2 text-base font-semibold text-pf-danger">
             We couldn&apos;t finish this image.
           </p>
           <p>{processingFailureMessage}</p>
-          <p>
-            If the image is very large or detailed, try a smaller file or use 2x
-            upscale instead of 4x.
-          </p>
+          <p>If the source is very large or detailed, try a smaller file.</p>
         </div>
       </AppModals>
 
       <AppModals
         isOpen={appAlert.show && appAlert.type === 'auto_downscaled'}
         onClose={closeAndClear}
-        title="Image Optimized Automatically"
+        title="Image adjusted"
       >
         <div className="space-y-1.5 text-left">
-          <p className="font-semibold text-slate-800 text-base mb-2">
-            Image Resized Automatically
+          <p className="mb-2 text-base font-semibold text-pf-editorial-ink">
+            Source resized automatically
           </p>
           <p>
             Your image resolution was larger than PixelForge’s free processing
@@ -123,19 +115,19 @@ export default function WorkspaceModals({
       <AppModals
         isOpen={appAlert.show && appAlert.type === 'reserved_warning'}
         onClose={() => setAppAlert({ show: false, type: null })}
-        title="Session Restored 🔄"
+        title="Session restored"
       >
         {appAlert.show && appAlert.type === 'reserved_warning' && (
           <div className="space-y-1.5 text-left">
-            <p className="font-semibold text-slate-800 text-base mb-2">
-              We reserved your image!
+            <p className="mb-2 text-base font-semibold text-pf-editorial-ink">
+              Your result is available again.
             </p>
             <p>
               Just letting you know that your {sessionImageLabel} image won&apos;t
               stay here forever.
             </p>
             <p>
-              Please remember to download it before it expires in{' '}
+              Export it before it expires in{' '}
               <CountdownTimer
                 targetTimestamp={
                   Number(localStorage.getItem(storageKeys.RESULT_TIMESTAMP)) +
@@ -144,7 +136,7 @@ export default function WorkspaceModals({
                 isWarning={true}
                 onExpire={() => setAppAlert({ show: true, type: 'expired' })}
               />{' '}
-              minutes!
+              minutes.
             </p>
           </div>
         )}
@@ -157,20 +149,19 @@ export default function WorkspaceModals({
           localStorage.removeItem(storageKeys.ALERT);
           localStorage.removeItem(`${storageKeys.ALERT}_message`);
         }}
-        title="Session Expired ⏱️"
+        title="Session expired"
       >
         <div className="space-y-1.5 text-left">
-          <p className="font-semibold text-rose-600 text-base mb-2">
+          <p className="mb-2 text-base font-semibold text-pf-danger">
             Image deleted for privacy.
           </p>
           <p>
             Your session timed out and your image was permanently deleted from
             your browser and our servers to protect your privacy.
           </p>
-          <p>Please upload your image again if you still need to process it!</p>
+          <p>Upload the source again to start a new request.</p>
         </div>
       </AppModals>
-
     </>
   );
 }

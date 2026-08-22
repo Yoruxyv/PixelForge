@@ -23,11 +23,12 @@ function ResultViewerContent({
   originalLabel = 'Original',
   resultLabel = 'Result',
   isHighRes = false,
+  canvasClassName = '',
 }) {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadingText, setLoadingText] = useState('Downloading Results...');
-  const [fitMode, setFitMode] = useState('cover');
+  const [fitMode, setFitMode] = useState('contain');
 
   useEffect(() => {
     if (isLoaded) return undefined;
@@ -65,36 +66,37 @@ function ResultViewerContent({
   const fitClass =
     fitMode === 'cover'
       ? 'object-cover object-top'
-      : 'object-contain bg-slate-100';
+      : 'object-contain';
 
   return (
     <Magnifier
-      containerClassName="relative w-full h-full overflow-hidden rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center min-h-96 group"
+      containerClassName={`group relative flex min-h-[26rem] h-full w-full items-center justify-center overflow-hidden bg-pf-editorial-raised ${canvasClassName}`}
       innerClassName="relative w-full h-full"
       renderControls={({ isZoomed, toggleZoom }) => (
         <>
           {!isLoaded && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm z-50 px-4 text-center pointer-events-none">
-              <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin mb-4"></div>
-              <p className="text-sm font-bold text-slate-700 animate-pulse transition-all duration-300">
+            <div className="pointer-events-none absolute inset-0 z-50 flex flex-col items-center justify-center bg-pf-editorial-base/90 px-4 text-center">
+              <div className="mb-4 h-8 w-8 animate-spin border-2 border-pf-editorial-line border-t-pf-editorial-accent" />
+              <p className="text-sm font-bold text-pf-editorial-ink">
                 {loadingText}
               </p>
             </div>
           )}
-          <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 flex gap-2">
+          <div className="absolute bottom-4 right-4 z-50 flex gap-2 opacity-100 transition-opacity md:opacity-0 md:group-focus-within:opacity-100 md:group-hover:opacity-100">
             <FitModeToggle
               isFitMode={fitMode === 'contain'}
               onToggle={toggleFitMode}
               fitTitle="Show full image"
               fillTitle="Fill container"
+              className="border border-pf-editorial-line bg-pf-editorial-base/90 p-2 text-pf-editorial-muted transition-colors hover:border-pf-editorial-accent hover:text-pf-editorial-ink"
             />
             <ZoomButton
               isZoomed={isZoomed}
               onToggle={toggleZoom}
-              className={`p-2 backdrop-blur rounded-lg border shadow-sm transition-colors ${
+              className={`border p-2 transition-colors ${
                 isZoomed
-                  ? 'bg-indigo-600 border-indigo-600 text-white hover:bg-indigo-700'
-                  : 'bg-white/90 border-slate-200 text-slate-600 hover:text-indigo-600 hover:bg-white'
+                  ? 'border-pf-editorial-accent bg-pf-editorial-accent-soft text-pf-editorial-ink'
+                  : 'border-pf-editorial-line bg-pf-editorial-base/90 text-pf-editorial-muted hover:border-pf-editorial-accent hover:text-pf-editorial-ink'
               }`}
             />
           </div>
@@ -106,13 +108,13 @@ function ResultViewerContent({
           <img
             src={processedImage}
             alt="Processed result"
-            className={`absolute inset-0 w-full h-full ${fitClass}`}
+            className={`absolute inset-0 h-full w-full ${fitClass}`}
             onLoad={handleProcessedLoad}
             onError={() => setIsLoaded(false)}
           />
 
           <div
-            className="absolute top-3 right-3 bg-slate-900/90 text-white text-[10px] font-medium px-2 py-0.5 rounded border border-slate-800 pointer-events-none uppercase tracking-wide shadow-sm z-20 transition-transform"
+            className="pointer-events-none absolute right-3 top-3 z-20 border border-pf-editorial-line bg-pf-editorial-ink px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-pf-editorial-base transition-transform"
             style={{
               transform: isZoomed ? 'scale(0.4)' : 'scale(1)',
               transformOrigin: 'top right',
@@ -122,7 +124,7 @@ function ResultViewerContent({
           </div>
 
           <div
-            className="absolute top-3 left-3 bg-white/95 text-slate-700 text-[10px] font-medium px-2 py-0.5 rounded border border-slate-300 pointer-events-none uppercase tracking-wide shadow-sm z-20 transition-transform"
+            className="pointer-events-none absolute left-3 top-3 z-20 border border-pf-editorial-line bg-pf-editorial-base/90 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-pf-editorial-ink transition-transform"
             style={{
               transform: isZoomed ? 'scale(0.4)' : 'scale(1)',
               transformOrigin: 'top left',
@@ -132,7 +134,7 @@ function ResultViewerContent({
           </div>
 
           <div
-            className="absolute inset-0 w-full h-full pointer-events-none z-10"
+            className="pointer-events-none absolute inset-0 z-10 h-full w-full"
             style={{
               clipPath: `polygon(0 0, ${sliderPosition}% 0, ${sliderPosition}% 100%, 0 100%)`,
             }}
@@ -140,20 +142,22 @@ function ResultViewerContent({
             <img
               src={originalImage}
               alt="Original input"
-              className={`absolute inset-0 w-full h-full pointer-events-auto ${fitClass}`}
+              className={`pointer-events-auto absolute inset-0 h-full w-full ${fitClass}`}
             />
           </div>
 
           <div
-            className="absolute top-0 bottom-0 w-px bg-slate-300 pointer-events-none z-30"
+            className="pointer-events-none absolute bottom-0 top-0 z-30 w-px bg-pf-editorial-accent"
             style={{ left: `${sliderPosition}%` }}
           >
             <div
-              className="absolute top-1/2 -translate-y-1/2 w-7 h-7 bg-white rounded-full shadow-sm flex items-center justify-center border border-slate-200 transition-transform"
+              className="absolute top-1/2 flex h-8 w-8 items-center justify-center rounded-full border border-pf-editorial-accent bg-pf-editorial-ink text-pf-editorial-base transition-transform"
               style={{
                 left: '0',
                 marginLeft: '-14px',
-                transform: isZoomed ? 'scale(0.4)' : 'scale(1)',
+                transform: isZoomed
+                  ? 'translateY(-50%) scale(0.4)'
+                  : 'translateY(-50%) scale(1)',
               }}
             >
               <svg
@@ -165,7 +169,7 @@ function ResultViewerContent({
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-slate-400"
+                className="text-pf-editorial-base"
               >
                 <path d="M9 18l-6-6 6-6" />
                 <path d="M15 6l6 6-6 6" />
@@ -195,6 +199,7 @@ ResultViewerContent.propTypes = {
   originalLabel: PropTypes.string,
   resultLabel: PropTypes.string,
   isHighRes: PropTypes.bool,
+  canvasClassName: PropTypes.string,
 };
 
 /**

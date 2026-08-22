@@ -173,16 +173,16 @@ const ObjectRemoveMaskCanvas = forwardRef(function ObjectRemoveMaskCanvas(
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center p-3">
-      <div className="relative max-w-full max-h-112 rounded-2xl overflow-hidden shadow-inner border border-white/70 bg-white/30">
+    <div className="relative flex h-full w-full flex-col items-center justify-center">
+      <div className="relative max-h-[68vh] max-w-full overflow-hidden border border-pf-editorial-line bg-pf-editorial-base">
         <canvas
           ref={imageCanvasRef}
-          className="block max-w-full max-h-112 object-contain"
+          className="block max-h-[68vh] max-w-full object-contain"
         />
 
         <canvas
           ref={maskCanvasRef}
-          className="absolute inset-0 w-full h-full opacity-55 cursor-crosshair touch-none"
+          className="absolute inset-0 h-full w-full cursor-crosshair touch-none opacity-55"
           onMouseDown={handlePointerDown}
           onMouseMove={drawAt}
           onMouseUp={handlePointerUp}
@@ -193,7 +193,7 @@ const ObjectRemoveMaskCanvas = forwardRef(function ObjectRemoveMaskCanvas(
         />
       </div>
 
-      <div className="mt-3 flex items-center gap-3 text-xs text-slate-600">
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-pf-editorial-muted">
         <span>
           {isReady
             ? 'Paint the object you want to remove.'
@@ -204,7 +204,7 @@ const ObjectRemoveMaskCanvas = forwardRef(function ObjectRemoveMaskCanvas(
           type="button"
           onClick={clearMask}
           disabled={disabled || !isReady}
-          className="px-3 py-1.5 rounded-lg bg-white/70 border border-white text-slate-700 font-bold hover:bg-white disabled:opacity-50"
+          className="border border-pf-editorial-line bg-pf-editorial-base px-3 py-1.5 font-bold text-pf-editorial-ink transition-colors hover:border-pf-editorial-accent disabled:opacity-50"
         >
           Clear Mask
         </button>

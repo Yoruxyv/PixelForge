@@ -17,10 +17,10 @@ export default function MissingMaskModal({ appAlert, setAppAlert }) {
     <AppModals
       isOpen={appAlert.show && appAlert.type === 'missing_mask'}
       onClose={handleClose}
-      title="Selection Required ✏️"
+      title="Selection required"
     >
       <div className="space-y-1.5 text-left">
-        <p className="font-semibold text-slate-800 text-base mb-2">
+        <p className="mb-2 text-base font-semibold text-pf-editorial-ink">
           Please paint the object area first.
         </p>
         <p>

@@ -12,7 +12,6 @@ import AiFeatureWorkspace from '@/shared/components/ai/AiFeatureWorkspace';
 import { useSimulatedProgress } from '@/shared/hooks/ai/useSimulatedProgress';
 import ColorRestoreControls from './ColorRestoreControls';
 import { useColorRestorePipeline } from './useColorRestorePipeline';
-import { marketingProps } from './colorRestoreMarketing';
 
 /**
  * Render the AI color restoration tool.
@@ -56,6 +55,7 @@ export default function ColorRestoration() {
       selectedFile={selectedFile}
       previewUrl={previewUrl}
       isProcessing={isProcessing}
+      isWaitingForToken={isWaitingForToken}
       resultUrl={resultUrl}
       jobId={jobId}
       usesRemaining={usesRemaining}
@@ -67,7 +67,6 @@ export default function ColorRestoration() {
       featureName="colorrestore"
       featureText="color restorations"
       resultLabel="Color Restored"
-      marketingProps={marketingProps}
       onFileSelect={handleFileSelect}
       onCancel={handleCancel}
       leftControls={
@@ -84,9 +83,6 @@ export default function ColorRestoration() {
         />
       }
       downloadPrefix="Colorized-"
-      rightPanelClassName="flex-1 min-h-105 relative rounded-2xl border border-white/50 bg-white/30 flex items-center justify-center overflow-hidden shadow-inner"
-      previewImageClassName={`max-h-96 w-full object-contain p-2 transition-all duration-700 ${isProcessing ? 'scale-105 opacity-60 blur-sm' : 'opacity-100'}`}
-      resultContainerClassName="w-full h-full"
     />
   );
 }
