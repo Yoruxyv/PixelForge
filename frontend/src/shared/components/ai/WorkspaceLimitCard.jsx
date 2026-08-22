@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import CountdownTimer from '@/components/Common/CountdownTimer';
+import CountdownTimer from '@/shared/components/common/CountdownTimer';
 
 /**
  * Displays a limit reached message or a loading state for AI workspace features.

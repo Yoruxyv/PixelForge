@@ -55,7 +55,6 @@ export const STORAGE_KEYS = {
   ALERT: 'pf_alert',
   UPSCALE_HISTORY: 'pf_upscale_history',
   UPLOAD_TIMESTAMP: 'pf_upload_timestamp',
-  FEEDBACK_LIMIT: 'pf_feedback_limit',
   RUNTIME_LIMITS: 'pf_runtime_limits',
 };
 
@@ -84,90 +83,3 @@ export const RESULT_LABELS = {
   colorrestore: 'Color Restored',
   objectremove: 'Object Removed',
 };
-
-export const CROP_ASPECT_RATIOS = [
-  { label: 'Free', value: null },
-  { label: 'Square (1:1)', value: 1 },
-  { label: 'Landscape (16:9)', value: 16 / 9 },
-  { label: 'Portrait (9:16)', value: 9 / 16 },
-  { label: 'Classic (4:3)', value: 4 / 3 },
-  { label: 'Story (3:4)', value: 3 / 4 },
-];
-
-export const SHOWCASES = {
-  upscale: {
-    label: 'AI Upscaler',
-    before: '/demo/upscale_before.jpg',
-    after: '/demo/upscale_after.png',
-  },
-  rembg: {
-    label: 'Background Remover',
-    before: '/demo/rem_bg_before.jpg',
-    after: '/demo/rem_bg_after.png',
-  },
-  color: {
-    label: 'Color Restorer',
-    before: '/demo/res_color_before.jpg',
-    after: '/demo/res_color_after.png',
-  },
-  objectremove: {
-    label: 'Object Remover',
-    before: '/demo/object_remove_before.png',
-    after: '/demo/object_remove_after.png',
-  },
-};
-
-export const FontFamilies = [
-  'Inter',
-  'Poppins',
-  'Montserrat',
-  'Roboto',
-  'Open Sans',
-  'Lato',
-  'Nunito',
-  'Anton',
-  'Caveat',
-  'Dancing Script',
-  'Merriweather',
-  'Oswald',
-  'Pacifico',
-  'Playfair Display',
-  'Raleway',
-  'Ubuntu',
-  'Arial',
-  'Georgia',
-  'Impact',
-];
-
-export const WatermarkDefaulText = {
-  text: 'Your Text Here',
-  charStyles: Array('Your Text Here'.length).fill({
-    b: true,
-    i: false,
-    u: false,
-  }),
-  fontFamily: 'Inter',
-  color: '#ffffff',
-  fontSize: 40,
-  opacity: 0.8,
-  isBold: true,
-  isItalic: false,
-  isUnderline: false,
-};
-
-export const WatermarkDefaultImage = {
-  url: null,
-  opacity: 0.8,
-  scale: 0.3,
-  naturalWidth: 1,
-  naturalHeight: 1,
-};
-
-export const WatermarkColors = [
-  '#ffffff',
-  '#000000',
-  '#ef4444',
-  '#3b82f6',
-  '#10b981',
-  '#f59e0b',
-];

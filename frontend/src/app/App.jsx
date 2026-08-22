@@ -11,14 +11,14 @@
 import { useState, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import { legalModalData } from '@/content/modals/legalModalData';
+import { legalModalData } from './layout/legalModalData';
 import routes from './routing/routes';
 
 import Navbar from './layout/NavBar';
 import GlobalHeader from './layout/GlobalHeader';
 import Footer from './layout/Footer';
-import AppModals from '@/components/Common/AppModals';
-import FaqChatbotWidget from '@/pages/Special/FaqChatbotWidget';
+import AppModals from '@/shared/components/common/AppModals';
+import FaqChatbotWidget from '@/features/chatbot/FaqChatbotWidget';
 
 /**
  * Generic fallback shown while non-workspace pages are loading.

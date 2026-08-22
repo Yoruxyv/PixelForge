@@ -9,7 +9,7 @@ import { useEffect, useRef } from 'react';
 import { loadFileFromIDB } from '@/shared/storage/idb';
 import { clearAppSession } from '@/shared/storage/session';
 import { AppConfig as config } from '@/config';
-import { isExpired } from '@/utils/time';
+import { isExpired } from '@/shared/lib/time';
 
 /**
  * Restore and clean up saved workspace session state.
