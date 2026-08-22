@@ -28,6 +28,8 @@ if not exist "%RESET_SCRIPT%" (
   exit /b 1
 )
 
+set "PYTHONPATH=%BACKEND%;%PYTHONPATH%"
+
 if exist "%BACKEND_PY%" (
   cd /d "%BACKEND%"
   "%BACKEND_PY%" "scripts\%fileName%"

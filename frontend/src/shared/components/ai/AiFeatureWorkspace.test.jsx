@@ -22,6 +22,36 @@ const baseProps = {
 };
 
 describe('AiFeatureWorkspace', () => {
+  it('renders the workspace while usage metadata loads', () => {
+    render(<AiFeatureWorkspace {...baseProps} isLoading />);
+
+    expect(screen.getByText('Awaiting image')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Upload image file' })).toBeInTheDocument();
+    expect(screen.getByText('Checking usage…')).toBeInTheDocument();
+    expect(screen.queryByText('Preparing workspace')).not.toBeInTheDocument();
+  });
+
+  it('shows the quota state only after usage loading completes', () => {
+    const { rerender } = render(
+      <AiFeatureWorkspace {...baseProps} usesRemaining={0} isLoading />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Upload image file' })).toBeInTheDocument();
+    expect(screen.queryByText('Daily limit reached.')).not.toBeInTheDocument();
+
+    rerender(
+      <AiFeatureWorkspace
+        {...baseProps}
+        usesRemaining={0}
+        isLoading={false}
+        resetTimestamp={Date.now() + 60_000}
+      />,
+    );
+
+    expect(screen.getByText('Daily limit reached.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Upload image file' })).not.toBeInTheDocument();
+  });
+
   it('moves from the upload state to a processing workstation', () => {
     const { rerender } = render(<AiFeatureWorkspace {...baseProps} />);
 
