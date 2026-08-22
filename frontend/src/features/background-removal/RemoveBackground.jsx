@@ -81,6 +81,7 @@ export default function RemoveBG() {
       setAppAlert={setAppAlert}
       featureName="rembg"
       featureText="background removals"
+      resultLabel="Background Removed"
       marketingProps={marketingProps}
       onFileSelect={handleFileSelect}
       onCancel={handleCancel}

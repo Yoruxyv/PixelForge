@@ -62,6 +62,8 @@ export default function UpscaleWorkspace() {
       setAppAlert={setAppAlert}
       featureName="upscale"
       featureText="upscales"
+      resultLabel="Upscaled"
+      sessionImageLabel="upscaled"
       marketingProps={marketingProps}
       onFileSelect={handleFileSelect}
       onCancel={handleCancel}

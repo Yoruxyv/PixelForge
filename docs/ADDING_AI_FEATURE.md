@@ -493,29 +493,30 @@ Why this matters:
 
 ### Frontend checklist
 
-For a normal AI feature, usually edit or create these files:
+Keep one AI capability together under its feature root:
 
 ```txt
-frontend/src/services/features/<feature>Service.js
-frontend/src/services/apiService.js
-frontend/src/hooks/actions/use<Feature>Actions.js
-frontend/src/hooks/pipeline/use<Feature>Pipeline.js
-frontend/src/components/Workspace/controls/AiFeatures/<Feature>Controls.jsx
-frontend/src/pages/AiFeatures/<Feature>Page.jsx
-frontend/src/content/feature/<feature>Marketing.jsx
-frontend/src/routes/aiFeature.routes.js
-frontend/src/content/navigation/navConfig.js
-frontend/src/config.js
+frontend/src/features/<feature>/
+├── <Feature>Page.jsx
+├── <Feature>Controls.jsx
+├── <feature>Service.js
+├── use<Feature>Actions.js
+├── use<Feature>Pipeline.js
+└── <feature>Marketing.jsx
 ```
 
-For special tools with custom UI, custom validation, modals, or extra uploads, also check:
+Then update application composition and shared fallback configuration where
+required:
 
 ```txt
-frontend/src/services/base/apiClient.js
-frontend/src/components/Workspace/AiFeatureWorkspace.jsx
-frontend/src/components/Workspace/display/<Feature>CustomEditor.jsx
-frontend/src/content/modals/WorkspaceModals.jsx
+frontend/src/app/routing/aiFeature.routes.js
+frontend/src/app/navigation/navConfig.js
+frontend/src/shared/config/ai.js
 ```
+
+Special tools with custom previews, validation, or extra uploads may add more
+files inside their own feature folder. Change `shared` only when the capability
+is genuinely useful to multiple independent features.
 
 ---
 
@@ -528,66 +529,33 @@ feature key: cartoonize
 display name: Cartoonize
 ```
 
----
+### 6.1 Create `frontend/src/features/cartoonize/cartoonizeService.js`
 
-### 6.1 Create `frontend/src/services/features/cartoonizeService.js`
-
-For normal features:
-
-```js
-import { apiClient } from '../base/apiClient';
-
-export async function cartoonizeImage(file, turnstileToken) {
-  return apiClient.executeAiJob('cartoonize', file, turnstileToken);
-}
-```
-
-For options:
+Feature services call the shared transport directly. Do not add a central API
+facade that imports sibling features.
 
 ```js
+import { apiClient } from '@/shared/api/apiClient';
+
 export async function cartoonizeImage(file, turnstileToken, style = 'anime') {
   return apiClient.executeAiJob('cartoonize', file, turnstileToken, { style });
 }
 ```
 
-For extra uploads, create a custom method inside `apiClient.js`, then call it here.
+Keep specialized multi-upload transport in the feature service, using shared
+`apiClient` and `uploadToAzure` primitives as Object Removal does.
 
----
-
-### 6.2 Update `frontend/src/services/apiService.js`
-
-Import the service:
-
-```js
-import { cartoonizeImage } from './features/cartoonizeService';
-```
-
-Add it to the exported object:
-
-```js
-export const apiService = {
-  uploadImage,
-  removeBackgroundImage,
-  colorRestoreImage,
-  removeObjectFromImage,
-  cartoonizeImage,
-  submitFeedback,
-  pollResult,
-};
-```
-
----
-
-### 6.3 Create `frontend/src/hooks/actions/useCartoonizeActions.js`
+### 6.2 Create `frontend/src/features/cartoonize/useCartoonizeActions.js`
 
 ```js
 import { useCallback } from 'react';
-import { apiService } from '@/services/apiService';
-import { useActions } from './useActions';
+import { useActions } from '@/shared/hooks/ai/useActions';
+import { cartoonizeImage } from './cartoonizeService';
 
 export function useCartoonizeActions(props) {
   const apiCallFn = useCallback(
-    (file, token) => apiService.cartoonizeImage(file, token),
+    (file, token, options = {}) =>
+      cartoonizeImage(file, token, options.style),
     [],
   );
 
@@ -595,235 +563,64 @@ export function useCartoonizeActions(props) {
 }
 ```
 
-With options:
+### 6.3 Create `frontend/src/features/cartoonize/useCartoonizePipeline.js`
 
 ```js
-const apiCallFn = useCallback(
-  (file, token, options = {}) => {
-    return apiService.cartoonizeImage(file, token, options.style);
-  },
-  [],
-);
-```
-
----
-
-### 6.4 Create `frontend/src/hooks/pipeline/useCartoonizePipeline.js`
-
-```js
-import { usePipeline } from './usePipeline';
-import { useCartoonizeActions } from '../actions/useCartoonizeActions';
+import { usePipeline } from '@/shared/hooks/ai/usePipeline';
+import { useCartoonizeActions } from './useCartoonizeActions';
 
 export function useCartoonizePipeline(setProgress) {
   return usePipeline(setProgress, useCartoonizeActions, 'cartoonize');
 }
 ```
 
-The feature key matters because it controls:
+The feature key controls storage namespacing, usage-limit calls, progress
+persistence, and session restoration. It must match the backend key.
 
-- localStorage keys
-- usage limit calls
-- progress persistence
-- session persistence
+### 6.4 Add feature controls and page composition
 
----
-
-### 6.5 Create `frontend/src/components/Workspace/controls/AiFeatures/CartoonizeControls.jsx`
+Create `CartoonizeControls.jsx` and `CartoonizeImage.jsx` in the same feature
+folder. Use shared AI primitives through their public modules:
 
 ```jsx
-import PropTypes from 'prop-types';
-import BaseToolControls from './BaseToolControls';
-
-export default function CartoonizeControls(props) {
-  const getProgressText = () => {
-    if (props.progress < 30) return 'Uploading to Cloud GPUs...';
-    if (props.progress < 50) return 'Analyzing image style...';
-    if (props.progress < 70) return 'Running cartoon model...';
-    if (props.progress < 90) return 'Refining outlines and colors...';
-    if (props.progress < 99) return 'Polishing final output...';
-    return 'Finalizing download...';
-  };
-
-  return (
-    <BaseToolControls
-      {...props}
-      progressText={getProgressText()}
-      submitText="Cartoonize Image"
-    />
-  );
-}
-
-CartoonizeControls.propTypes = {
-  isProcessing: PropTypes.bool.isRequired,
-  isWaitingForToken: PropTypes.bool.isRequired,
-  resultUrl: PropTypes.string,
-  progress: PropTypes.number.isRequired,
-  jobId: PropTypes.string,
-  handleCancel: PropTypes.func.isRequired,
-  handleProcess: PropTypes.func.isRequired,
-  turnstileRef: PropTypes.object.isRequired,
-  setTurnstileToken: PropTypes.func.isRequired,
-};
+import AiFeatureWorkspace from '@/shared/components/ai/AiFeatureWorkspace';
+import BaseToolControls from '@/shared/components/ai/BaseToolControls';
+import { useSimulatedProgress } from '@/shared/hooks/ai/useSimulatedProgress';
 ```
 
----
+The feature page owns its controls, display labels, options, marketing content,
+and any custom preview or validation UI. `AiFeatureWorkspace` owns only the
+cross-feature upload, processing, result, quota, and session presentation.
 
-### 6.6 Create `frontend/src/pages/AiFeatures/CartoonizeImage.jsx`
+### 6.5 Add feature-owned marketing content
 
-```jsx
-import { useState } from 'react';
-import AiFeatureWorkspace from '@/components/Workspace/AiFeatureWorkspace';
-import CartoonizeControls from '@/components/Workspace/controls/AiFeatures/CartoonizeControls';
-import { useCartoonizePipeline } from '@/hooks/pipeline/useCartoonizePipeline';
-import { useSimulatedProgress } from '@/hooks/workspace/Core/useSimulatedProgress';
-import { marketingProps } from '@/content/feature/cartoonizeMarketing';
+Create `frontend/src/features/cartoonize/cartoonizeMarketing.jsx` only when the
+workspace currently renders marketing content. Do not move feature copy into
+`shared`.
 
-export default function CartoonizeImage() {
-  const [progress, setProgress] = useState(0);
+### 6.6 Update `frontend/src/app/routing/aiFeature.routes.js`
 
-  const {
-    selectedFile,
-    previewUrl,
-    isProcessing,
-    resultUrl,
-    jobId,
-    handleFileSelect,
-    handleCancel,
-    handleProcess,
-    turnstileRef,
-    setTurnstileToken,
-    turnstileToken,
-    appAlert,
-    setAppAlert,
-    usesRemaining,
-    resetTimestamp,
-    isLoading,
-    maxLimit,
-    isWaitingForToken,
-  } = useCartoonizePipeline(setProgress);
-
-  useSimulatedProgress(
-    isProcessing,
-    setProgress,
-    turnstileToken,
-    'cartoonize',
-  );
-
-  return (
-    <AiFeatureWorkspace
-      selectedFile={selectedFile}
-      previewUrl={previewUrl}
-      isProcessing={isProcessing}
-      resultUrl={resultUrl}
-      jobId={jobId}
-      usesRemaining={usesRemaining}
-      resetTimestamp={resetTimestamp}
-      isLoading={isLoading}
-      maxLimit={maxLimit}
-      appAlert={appAlert}
-      setAppAlert={setAppAlert}
-      featureName="cartoonize"
-      featureText="cartoon generations"
-      marketingProps={marketingProps}
-      onFileSelect={handleFileSelect}
-      onCancel={handleCancel}
-      leftControls={
-        <CartoonizeControls
-          isProcessing={isProcessing}
-          isWaitingForToken={isWaitingForToken}
-          resultUrl={resultUrl}
-          progress={progress}
-          jobId={jobId}
-          handleCancel={handleCancel}
-          handleProcess={handleProcess}
-          turnstileRef={turnstileRef}
-          setTurnstileToken={setTurnstileToken}
-        />
-      }
-      downloadPrefix="Cartoonized-"
-      rightPanelClassName="flex-1 min-h-105 relative rounded-2xl border border-white/50 bg-white/30 flex items-center justify-center overflow-hidden shadow-inner"
-      previewImageClassName={`max-h-96 w-full object-contain p-2 transition-all duration-700 ${isProcessing ? 'scale-105 opacity-60 blur-sm' : 'opacity-100'}`}
-      resultContainerClassName="w-full h-full"
-    />
-  );
-}
-```
-
----
-
-### 6.7 Create `frontend/src/content/feature/cartoonizeMarketing.jsx`
-
-```jsx
-export const marketingProps = {
-  subtitle: 'Turn photos into clean cartoon-style artwork with AI.',
-  features: [
-    {
-      title: 'AI stylization',
-      description: 'Transform normal photos into stylized cartoon images.',
-    },
-    {
-      title: 'Fast workflow',
-      description: 'Upload, process, and download from one workspace.',
-    },
-    {
-      title: 'Private by design',
-      description: 'Temporary uploads and generated results expire automatically.',
-    },
-  ],
-  steps: [
-    {
-      title: 'Upload image',
-      description: 'Choose a JPG, PNG, or WEBP image.',
-    },
-    {
-      title: 'Run AI',
-      description: 'PixelForge sends your image to the selected AI model.',
-    },
-    {
-      title: 'Download result',
-      description: 'Save the cartoonized image when processing finishes.',
-    },
-  ],
-};
-```
-
----
-
-### 6.8 Update `frontend/src/routes/aiFeature.routes.js`
-
-Add:
+Add a lazy feature entry point:
 
 ```js
 {
   path: '/cartoonize',
-  component: React.lazy(() => import('../pages/AiFeatures/CartoonizeImage')),
+  component: React.lazy(() =>
+    import('../../features/cartoonize/CartoonizeImage')
+  ),
 },
 ```
 
-`frontend/src/routes.js` remains the facade consumed by `App.jsx`, so new AI feature routes should be added to the categorized route file instead of directly editing the facade.
+Route groups compose features; they do not own feature logic.
 
----
+### 6.7 Update `frontend/src/app/navigation/navConfig.js`
 
-### 6.9 Update `frontend/src/content/navigation/navConfig.js`
+Add the tool's discovery link to the appropriate navigation category. A
+navigation category is not a feature folder.
 
-Add the tool to the AI Features section:
+### 6.8 Update `frontend/src/shared/config/ai.js`
 
-```js
-{
-  id: 'cartoonize',
-  to: "/cartoonize",
-  label: "Cartoonize",
-  isAi: true,
-  icon: "M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c.251.023.501.05.75.082m-.75-.082a24.301 24.301 0 00-4.5 0m4.5 0v.001M5 14.5h14M5 14.5l-1.5 6h17l-1.5-6M14.25 3.104v5.714c0 .597.237 1.169.659 1.591L19 14.5",
-  desc: "Turn photos into stylized cartoon artwork.",
-}
-```
-
----
-
-### 6.10 Update `frontend/src/config.js`
-
-Add feature limit:
+Add the frontend fallback limit used before the backend usage response arrives:
 
 ```js
 export const FEATURE_LIMITS = {
@@ -833,24 +630,21 @@ export const FEATURE_LIMITS = {
   colorrestore: 5,
   objectremove: 5,
   cartoonize: 5,
-  feedback: 3,
 };
 ```
 
-Add result label:
+The backend remains the source of truth for quotas. Pass result and restored
+session labels from the feature page instead of adding feature copy to shared
+configuration.
 
-```js
-export const RESULT_LABELS = {
-  upscale: 'Upscaled',
-  rembg: 'Background Removed',
-  colorrestore: 'Color Restored',
-  objectremove: 'Object Removed',
-  cartoonize: 'Cartoonized',
-};
-```
+### 6.9 Add a public feature surface only when needed
+
+Application routes may import the feature's root page directly. If another
+feature must consume a capability, expose only that contract from a small
+`frontend/src/features/<feature>/index.js` and import the index. Never deep-import
+a sibling feature's internal hook, component, service, or helper.
 
 ---
-
 ## 7. Special Feature Patterns
 
 ### Pattern A: Normal one-image feature
@@ -1276,7 +1070,8 @@ executeObjectRemoveJob(file, maskBlob, token)
 
 ### 6. Missing result label
 
-If `RESULT_LABELS[featureName]` is missing, the result viewer falls back to `Processed`.
+If the feature page omits `resultLabel`, the shared result viewer falls back to
+`Processed`.
 
 That is safe, but less polished.
 ---
@@ -1297,10 +1092,10 @@ Use a specific alert type instead:
 setAppAlert({ show: true, type: 'missing_mask' });
 ```
 
-Then display a user-friendly modal in:
+Keep the user-friendly modal with the feature that owns the validation rule:
 
 ```txt
-frontend/src/content/modals/WorkspaceModals.jsx
+frontend/src/features/object-removal/MissingMaskModal.jsx
 ```
 
 Example message:
@@ -1358,16 +1153,15 @@ Backend:
 [ ] services/job/job_manager.py
 
 Frontend:
-[ ] services/features/<feature>Service.js
-[ ] services/apiService.js
-[ ] hooks/actions/use<Feature>Actions.js
-[ ] hooks/pipeline/use<Feature>Pipeline.js
-[ ] components/Workspace/controls/AiFeatures/<Feature>Controls.jsx
-[ ] pages/AiFeatures/<Feature>Page.jsx
-[ ] content/feature/<feature>Marketing.jsx
-[ ] routes/aiFeature.routes.js
-[ ] content/navigation/navConfig.js
-[ ] config.js
+[ ] features/<feature>/<feature>Service.js
+[ ] features/<feature>/use<Feature>Actions.js
+[ ] features/<feature>/use<Feature>Pipeline.js
+[ ] features/<feature>/<Feature>Controls.jsx
+[ ] features/<feature>/<Feature>Page.jsx
+[ ] features/<feature>/<feature>Marketing.jsx
+[ ] app/routing/aiFeature.routes.js
+[ ] app/navigation/navConfig.js
+[ ] shared/config/ai.js
 ```
 
 ### Special AI feature
@@ -1375,10 +1169,10 @@ Frontend:
 ```txt
 Also check:
 [ ] backend/services/job/job_initializer.py
-[ ] frontend/src/services/base/apiClient.js
-[ ] frontend/src/components/Workspace/AiFeatureWorkspace.jsx
-[ ] frontend/src/components/Workspace/display/<Feature>CustomEditor.jsx
-[ ] frontend/src/content/modals/WorkspaceModals.jsx
+[ ] frontend/src/shared/api/apiClient.js
+[ ] frontend/src/shared/components/ai/AiFeatureWorkspace.jsx
+[ ] frontend/src/features/<feature>/<Feature>CustomEditor.jsx
+[ ] frontend/src/features/<feature>/<Feature>Modal.jsx
 ```
 
 ---
@@ -1391,21 +1185,9 @@ PixelForge is maintainable because:
 - Shared AI job routes handle init, polling, and usage
 - Each AI feature owns only its start route
 - Model configuration is centralized
-- Frontend API calls are centralized
-- Frontend pipelines reuse shared state and polling logic
+- Frontend transport is shared while service adapters remain feature-owned
+- Frontend features reuse shared state and polling only where contracts match
 - Workspace UI is reusable through `AiFeatureWorkspace`
 - Special tools can override preview UI through `previewOverride`
-
-As the number of features grows, consider creating a stronger shared feature registry to reduce repeated edits across:
-
-```txt
-frontend/src/routes/aiFeature.routes.js
-frontend/src/content/navigation/navConfig.js
-frontend/src/config.js
-frontend/src/services/apiService.js
-backend/domain/ai_features.py
-backend/core/config.py
-backend/core/model_registry.py
-```
-
-A registry-based approach would make adding future features faster and safer.
+- Route categories remain application composition rather than product owners
+- No registry or facade is added until current source evidence justifies it

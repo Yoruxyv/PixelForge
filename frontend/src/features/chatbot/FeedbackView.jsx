@@ -1,4 +1,4 @@
-import FeedbackForm from '@/features/feedback/FeedbackForm';
+import FeedbackForm from '@/features/feedback';
 import PropTypes from 'prop-types';
 
 /**

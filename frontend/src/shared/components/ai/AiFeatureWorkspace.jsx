@@ -8,7 +8,7 @@ import WorkspaceLimitCard from './WorkspaceLimitCard';
 import WorkspaceMarketing from './WorkspaceMarketing';
 import StagedFileCard from './StagedFileCard';
 import ResultActions from './ResultActions';
-import { AppConfig as config, RESULT_LABELS } from '@/config';
+import { FILE_LIMITS } from '@/shared/config/imageValidation';
 
 /**
  * Reusable AI feature workspace shell for upload, processing, preview, and result actions.
@@ -27,11 +27,13 @@ export default function AiFeatureWorkspace({
   setAppAlert,
   featureName,
   featureText,
+  resultLabel = 'Processed',
+  sessionImageLabel = 'transparent',
   marketingProps,
   onFileSelect,
   onCancel,
   leftControls,
-  supportsList = config.ALLOWED_EXTENSIONS,
+  supportsList = FILE_LIMITS.ALLOWED_EXTENSIONS,
   downloadPrefix = 'Result-',
   emptyState = null,
   rightPanelClassName = 'flex-1 min-h-105 relative rounded-2xl border border-white/50 bg-white/30 flex items-center justify-center overflow-hidden shadow-inner isolate',
@@ -60,7 +62,7 @@ export default function AiFeatureWorkspace({
             originalImage={previewUrl}
             processedImage={resultUrl}
             onImageLoad={() => setIsResultLoaded(true)}
-            resultLabel={RESULT_LABELS[featureName] ?? 'Processed'}
+            resultLabel={resultLabel}
           />
         </div>
       );
@@ -186,6 +188,7 @@ export default function AiFeatureWorkspace({
         appAlert={appAlert}
         setAppAlert={setAppAlert}
         featureName={featureName}
+        sessionImageLabel={sessionImageLabel}
       />
     </div>
   );
@@ -205,6 +208,8 @@ AiFeatureWorkspace.propTypes = {
   setAppAlert: PropTypes.func.isRequired,
   featureName: PropTypes.string.isRequired,
   featureText: PropTypes.string.isRequired,
+  resultLabel: PropTypes.string,
+  sessionImageLabel: PropTypes.string,
   marketingProps: PropTypes.shape({
     subtitle: PropTypes.string.isRequired,
     features: PropTypes.array.isRequired,

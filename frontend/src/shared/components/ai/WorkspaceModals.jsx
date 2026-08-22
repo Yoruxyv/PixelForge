@@ -9,7 +9,7 @@ import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import AppModals from '@/shared/components/common/AppModals';
 import CountdownTimer from '@/shared/components/common/CountdownTimer';
-import { AppConfig as config } from '@/config';
+import { SESSION_EXPIRATION } from '@/shared/config/session';
 import { makeStorageKeys } from '@/shared/storage/storageKeys';
 
 /**
@@ -21,6 +21,7 @@ export default function WorkspaceModals({
   appAlert,
   setAppAlert,
   featureName,
+  sessionImageLabel,
 }) {
   const storageKeys = makeStorageKeys(featureName);
 
@@ -37,7 +38,6 @@ export default function WorkspaceModals({
     localStorage.removeItem(storageKeys.REFRESH_COUNT);
   };
 
-  const imageTypeName = featureName === 'upscale' ? 'upscaled' : 'transparent';
   const processingFailureMessage =
     appAlert.message ||
     localStorage.getItem(`${storageKeys.ALERT}_message`) ||
@@ -131,7 +131,7 @@ export default function WorkspaceModals({
               We reserved your image!
             </p>
             <p>
-              Just letting you know that your {imageTypeName} image won&apos;t
+              Just letting you know that your {sessionImageLabel} image won&apos;t
               stay here forever.
             </p>
             <p>
@@ -139,7 +139,7 @@ export default function WorkspaceModals({
               <CountdownTimer
                 targetTimestamp={
                   Number(localStorage.getItem(storageKeys.RESULT_TIMESTAMP)) +
-                  config.RESULT_EXPIRATION_TIME
+                  SESSION_EXPIRATION.RESULT_MS
                 }
                 isWarning={true}
                 onExpire={() => setAppAlert({ show: true, type: 'expired' })}
@@ -171,26 +171,6 @@ export default function WorkspaceModals({
         </div>
       </AppModals>
 
-      <AppModals
-        isOpen={appAlert.show && appAlert.type === 'missing_mask'}
-        onClose={closeAndClear}
-        title="Selection Required ✏️"
-      >
-        <div className="space-y-1.5 text-left">
-          <p className="font-semibold text-slate-800 text-base mb-2">
-            Please paint the object area first.
-          </p>
-          <p>
-            Object Remove needs a painted mask so PixelForge knows exactly which
-            part of the image you want to remove.
-          </p>
-          <p>
-            Use the brush on the preview image, paint over the unwanted object,
-            then click <span className="font-semibold">Remove Object</span>{' '}
-            again.
-          </p>
-        </div>
-      </AppModals>
     </>
   );
 }
@@ -199,4 +179,5 @@ WorkspaceModals.propTypes = {
   appAlert: PropTypes.object.isRequired,
   setAppAlert: PropTypes.func.isRequired,
   featureName: PropTypes.string.isRequired,
+  sessionImageLabel: PropTypes.string.isRequired,
 };

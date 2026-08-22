@@ -11,6 +11,7 @@ import AiFeatureWorkspace from '@/shared/components/ai/AiFeatureWorkspace';
 import { useSimulatedProgress } from '@/shared/hooks/ai/useSimulatedProgress';
 import ObjectRemoveControls from './ObjectRemoveControls';
 import ObjectRemoveMaskCanvas from './ObjectRemoveMaskCanvas';
+import MissingMaskModal from './MissingMaskModal';
 import { useObjectRemovePipeline } from './useObjectRemovePipeline';
 import { marketingProps } from './objectRemoverMarketing';
 
@@ -100,7 +101,8 @@ export default function ObjectRemover() {
   };
 
   return (
-    <AiFeatureWorkspace
+    <>
+      <AiFeatureWorkspace
       selectedFile={selectedFile}
       previewUrl={previewUrl}
       isProcessing={isProcessing}
@@ -114,6 +116,7 @@ export default function ObjectRemover() {
       setAppAlert={setAppAlert}
       featureName="objectremove"
       featureText="object removals"
+      resultLabel="Object Removed"
       marketingProps={marketingProps}
       onFileSelect={handleObjectRemoveFileSelect}
       onCancel={handleObjectRemoveCancel}
@@ -219,6 +222,8 @@ export default function ObjectRemover() {
           />
         ) : null
       }
-    />
+      />
+      <MissingMaskModal appAlert={appAlert} setAppAlert={setAppAlert} />
+    </>
   );
 }

@@ -6,7 +6,8 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { AppConfig as config, FEATURE_LIMITS } from '@/config';
+import { FEATURE_LIMITS } from '@/shared/config/ai';
+import { DAY_MS } from '@/shared/lib/time';
 
 const apiUrl =
   import.meta.env.VITE_API_BASE_URL ||
@@ -83,7 +84,7 @@ export function useUsageLimit(feature = 'upscale') {
 
   const forceMaxLimit = useCallback(() => {
     setUsesRemaining(0);
-    setResetTimestamp(Date.now() + (config.DAY_MS || 86400000));
+    setResetTimestamp(Date.now() + DAY_MS);
   }, []);
 
   return {

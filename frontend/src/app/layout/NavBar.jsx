@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { IMAGES as img } from '@/config';
+import logoIcon from '@/assets/PixelForge.png';
+import logoTextBlack from '@/assets/PixelForgeAI_BlackText.png';
 import { NavLinks } from '../navigation/navConfig';
 
 /**
@@ -137,12 +138,12 @@ export default function Navbar() {
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
           <img
-            src={img.icon}
+            src={logoIcon}
             alt="Pixel Forge Logo"
             className="h-8 sm:h-10 md:h-8 w-auto object-contain block"
           />
           <img
-            src={img.textBlack}
+            src={logoTextBlack}
             alt="Pixel Forge Text"
             className="h-6 sm:h-7 md:h-4 w-auto object-contain block translate-y-0.5"
           />

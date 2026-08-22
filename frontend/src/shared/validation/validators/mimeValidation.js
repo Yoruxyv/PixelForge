@@ -6,10 +6,10 @@
  * they improve user feedback and avoid unnecessary work.
  */
 
-import { AppConfig as config } from '@/config';
+import { FILE_LIMITS } from '@/shared/config/imageValidation';
 import { ERROR_MESSAGES, invalidResult } from './errorMessages';
 
-const FALLBACK_ALLOWED_EXTENSIONS = config.ALLOWED_EXTENSIONS;
+const FALLBACK_ALLOWED_EXTENSIONS = FILE_LIMITS.ALLOWED_EXTENSIONS;
 
 /**
  * Normalize extension aliases used by backend and frontend config.

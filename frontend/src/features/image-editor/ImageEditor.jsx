@@ -6,7 +6,7 @@
  */
 
 import { useRef } from 'react';
-import { AppConfig } from '@/config';
+import { FILE_LIMITS } from '@/shared/config/imageValidation';
 
 import FitModeToggle from '@/shared/components/image-viewer/FitModeToggle';
 import Magnifier, {
@@ -64,7 +64,7 @@ export default function ImageEditor() {
                 inputId="editor-file-input"
                 inputRef={fileInputRef}
                 onChange={onFileChange}
-                helperText={`Any format up to ${AppConfig.MAX_FILE_SIZE_MB}MB`}
+                helperText={`Any format up to ${FILE_LIMITS.MAX_FILE_SIZE_MB}MB`}
                 hasActiveFile={Boolean(file)}
               />
             ) : (
