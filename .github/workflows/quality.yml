@@ -125,3 +125,16 @@ jobs:
         run: python -m pip install -r requirements.txt pytest==9.1.1
       - name: Test
         run: pytest
+
+  quality-gate:
+    name: Quality gate
+    if: ${{ always() }}
+    needs: [frontend-quality, backend-quality, backend-compatibility]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm required checks passed
+        env:
+          FRONTEND: ${{ needs.frontend-quality.result }}
+          BACKEND: ${{ needs.backend-quality.result }}
+          COMPATIBILITY: ${{ needs.backend-compatibility.result }}
+        run: '[[ "$FRONTEND" == success && "$BACKEND" == success && "$COMPATIBILITY" == success ]]'
