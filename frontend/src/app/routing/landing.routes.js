@@ -14,8 +14,8 @@ import React from 'react';
 const landingRoutes = [
   {
     path: '/',
-    component: React.lazy(() => import('../../pages/Landing/Home')),
-  }
+    component: React.lazy(() => import('../landing/Home')),
+  },
 ];
 
 export default landingRoutes;

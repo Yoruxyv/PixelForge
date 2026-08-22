@@ -17,11 +17,11 @@ import React from 'react';
 const utilityRoutes = [
   {
     path: '/watermark-adder',
-    component: React.lazy(() => import('../../pages/Utilities/WatermarkAdder')),
+    component: React.lazy(() => import('../../features/watermark/WatermarkAdder')),
   },
   {
     path: '/color-palette',
-    component: React.lazy(() => import('../../pages/Utilities/ColorPalette')),
+    component: React.lazy(() => import('../../features/palette/ColorPalette')),
   },
 ];
 

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import FitModeToggle from '@/components/Workspace/controls/Editor/FitModeToggle';
-import Magnifier, { ZoomButton } from '@/components/Workspace/controls/Editor/Magnifier';
+import FitModeToggle from '@/shared/components/image-viewer/FitModeToggle';
+import Magnifier, {
+  ZoomButton,
+} from '@/shared/components/image-viewer/Magnifier';
 
 /**
  * Inner content logic for the interactive before/after image comparison slider.

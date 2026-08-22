@@ -7,8 +7,8 @@
 
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import AppModals from '@/components/Common/AppModals';
-import CountdownTimer from '@/components/Common/CountdownTimer';
+import AppModals from '@/shared/components/common/AppModals';
+import CountdownTimer from '@/shared/components/common/CountdownTimer';
 import { AppConfig as config } from '@/config';
 import { makeStorageKeys } from '@/shared/storage/storageKeys';
 

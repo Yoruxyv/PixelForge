@@ -16,11 +16,11 @@ import React from 'react';
 const specialRoutes = [
   {
     path: '/coming-soon',
-    component: React.lazy(() => import('../../pages/Special/ComingSoon')),
+    component: React.lazy(() => import('./ComingSoon')),
   },
   {
     path: '*',
-    component: React.lazy(() => import('../../pages/Special/NotFound')),
+    component: React.lazy(() => import('./NotFound')),
   },
 ];
 

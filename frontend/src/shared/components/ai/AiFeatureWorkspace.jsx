@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import WorkspaceLayout from '@/components/Layout/Tool/WorkspaceLayout';
-import UploadDropzone from '@/components/Upload/UploadDropzone';
+import WorkspaceLayout from '@/shared/components/workspace/WorkspaceLayout';
+import UploadDropzone from '@/shared/components/upload/UploadDropzone';
 import ResultViewer from './ResultViewer';
 import WorkspaceModals from './WorkspaceModals';
 import WorkspaceLimitCard from './WorkspaceLimitCard';
