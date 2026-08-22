@@ -10,14 +10,7 @@ export default function BackButton({ onClick }) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider transition-all"
-      style={{ color: 'rgba(124,58,237,0.7)' }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.color = 'rgba(109,40,217,1)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.color = 'rgba(124,58,237,0.7)';
-      }}
+      className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-pf-editorial-muted transition-colors hover:text-pf-editorial-accent"
     >
       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />

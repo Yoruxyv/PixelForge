@@ -6,7 +6,7 @@ export default function FabToggle({ isOpen, setIsOpen }) {
     <button
       type="button"
       onClick={() => setIsOpen((open) => !open)}
-      className="flex h-11 w-11 items-center justify-center rounded-pf-control border border-pf-editorial-line bg-pf-editorial-surface text-pf-editorial-ink transition-colors hover:bg-pf-editorial-raised"
+      className={`flex h-11 w-11 items-center justify-center rounded-pf-control border shadow-pf-card transition-colors ${isOpen ? 'border-pf-editorial-accent bg-pf-editorial-accent-soft text-pf-editorial-ink' : 'border-pf-editorial-line bg-pf-editorial-surface text-pf-editorial-ink hover:border-pf-editorial-muted hover:bg-pf-editorial-raised'}`}
       aria-label={isOpen ? 'Close help' : 'Open help'}
       aria-expanded={isOpen}
     >

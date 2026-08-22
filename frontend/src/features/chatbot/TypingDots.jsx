@@ -8,11 +8,7 @@ export default function TypingDots() {
       {[0, 1, 2].map((i) => (
         <span
           key={i}
-          className="fw-dot w-2 h-2 rounded-full"
-          style={{
-            background: `hsl(${270 + i * 22}, 80%, 72%)`,
-            boxShadow: `0 0 7px hsl(${270 + i * 22}, 80%, 60%)`,
-          }}
+          className="h-1.5 w-1.5 rounded-full bg-pf-editorial-accent fw-dot"
         />
       ))}
     </div>

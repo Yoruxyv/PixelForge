@@ -26,8 +26,7 @@ export default function AnswerView({ img, activeQuestion, isTyping, showAnswer, 
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.94, y: -4 }}
         transition={{ duration: 0.18 }}
-        className="rounded-2xl rounded-tl-sm px-4 py-3"
-        style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.8)' }}
+        className="rounded-pf-control border border-pf-editorial-line bg-pf-editorial-base px-4 py-3"
       >
         <TypingDots />
       </motion.div>
@@ -39,8 +38,7 @@ export default function AnswerView({ img, activeQuestion, isTyping, showAnswer, 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-        className="max-w-[88%] rounded-2xl rounded-tl-sm px-4 py-3 text-sm leading-relaxed text-slate-700"
-        style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.8)' }}
+        className="max-w-[88%] rounded-pf-control border border-pf-editorial-line bg-pf-editorial-base px-4 py-3 text-sm leading-relaxed text-pf-editorial-ink"
       >
         {activeQuestion.a}
       </motion.div>
@@ -52,16 +50,13 @@ export default function AnswerView({ img, activeQuestion, isTyping, showAnswer, 
       <BackButton onClick={handleBack} />
 
       <div className="flex justify-end">
-        <div
-          className="max-w-[84%] rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white font-medium leading-relaxed"
-          style={{ background: 'linear-gradient(135deg, #6d28d9, #a21caf)', boxShadow: '0 6px 16px rgba(109,40,217,0.2)' }}
-        >
+        <div className="max-w-[84%] rounded-pf-control border border-pf-editorial-accent bg-pf-editorial-accent-soft px-4 py-2.5 text-sm font-medium leading-relaxed text-pf-editorial-ink">
           {activeQuestion.q}
         </div>
       </div>
 
       <div className="flex items-start gap-2.5">
-        <img src={img.chatbotIcon} alt="Assistant" className="w-7 h-7 rounded-full object-cover mt-0.5" />
+        <img src={img.chatbotIcon} alt="Assistant" className="mt-0.5 h-7 w-7 rounded-pf-control border border-pf-editorial-line object-cover opacity-75 saturate-50" />
         <AnimatePresence mode="wait">{responseContent}</AnimatePresence>
       </div>
     </div>

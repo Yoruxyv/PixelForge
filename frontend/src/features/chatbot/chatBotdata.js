@@ -94,27 +94,27 @@ export const QUICK_ACTIONS = [
 
 export const CAT_ACCENT = {
   'getting-started': {
-    bg: 'linear-gradient(135deg, #7c3aed 0%, #d946ef 100%)',
-    glow: 'rgba(124,58,237,0.55)',
-    pill: 'rgba(124,58,237,0.15)',
-    pillBorder: 'rgba(124,58,237,0.3)',
+    bg: 'var(--color-pf-editorial-accent-soft)',
+    glow: 'transparent',
+    pill: 'var(--color-pf-editorial-accent-soft)',
+    pillBorder: 'var(--color-pf-editorial-line)',
   },
   tools: {
-    bg: 'linear-gradient(135deg, #0891b2 0%, #3b82f6 100%)',
-    glow: 'rgba(8,145,178,0.55)',
-    pill: 'rgba(8,145,178,0.15)',
-    pillBorder: 'rgba(8,145,178,0.3)',
+    bg: 'var(--color-pf-editorial-accent-soft)',
+    glow: 'transparent',
+    pill: 'var(--color-pf-editorial-accent-soft)',
+    pillBorder: 'var(--color-pf-editorial-line)',
   },
   quality: {
-    bg: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
-    glow: 'rgba(217,119,6,0.55)',
-    pill: 'rgba(217,119,6,0.15)',
-    pillBorder: 'rgba(217,119,6,0.3)',
+    bg: 'var(--color-pf-editorial-accent-soft)',
+    glow: 'transparent',
+    pill: 'var(--color-pf-editorial-accent-soft)',
+    pillBorder: 'var(--color-pf-editorial-line)',
   },
   privacy: {
-    bg: 'linear-gradient(135deg, #059669 0%, #0d9488 100%)',
-    glow: 'rgba(5,150,105,0.55)',
-    pill: 'rgba(5,150,105,0.15)',
-    pillBorder: 'rgba(5,150,105,0.3)',
+    bg: 'var(--color-pf-editorial-accent-soft)',
+    glow: 'transparent',
+    pill: 'var(--color-pf-editorial-accent-soft)',
+    pillBorder: 'var(--color-pf-editorial-line)',
   },
 };

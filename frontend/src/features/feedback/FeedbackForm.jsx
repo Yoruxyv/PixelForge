@@ -123,8 +123,8 @@ export default function FeedbackForm() {
 
   if (isRateLimited) {
     return (
-      <div className="p-5 bg-white/60 border border-white/80 rounded-2xl shadow-sm text-center animate-fade-in">
-        <div className="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-3">
+      <div className="border-y border-pf-editorial-line bg-pf-editorial-base p-5 text-center animate-fade-in">
+        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-pf-control bg-pf-danger-soft text-pf-danger">
           <svg
             className="w-6 h-6"
             fill="none"
@@ -139,9 +139,9 @@ export default function FeedbackForm() {
             />
           </svg>
         </div>
-        <p className="font-bold text-slate-800 text-base mb-1">Limit Reached</p>
-        <p className="text-sm text-slate-600">
-          You have reached your daily feedback limit. Please try again tomorrow!
+        <p className="mb-1 text-base font-bold text-pf-editorial-ink">Limit reached</p>
+        <p className="text-sm text-pf-editorial-muted">
+          You have reached your daily feedback limit. Please try again tomorrow.
         </p>
       </div>
     );
@@ -149,8 +149,8 @@ export default function FeedbackForm() {
 
   if (status === 'success') {
     return (
-      <div className="p-5 bg-white/60 border border-white/80 rounded-2xl shadow-sm text-center animate-fade-in">
-        <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3">
+      <div className="border-y border-pf-editorial-line bg-pf-editorial-base p-5 text-center animate-fade-in">
+        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-pf-control bg-pf-success-soft text-pf-success">
           <svg
             className="w-6 h-6"
             fill="none"
@@ -165,8 +165,8 @@ export default function FeedbackForm() {
             />
           </svg>
         </div>
-        <p className="font-bold text-slate-800 text-base mb-1">Message Sent!</p>
-        <p className="text-sm text-slate-600">
+        <p className="mb-1 text-base font-bold text-pf-editorial-ink">Message sent</p>
+        <p className="text-sm text-pf-editorial-muted">
           Thank you for your feedback. Our team will review it shortly.
         </p>
       </div>
@@ -174,7 +174,7 @@ export default function FeedbackForm() {
   }
 
   const inputStyles =
-    'w-full bg-white/50 border border-white/60 focus:bg-white focus:border-purple-400 focus:ring-4 focus:ring-purple-500/10 rounded-xl px-4 py-2.5 outline-none transition-all duration-200 text-slate-700 placeholder-slate-400';
+    'w-full rounded-pf-control border border-pf-editorial-line bg-pf-editorial-base px-3.5 py-2.5 text-pf-editorial-ink outline-none transition-colors placeholder:text-pf-editorial-muted focus:border-pf-editorial-accent';
 
   return (
     <form
@@ -221,7 +221,7 @@ export default function FeedbackForm() {
       </div>
 
       {errorMsg && (
-        <div className="bg-red-50/80 border border-red-100 text-red-600 px-3 py-2 rounded-lg text-xs text-center font-medium">
+        <div className="rounded-pf-control border border-pf-danger bg-pf-danger-soft px-3 py-2 text-center text-xs font-medium text-pf-danger">
           {errorMsg}
         </div>
       )}
@@ -229,7 +229,7 @@ export default function FeedbackForm() {
       <button
         type="submit"
         disabled={status === 'loading'}
-        className="w-full mt-1 bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+        className="mt-1 flex w-full items-center justify-center gap-2 rounded-pf-control bg-pf-editorial-accent px-4 py-2.5 font-semibold text-white transition-colors hover:bg-pf-accent-hover active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60 disabled:transform-none"
       >
         {status === 'loading' ? (
           <>
