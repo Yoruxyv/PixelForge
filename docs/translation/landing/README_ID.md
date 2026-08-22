@@ -47,115 +47,45 @@ Sistem ini dirancang untuk menangani batasan dunia nyata seperti rate limit, job
 
 1. 🔍 **Upscale Image (AI)** — peningkatan kualitas Real-ESRGAN
 
-<details>
-  <summary><b>🎥 Klik untuk melihat preview </b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/61cff1c1-69f2-4707-9cef-025cee09298f">
-</details>
 
 2. 🧍 **Remove Background (AI)** — ekstraksi subjek yang bersih
 
-<details>
-  <summary><b>🎥 Klik untuk melihat preview </b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/d22a42c6-ad5d-41b6-8f83-419aba47d09f">
-</details>
 
 3. 🎨 **Restore Color (AI)** — menghidupkan kembali foto grayscale dan foto pudar
 
-<details>
-  <summary><b>🎥 Klik untuk melihat preview </b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/68491a17-057d-49cf-b1a2-03cbc2f5f9ca">
-</details>
 
 4. 🎨 **Object Remover (AI)** — sapu objek yang tidak diinginkan lalu hapus dengan bersih
 
-<details>
-  <summary><b>🎥 Klik untuk melihat preview </b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/3c68ed8b-dad1-4f88-b1d7-873455ecd3ee">
-</details>
 
 5. 🎛️ **Image Editor** — brightness, contrast, saturation, blur, vignette
 
-<details>
-  <summary><b>🎥 Klik untuk melihat preview </b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/a2e1db98-212e-4801-afa5-3d0d548925df">
-</details>
 
 6. 📐 **Resize Image** — ukuran kustom, kunci aspek rasio, preset
 
-<details>
-  <summary><b>🎥 Klik untuk melihat preview </b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/169353e7-1916-44e5-bfe0-5075bbf4fa8e">
-</details>
 
 7. 🔄 **Rotate & Flip** — kontrol transformasi cepat
 
-<details>
-  <summary><b>🎥 Klik untuk melihat preview </b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/a1dda108-f6dd-4a7c-9002-6db21ef25d49">
-</details>
 
 8. 🗜️ **Compress Image** — mengurangi ukuran file dengan kontrol kualitas
 
-<details>
-  <summary><b>🎥 Klik untuk melihat preview </b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/25a7f82c-8550-4e0e-8d4c-9a4420d646d9">
-</details>
 
 9. 🔁 **Convert Format** — PNG / JPG / WEBP
 
-<details>
-  <summary><b>🎥 Klik untuk melihat preview </b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/3d353e7a-b614-4bdc-b549-e8a092a41621">
-</details>
 
 10. 🧹 **Remove Metadata** — membersihkan data EXIF
 
-<details>
-  <summary><b>🎥 Klik untuk melihat preview </b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/3b06be04-1020-4b0e-aad8-7aff77e76f58">
-</details>
 
 11. 🎯 **Color Palette Extractor** — titik sampling yang dapat digeser
 
-<details>
-  <summary><b>🎥 Klik untuk melihat preview </b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/da8a8267-428f-4c02-8abb-4029305511d6">
-</details>
 
 12. 🏷️ **Add Watermark** — teks/gambar dengan live preview
 
-<details>
-  <summary><b>🎥 Klik untuk melihat preview </b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/928bb069-7643-4a0c-b6e5-1056706547f6">
-</details>
 
 13. ✂️ **Crop Image** — bebas atau menggunakan preset aspek rasio
 
-<details>
-  <summary><b>🎥 Klik untuk melihat preview </b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/717edf23-64d5-4673-bffa-21b10fec7ca9">
-</details>
 
 14. 🤖 **Chatbot** — asisten FAQ interaktif untuk jawaban cepat dan panduan platform
 
-<details>
-  <summary><b>🎥 Klik untuk melihat preview </b></summary>
-  <br>
-  <video src="https://github.com/user-attachments/assets/90083dfb-915a-43f1-a2b3-d9fbefc10bdd">
-</details>
 
 15. 📝 **Feedback System** — input pengguna untuk peningkatan dan laporan bug
 
@@ -379,7 +309,7 @@ Script testing backend dan AI:
 - [Pengujian PixelForge](../dev/TESTING_ID.md) ([EN](../../TESTING.md), [ZH](../dev/TESTING_ZH.md))
 
 Skrip bantuan developer:
-- [Total Line Counter](scripts/dev/get_total_lines.ps1) — skrip PowerShell Windows interaktif untuk menghitung jumlah baris project berdasarkan folder, ekstensi file, dan bagian project.
+- [Total Line Counter](../../../scripts/dev/get_total_lines.ps1) — skrip PowerShell Windows interaktif untuk menghitung jumlah baris project berdasarkan folder, ekstensi file, dan bagian project.
 
 > Script PowerShell lokal dan file helper `.bat` ditujukan untuk environment development Windows.
 
