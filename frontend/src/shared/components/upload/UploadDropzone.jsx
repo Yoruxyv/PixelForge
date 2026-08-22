@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import PropTypes from 'prop-types';
 import { FILE_LIMITS } from '@/shared/config/imageValidation';
 import { useFileUpload } from '@/shared/hooks/useFileUpload';
@@ -21,6 +22,7 @@ export default function UploadDropzone({
   requireGrayscale = false,
   variant = 'default',
 }) {
+  const errorId = useId();
   const { isDragging, error, inputRef, handlers } = useFileUpload({
     onFileSelect,
     requireGrayscale,
@@ -50,97 +52,106 @@ export default function UploadDropzone({
   }
 
   return (
-    <button
-      type="button"
-      aria-label="Upload image file"
-      className={`flex w-full cursor-pointer items-center justify-center rounded-pf-control border border-dashed p-8 text-center transition-colors sm:p-10 ${
-        variant === 'editorial' ? 'min-h-[26rem]' : ''
-      } ${getDropzoneStateClasses()}`}
-      onDragOver={handlers.onDragOver}
-      onDragLeave={handlers.onDragLeave}
-      onDrop={handlers.onDrop}
-      onClick={handlers.onClick}
-    >
-      <input
-        type="file"
-        className="hidden"
-        ref={inputRef}
-        accept={AcceptableImageMimeTypes}
-        onChange={handlers.onChange}
-        onClick={(e) => e.stopPropagation()}
-      />
+    <div className="w-full">
+      <button
+        type="button"
+        aria-label="Upload image file"
+        aria-describedby={error ? errorId : undefined}
+        className={`flex w-full cursor-pointer items-center justify-center rounded-pf-control border border-dashed p-8 text-center transition-colors sm:p-10 ${
+          variant === 'editorial' ? 'min-h-[26rem]' : ''
+        } ${getDropzoneStateClasses()}`}
+        onDragOver={handlers.onDragOver}
+        onDragLeave={handlers.onDragLeave}
+        onDrop={handlers.onDrop}
+        onClick={handlers.onClick}
+      >
+        <input
+          type="file"
+          className="hidden"
+          ref={inputRef}
+          accept={AcceptableImageMimeTypes}
+          onChange={handlers.onChange}
+          onClick={(event) => event.stopPropagation()}
+        />
 
-      <div className="flex flex-col items-center justify-center space-y-4 pointer-events-none">
-        <div
-          className={`flex h-12 w-12 items-center justify-center rounded-pf-control border transition-colors
-          ${iconClasses}`}
-        >
-          {error ? (
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          ) : (
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-              />
-            </svg>
-          )}
-        </div>
+        <div className="pointer-events-none flex flex-col items-center justify-center space-y-4">
+          <div
+            className={`flex h-12 w-12 items-center justify-center rounded-pf-control border transition-colors
+            ${iconClasses}`}
+          >
+            {error ? (
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            ) : (
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.5"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                />
+              </svg>
+            )}
+          </div>
 
-        <div>
-          {error ? (
-            <>
-              <p className="mx-auto max-w-100 px-4 text-base font-bold leading-snug text-pf-danger sm:text-lg">
-                {error}
-              </p>
-              <p className="mt-2 text-sm font-medium text-pf-danger">
-                Supported formats: {AllowedFormatsText}
-              </p>
-            </>
-          ) : (
-            <>
-              <p
-                className={`text-lg font-bold ${
-                  variant === 'editorial'
-                    ? 'text-pf-editorial-ink'
-                    : 'text-pf-ink'
-                }`}
-              >
-                Drop, paste, or choose an image
-              </p>
-              <p
-                className={`mt-1.5 text-sm font-medium ${
-                  variant === 'editorial'
-                    ? 'text-pf-editorial-muted'
-                    : 'text-pf-ink-muted'
-                }`}
-              >
-                {AllowedFormatsText} · Max {FILE_LIMITS.MAX_FILE_SIZE_MB}MB
-              </p>
-            </>
-          )}
+          <div>
+            {error ? (
+              <>
+                <p className="mx-auto max-w-100 px-4 text-base font-bold leading-snug text-pf-danger sm:text-lg">
+                  {error}
+                </p>
+                <p className="mt-2 text-sm font-medium text-pf-danger">
+                  Supported formats: {AllowedFormatsText}
+                </p>
+              </>
+            ) : (
+              <>
+                <p
+                  className={`text-lg font-bold ${
+                    variant === 'editorial'
+                      ? 'text-pf-editorial-ink'
+                      : 'text-pf-ink'
+                  }`}
+                >
+                  Drop, paste, or choose an image
+                </p>
+                <p
+                  className={`mt-1.5 text-sm font-medium ${
+                    variant === 'editorial'
+                      ? 'text-pf-editorial-muted'
+                      : 'text-pf-ink-muted'
+                  }`}
+                >
+                  {AllowedFormatsText} · Max {FILE_LIMITS.MAX_FILE_SIZE_MB}MB
+                </p>
+              </>
+            )}
+          </div>
         </div>
-      </div>
-    </button>
+      </button>
+
+      <span id={errorId} className="sr-only" role="alert" aria-atomic="true">
+        {error}
+      </span>
+    </div>
   );
 }
 
