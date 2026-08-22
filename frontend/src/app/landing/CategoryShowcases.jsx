@@ -13,8 +13,10 @@ function ToolIcon({ path }) {
 }
 
 function ToolLinks({ items }) {
+  const gridClassName = items.length === 3 ? 'sm:grid-cols-2 lg:grid-cols-3' : 'sm:grid-cols-2';
+
   return (
-    <div className="mt-8 grid gap-px border-y border-pf-editorial-line bg-pf-editorial-line sm:grid-cols-2">
+    <div className={`mt-8 grid gap-px border-y border-pf-editorial-line bg-pf-editorial-line ${gridClassName}`}>
       {items.map((item) => (
         <Link
           key={item.id}
@@ -43,7 +45,14 @@ function EditComposition() {
       </div>
       <div className="mt-5 grid gap-4 sm:grid-cols-[1fr_9rem]">
         <div className="relative min-h-[280px] overflow-hidden bg-pf-editorial-raised">
-          <img src="/demo/res_color_after.png" alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+          <svg viewBox="0 0 720 460" role="img" aria-label="Abstract image composition inside an editing canvas" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice">
+            <rect width="720" height="460" fill="#b9afa5" />
+            <path d="M0 318 185 130l156 138L520 72l200 184v204H0Z" fill="#25252b" />
+            <circle cx="548" cy="104" r="62" fill="#8b789d" />
+            <rect x="82" y="74" width="122" height="244" fill="#d5a4ad" opacity=".84" />
+            <path d="m0 364 182-74 174 68 190-116 174 102v116H0Z" fill="#e8e1d8" opacity=".88" />
+            <path d="M310 0 90 460M438 0 218 460" stroke="#fff" strokeOpacity=".2" strokeWidth="2" />
+          </svg>
           <div className="absolute inset-[12%_14%] border border-white/90 shadow-[0_0_0_999px_rgba(0,0,0,0.34)]">
             <span className="absolute -left-1 -top-1 h-2 w-2 border border-white bg-black" />
             <span className="absolute -bottom-1 -right-1 h-2 w-2 border border-white bg-black" />
@@ -99,25 +108,26 @@ function OptimizeComposition() {
 
 function UtilitiesComposition() {
   const swatches = [
-    ['#16171B', 'bg-[#16171b]'],
-    ['#7C6EA8', 'bg-[#7c6ea8]'],
-    ['#C58A9F', 'bg-[#c58a9f]'],
-    ['#E9E4DB', 'bg-[#e9e4db]'],
+    '#131110',
+    '#1F1F1D',
+    '#1E1D1B',
+    '#585059',
+    '#C5B8AE',
   ];
 
   return (
     <div className="grid min-h-[430px] overflow-hidden bg-pf-editorial-base sm:grid-cols-[1.25fr_0.75fr]">
       <div className="relative min-h-[300px] overflow-hidden">
-        <img src="/demo/object_remove_after.png" alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+        <img src="/landing/utilities-palette-source.png" alt="Curated pigment tiles used for palette extraction" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
         <span className="absolute bottom-6 right-5 border-b border-white/70 pb-1 text-[10px] font-bold uppercase tracking-[0.26em] text-white/80">PixelForge / Studio</span>
       </div>
       <div className="flex flex-col justify-between border-t border-pf-editorial-line p-5 sm:border-l sm:border-t-0 sm:p-7">
         <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-pf-editorial-muted">Sample palette</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-pf-editorial-muted">PixelForge samples</p>
           <div className="mt-5 space-y-4">
-            {swatches.map(([hex, color]) => (
+            {swatches.map((hex) => (
               <div key={hex} className="flex items-center gap-3">
-                <span className={`h-8 w-8 border border-pf-editorial-line ${color}`} />
+                <span className="h-8 w-8 border border-pf-editorial-line" style={{ backgroundColor: hex }} />
                 <span className="font-mono text-xs text-pf-editorial-ink">{hex}</span>
               </div>
             ))}
