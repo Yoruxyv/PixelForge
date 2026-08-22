@@ -78,16 +78,25 @@ npm run dev
 
 ### Recommended Checks
 
-Run the checks that apply to the change:
+Install the locked frontend dependencies and run its complete quality gate:
 
 ```bash
-npm --prefix frontend run lint
-npm --prefix frontend run build
+cd frontend
+npm ci
+npm run lint
+npm run test -- --run
+npm run build
 ```
+
+Install backend development dependencies, then run its quality gate:
 
 ```bash
 cd backend
-python -m compileall api app core database domain limiter provider repository services utils
+pip install -r requirements-dev.txt
+ruff check --no-fix .
+ruff format --check .
+mypy
+pytest
 ```
 
 See [docs/TESTING.md](docs/TESTING.md) for backend and AI workflow checks.

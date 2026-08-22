@@ -161,19 +161,30 @@ Also submit feedback once and confirm it performs its own verification. In a non
 ## Frontend Checks
 
 ```powershell
-npm --prefix frontend run lint
-npm --prefix frontend run build
+Push-Location .\frontend
+npm ci
+npm run lint
+npm run test -- --run
+npm run build
+Pop-Location
 ```
 
 ---
 
-## Backend Compile Check
+## Backend Quality Checks
 
 ```powershell
 Push-Location .\backend
-python -m compileall api app core database domain limiter provider repository services utils
+python -m pip install -r requirements-dev.txt
+ruff check --no-fix .
+ruff format --check .
+mypy
+pytest
 Pop-Location
 ```
+
+CI reports the existing Ruff formatting and mypy failures in an explicit
+non-blocking baseline job until their production-source remediation is approved.
 
 ---
 
