@@ -33,7 +33,7 @@ export default function ToolWorkspaceShell({
       rightPanel={
         <div className="flex h-full w-full flex-col">
           <div className="mb-4">{rightHeader}</div>
-          <div className="relative flex min-h-72 flex-1 items-center justify-center overflow-hidden rounded-2xl border border-white/50 bg-white/30 p-2 shadow-inner">
+          <div className="relative flex min-h-80 flex-1 items-center justify-center overflow-hidden rounded-pf-control border border-pf-line-inverse bg-pf-surface-inverse p-2 text-pf-ink-inverse">
             {rightBody}
           </div>
         </div>

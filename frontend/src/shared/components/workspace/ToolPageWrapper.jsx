@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
  */
 export default function ToolPageWrapper({ children }) {
   return (
-    <section className="flex-1 w-full max-w-6xl mx-auto px-4 pt-6 pb-16">
+    <section className="mx-auto w-full max-w-pf-workspace flex-1 px-pf-gutter pb-16 pt-5">
       {children}
     </section>
   );

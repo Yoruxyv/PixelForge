@@ -4,7 +4,7 @@
  */
 export const NavLinks = {
   enhance: {
-    title: 'AI Features',
+    title: 'AI',
     items: [
       {
         id: 'upscale',
@@ -41,7 +41,7 @@ export const NavLinks = {
     ],
   },
   edit: {
-    title: 'Smart Edit',
+    title: 'Edit',
     items: [
       {
         id: 'editor',

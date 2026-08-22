@@ -12,9 +12,9 @@
  */
 export default function EmptyWorkspaceState() {
   return (
-    <div className="px-4 text-center">
-      <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full border border-white bg-white/50 shadow-sm">
-        <svg className="h-8 w-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div className="px-4 text-center opacity-60">
+      <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-pf-control border border-current/20 bg-current/5">
+        <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -23,7 +23,7 @@ export default function EmptyWorkspaceState() {
           />
         </svg>
       </div>
-      <p className="text-sm font-medium text-slate-400">Workspace is empty</p>
+      <p className="text-sm font-medium">Preview appears here</p>
     </div>
   );
 }
