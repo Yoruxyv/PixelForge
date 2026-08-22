@@ -2,6 +2,11 @@
 
 > Panduan developer untuk menambahkan fitur AI image baru ke PixelForge tanpa merusak pipeline backend/frontend yang sudah ada.
 
+> **Catatan sinkronisasi:** Contoh path frontend dalam terjemahan ini masih
+> menggambarkan struktur sebelum migrasi feature-layer Phase 04. Gunakan
+> [panduan bahasa Inggris](../../ADDING_AI_FEATURE.md) sebagai sumber utama
+> untuk path `app`, `features`, `shared`, routing, dan fitur baru saat ini.
+
 ---
 
 ## 1. Workflow Utama

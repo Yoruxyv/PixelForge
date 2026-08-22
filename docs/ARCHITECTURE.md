@@ -121,21 +121,23 @@ PixelForge/
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── components/
-│   │   ├── content/
-│   │   │   ├── bot/
-│   │   │   ├── feature/
-│   │   │   ├── modals/
-│   │   │   └── navigation/
-│   │   ├── hooks/
-│   │   ├── pages/
-│   │   ├── routes/
-│   │   ├── services/
-│   │   ├── utils/
-│   │   ├── App.jsx
-│   │   ├── config.js
+│   │   ├── app/
+│   │   │   ├── landing/
+│   │   │   ├── layout/
+│   │   │   ├── navigation/
+│   │   │   └── routing/
+│   │   ├── features/
+│   │   ├── shared/
+│   │   │   ├── api/
+│   │   │   ├── components/
+│   │   │   ├── config/
+│   │   │   ├── hooks/
+│   │   │   ├── lib/
+│   │   │   ├── storage/
+│   │   │   └── validation/
+│   │   ├── assets/
 │   │   ├── main.jsx
-│   │   └── routes.js
+│   │   └── index.css
 │   ├── public/
 │   └── vite.config.js
 │
@@ -146,162 +148,92 @@ PixelForge/
 
 ## 4. Frontend Architecture
 
-The frontend is organized around reusable workspace components and feature-specific pages.
-
-### 4.1 Application Shell
-
-`frontend/src/App.jsx` owns the main application layout:
-
-- Browser routing
-- Global navigation
-- Global header
-- Footer and legal modals
-- FAQ chatbot widget
-- Suspense loaders for lazy pages
-
-Routes are grouped by category under:
+The frontend is feature-layered. Application composition, product features, and
+cross-feature platform code have separate owners:
 
 ```txt
-frontend/src/routes/
+main.jsx -> app -> features -> shared
 ```
 
-The root route file remains as a facade:
+`assets/` and `index.css` remain source-root resources. They do not own product
+behavior.
 
-```txt
-frontend/src/routes.js
-```
+### 4.1 `app`: composition
 
-`App.jsx` imports only the facade, while the facade combines categorized route arrays such as AI features, smart edit tools, optimize tools, utilities, landing pages, and special pages. Each route still lazily imports its page component to keep the initial bundle size smaller.
+`frontend/src/app` owns the browser shell rather than tool behavior:
 
----
+- `App.jsx` mounts the router, persistent layout, legal modals, and chatbot;
+- `layout/` owns the global header, navigation, and footer;
+- `landing/` owns the application landing/discovery page;
+- `navigation/` owns route-discovery labels and links;
+- `routing/` composes lazy route entries and application fallbacks.
 
-### 4.2 Page Categories
+Navigation categories such as AI, Smart Edit, Optimize, and Utilities are route
+groups, not feature modules.
 
-Frontend pages are grouped by tool type:
+### 4.2 `features`: product ownership
 
-```txt
-pages/
-├── AiFeatures/
-│   ├── UpscaleImage.jsx
-│   ├── RemoveBackground.jsx
-│   ├── ColorRestoration.jsx
-│   └── ObjectRemover.jsx
-├── SmartEdit/
-│   ├── ImageEditor.jsx
-│   ├── ResizeImage.jsx
-│   ├── CropImage.jsx
-│   └── RotateFlip.jsx
-├── Optimize/
-│   ├── CompressImage.jsx
-│   ├── ConvertFormat.jsx
-│   └── MetadataWorkspace.jsx
-├── Utilities/
-│   ├── ColorPalette.jsx
-│   └── WatermarkAdder.jsx
-└── Special/
-    ├── ComingSoon.jsx
-    ├── FaqChatbotWidget.jsx
-    └── NotFound.jsx
-```
+Each folder under `frontend/src/features` owns one product capability. Its page,
+controls, hooks, service adapter, validators, helpers, content, state, and tests
+stay together when they change together.
 
----
+Current feature roots include AI tools (`upscale`, `background-removal`,
+`color-restoration`, and `object-removal`), browser tools (`image-editor`,
+`resize`, `rotate-flip`, `compress`, `convert`, `metadata-removal`, `palette`,
+`watermark`, and `crop`), plus `chatbot` and `feedback`.
 
-### 4.3 AI Feature Pages
+Root-level feature page files are deliberate route entry points. A feature that
+must be consumed by another feature exposes a small `index.js`; consumers must
+not import a sibling feature's internal file.
 
-AI feature pages use a shared workspace component:
+### 4.3 `shared`: proven cross-feature code
 
-```txt
-components/Workspace/AiFeatureWorkspace.jsx
-```
+`frontend/src/shared` contains responsibilities with multiple independent
+consumers:
 
-Each AI page wires feature-specific pieces into the shared workspace:
+- `api/`: generic HTTP, Azure upload, and job polling transport;
+- `components/ai/`: shared AI upload/process/result workspace presentation;
+- `components/upload/` and `components/workspace/`: reusable browser-workspace UI;
+- `config/`: shared validation, session, and AI fallback contracts;
+- `hooks/`: shared upload, object URL, workspace, and AI lifecycle state;
+- `lib/`: product-neutral file, image, and time helpers;
+- `storage/`: IndexedDB and feature-scoped session persistence;
+- `validation/`: browser upload validation and backend-runtime-limit fallback.
 
-| Page | Pipeline Hook | Controls | Feature Key |
-|---|---|---|---|
-| `UpscaleImage.jsx` | `useUpscalePipeline` | `UpscaleControls` | `upscale` |
-| `RemoveBackground.jsx` | `useRemBGPipeline` | `RemoveBgControls` | `rembg` |
-| `ColorRestoration.jsx` | `useColorRestorePipeline` | `ColorRestoreControls` | `colorrestore` |
-| `ObjectRemover.jsx` | `useObjectRemovePipeline` | `ObjectRemoveControls` + mask canvas | `objectremove` |
+Code may enter `shared` only when current consumers prove that its responsibility
+is independent of a single product feature. Similar-looking feature controls or
+processing logic remain feature-owned unless their behavior and lifecycle are
+actually the same.
 
-The AI pages are intentionally thin. They own page-specific UI state such as progress, scale, brush size, and mask readiness, while shared pipeline hooks own upload, polling, cancellation, Turnstile token state, result URLs, and usage-limit state.
+### 4.4 Dependency rules
 
----
+- `shared` must not import `app` or `features`.
+- A feature may import `shared` and its own files.
+- Cross-feature imports must target the other feature's explicit public
+  `index.js`, never an internal module.
+- `app` may import feature route entry points and feature public surfaces.
+- Route files compose lazy feature entries; they do not own feature logic.
+- Recursive barrel exports, central feature registries, and generic factories
+  are not used without concrete need.
 
-### 4.4 Frontend Pipeline Hooks
+### 4.5 Adding a frontend feature
 
-The AI workflow is abstracted through pipeline and action hooks:
+1. Create `frontend/src/features/<feature>/` with only the files the feature
+   currently needs.
+2. Keep its page, controls, hooks, service adapter, content, helpers, and tests
+   inside that folder.
+3. Reuse existing `shared` upload, validation, workspace, API, or lifecycle code
+   only when the contract fits without feature-specific branching.
+4. Add the lazy route entry under `frontend/src/app/routing/` and the discovery
+   link under `frontend/src/app/navigation/` when applicable.
+5. Add a small feature `index.js` only when another feature needs a deliberate
+   public surface.
+6. Verify route behavior, validation, processing, result, reset, and restoration
+   flows, then run frontend lint, tests, and build.
 
-```txt
-hooks/
-├── actions/
-│   ├── useActions.js
-│   ├── useUpscaleActions.js
-│   ├── useRemBGActions.js
-│   ├── useColorRestoreActions.js
-│   └── useObjectRemoveActions.js
-├── pipeline/
-│   ├── usePipeline.js
-│   ├── useUpscalePipeline.js
-│   ├── useRemBGPipeline.js
-│   ├── useColorRestorePipeline.js
-│   └── useObjectRemovePipeline.js
-└── auth/
-    └── useUsageLimit.js
-```
-
-The generic pipeline handles shared behavior:
-
-- Selected file state
-- Preview URL state
-- Turnstile token handling
-- Job start
-- Polling
-- Result URL state
-- Cancel behavior
-- Usage-limit display state
-- Alert state
-
-Feature-specific action hooks handle API calls and payload differences.
-
----
-
-### 4.5 Client-Side Tools
-
-Non-AI tools run mostly in the browser and use client hooks/utilities:
-
-```txt
-hooks/client/
-hooks/workspace/
-utils/image/
-utils/file/
-  fileValidation.js
-  validators/
-    errorMessages.js
-    runtimeLimits.js
-    mimeValidation.js
-    imageMetadata.js
-    imageOptimization.js
-    resolutionValidation.js
-    grayscaleValidation.js
-utils/storage/
-```
-
-`utils/file/fileValidation.js` remains the public validation entrypoint, while `utils/file/validators/` contains focused helper modules for runtime limits, MIME checks, image metadata loading, browser-side resolution optimization, resolution checks, grayscale checks, and validation messages.
-
-For AI uploads, the frontend may downscale images that exceed the public pixel limit before uploading them to Azure. This improves user experience and reduces provider load, but backend validation remains the security boundary because browser-side checks can be bypassed.
-
-Examples:
-
-- Image resize
-- Image crop
-- Rotate and flip
-- Compression
-- Format conversion
-- Metadata removal
-- Watermark rendering
-- Color palette extraction
-
-This keeps lightweight image operations fast, private, and independent from backend AI jobs.
+AI-backed features share polling, Turnstile, usage, session, and result lifecycle
+code. Browser-side features keep their canvas and processing logic local. The
+backend remains the security and API-contract boundary.
 
 ---
 

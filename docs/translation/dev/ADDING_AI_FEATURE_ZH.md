@@ -2,6 +2,10 @@
 
 > 一份实用的开发者指南，用于在 PixelForge 中添加新的 AI 图像功能，同时不破坏已有的 backend/frontend pipeline。
 
+> **同步说明：** 本译文中的前端路径示例仍描述 Phase 04 feature-layer
+> 迁移前的结构。涉及当前 `app`、`features`、`shared`、路由与新增功能路径时，
+> 请以[英文指南](../../ADDING_AI_FEATURE.md)为准。
+
 ---
 
 ## 1. 核心 Workflow

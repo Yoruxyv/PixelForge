@@ -4,6 +4,9 @@ This document records the Phase 01 frontend architecture baseline at commit
 `f7d7826bb2cf1cd9f7c24b700940481e768e02a8` (Phase 00, PR #199). It is a
 migration map, not the post-migration architecture.
 
+For the stabilized post-migration structure and contribution rules, see
+Section 4 of `docs/ARCHITECTURE.md`.
+
 No production source, route, API contract, behavior, or styling is changed by
 this phase.
 

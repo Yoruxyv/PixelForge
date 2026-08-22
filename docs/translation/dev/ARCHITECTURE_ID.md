@@ -8,6 +8,11 @@
 
 PixelForge adalah studio gambar open-source yang menyediakan alat gambar berbasis browser dan pemrosesan gambar berbantuan AI melalui frontend React dan backend FastAPI.
 
+> **Catatan sinkronisasi:** Bagian struktur frontend dalam terjemahan ini masih
+> menggambarkan arsitektur sebelum stabilisasi feature-layer Phase 04. Gunakan
+> [dokumen bahasa Inggris](../../ARCHITECTURE.md) sebagai sumber utama untuk
+> struktur `app`, `features`, `shared`, aturan dependensi, dan routing saat ini.
+
 Sistem ini dirancang dengan pemisahan tanggung jawab yang jelas:
 
 - **Frontend:** antarmuka pengguna, alat client-side, alur upload, UI progres, dan polling.
