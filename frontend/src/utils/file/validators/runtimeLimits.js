@@ -16,7 +16,7 @@ import {
   STORAGE_KEYS,
   FILE_VALIDATION_CONFIG,
 } from '@/config';
-import { apiClient } from '@/services/base/apiClient';
+import { apiClient } from '@/shared/api/apiClient';
 
 export const RUNTIME_LIMIT_CACHE_MS =
   FILE_VALIDATION_CONFIG.RUNTIME_LIMIT_CACHE_MS;

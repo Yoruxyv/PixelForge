@@ -1,4 +1,4 @@
-import { apiClient } from '../base/apiClient';
+import { apiClient } from '@/shared/api/apiClient';
 
 /**
  * Submits user feedback to the backend.

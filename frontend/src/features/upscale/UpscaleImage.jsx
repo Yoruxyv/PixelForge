@@ -1,0 +1,89 @@
+/**
+ * Image upscaling workspace page.
+ *
+ * This page wires the shared AI feature workspace to the upscale pipeline. It
+ * owns page-level progress state, exposes scale controls, simulates progress
+ * during backend processing, and delegates common upload/result UI to
+ * `AiFeatureWorkspace`.
+ */
+
+import { useState } from 'react';
+import AiFeatureWorkspace from '@/shared/components/ai/AiFeatureWorkspace';
+import { useSimulatedProgress } from '@/shared/hooks/ai/useSimulatedProgress';
+import UpscaleControls from './UpscaleControls';
+import { useUpscalePipeline } from './useUpscalePipeline';
+import { marketingProps } from './upscaleMarketing';
+
+/**
+ * Render the AI image upscaling tool.
+ *
+ * @returns {JSX.Element} Upscale workspace.
+ */
+export default function UpscaleWorkspace() {
+  const [progress, setProgress] = useState(0);
+
+  const {
+    selectedFile,
+    previewUrl,
+    isProcessing,
+    resultUrl,
+    jobId,
+    handleFileSelect,
+    handleCancel,
+    handleUpscale,
+    turnstileRef,
+    setTurnstileToken,
+    turnstileToken,
+    appAlert,
+    setAppAlert,
+    usesRemaining,
+    resetTimestamp,
+    isLoading,
+    scale,
+    setScale,
+    maxLimit,
+    isWaitingForToken,
+  } = useUpscalePipeline(setProgress);
+
+  useSimulatedProgress(isProcessing, setProgress, turnstileToken, 'upscale');
+
+  return (
+    <AiFeatureWorkspace
+      selectedFile={selectedFile}
+      previewUrl={previewUrl}
+      isProcessing={isProcessing}
+      resultUrl={resultUrl}
+      jobId={jobId}
+      usesRemaining={usesRemaining}
+      resetTimestamp={resetTimestamp}
+      isLoading={isLoading}
+      maxLimit={maxLimit}
+      appAlert={appAlert}
+      setAppAlert={setAppAlert}
+      featureName="upscale"
+      featureText="upscales"
+      marketingProps={marketingProps}
+      onFileSelect={handleFileSelect}
+      onCancel={handleCancel}
+      leftControls={
+        <UpscaleControls
+          isProcessing={isProcessing}
+          isWaitingForToken={isWaitingForToken}
+          resultUrl={resultUrl}
+          progress={progress}
+          jobId={jobId}
+          handleCancel={handleCancel}
+          handleUpscale={handleUpscale}
+          turnstileRef={turnstileRef}
+          setTurnstileToken={setTurnstileToken}
+          scale={scale}
+          setScale={setScale}
+        />
+      }
+      downloadPrefix="4K-"
+      rightPanelClassName="flex-1 min-h-105 relative rounded-2xl border border-white/50 bg-white/30 flex items-center justify-center overflow-hidden shadow-inner"
+      previewImageClassName={`max-h-96 w-full object-contain p-2 transition-all duration-700 ${isProcessing ? 'scale-105 opacity-60 blur-sm' : 'opacity-100'}`}
+      resultContainerClassName="w-full h-full"
+    />
+  );
+}
