@@ -118,7 +118,7 @@ function UtilitiesComposition() {
   return (
     <div className="grid min-h-[430px] overflow-hidden bg-pf-editorial-base sm:grid-cols-[1.25fr_0.75fr]">
       <div className="relative min-h-[300px] overflow-hidden">
-        <img src="/landing/utilities-palette-source.png" alt="Curated pigment tiles used for palette extraction" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+        <img src="/landing/utilities-palette-source.webp" srcSet="/landing/utilities-palette-source-800.webp 800w, /landing/utilities-palette-source.webp 1536w" sizes="(min-width: 1024px) calc(36.458vw - 2.24rem), (min-width: 640px) 58.75vw, calc(100vw - 2rem)" alt="Curated pigment tiles used for palette extraction" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
         <span className="absolute bottom-6 right-5 border-b border-white/70 pb-1 text-[10px] font-bold uppercase tracking-[0.26em] text-white/80">PixelForge / Studio</span>
       </div>
       <div className="flex flex-col justify-between border-t border-pf-editorial-line p-5 sm:border-l sm:border-t-0 sm:p-7">
