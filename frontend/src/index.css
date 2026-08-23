@@ -1,20 +1,6 @@
 @import "tailwindcss";
 @import "./shared/styles/design-system.css";
 
-.crop-workspace-scope .custom-scroll::-webkit-scrollbar {
-  width: 8px;
-}
-.crop-workspace-scope .custom-scroll::-webkit-scrollbar-track {
-  background: var(--color-pf-editorial-footer);
-  border-radius: 4px;
-}
-.crop-workspace-scope .custom-scroll::-webkit-scrollbar-thumb {
-  background: var(--color-pf-editorial-line);
-  border-radius: 4px;
-}
-.crop-workspace-scope .custom-scroll::-webkit-scrollbar-thumb:hover {
-  background: var(--color-pf-editorial-accent);
-}
 .crop-workspace-scope .ReactCrop__crop-selection {
   animation: none !important;
   background-image: none !important;
