@@ -3,7 +3,7 @@ import os
 
 TEST_ENV = {
     "ENVIRONMENT": "test",
-    "DATABASE_URL": "postgresql://postgres:postgres@localhost:5432/pixelforge_test",
+    "DATABASE_URL": "postgresql://postgres@localhost:5432/pixelforge_test",
     "AZURE_CONNECTION_STRING": "",
     "CLOUDFLARE_TURNSTILE_SECRET_KEY": "",
     "DISCORD_WEBHOOK_URL": "",
