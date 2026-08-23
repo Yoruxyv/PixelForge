@@ -10,6 +10,8 @@ import WorkspaceLayout from './WorkspaceLayout';
  * @param {React.ReactNode} props.rightHeader - The header content for the right panel.
  * @param {React.ReactNode} props.rightBody - The main body content for the right panel.
  * @param {string} [props.minHeight='min-h-96'] - Minimum height CSS class for the workspace.
+ * @param {string} [props.rightBodyMinHeight='min-h-80'] - Minimum height CSS class for the preview body.
+ * @param {boolean} [props.desktopViewportFit=false] - Keep loaded desktop actions visible while allowing one controls scroller.
  * @returns {JSX.Element}
  */
 export default function ToolWorkspaceShell({
@@ -19,21 +21,39 @@ export default function ToolWorkspaceShell({
   rightHeader,
   rightBody,
   minHeight = 'min-h-96',
+  rightBodyMinHeight = 'min-h-80',
+  desktopViewportFit = false,
 }) {
+  const desktopPanelClass = desktopViewportFit ? 'lg:min-h-0' : '';
+  const desktopControlsClass = desktopViewportFit
+    ? 'lg:overflow-x-hidden lg:overflow-y-auto lg:pr-2'
+    : '';
+
   return (
     <WorkspaceLayout
       minHeight={minHeight}
+      desktopViewportFit={desktopViewportFit}
       leftPanel={
-        <div className="flex h-full flex-col">
-          <div className="mb-6">{leftHeader}</div>
-          <div className="flex-1 min-h-0">{leftBody}</div>
-          <div className="mt-auto border-t border-pf-editorial-line pt-5">{leftFooter}</div>
+        <div className={`flex h-full flex-col ${desktopPanelClass}`}>
+          <div className="mb-6 shrink-0">{leftHeader}</div>
+          <div
+            className={`min-h-0 flex-1 ${desktopControlsClass}`}
+          >
+            {leftBody}
+          </div>
+          <div className="mt-auto shrink-0 border-t border-pf-editorial-line pt-5">
+            {leftFooter}
+          </div>
         </div>
       }
       rightPanel={
-        <div className="flex h-full w-full flex-col">
-          <div className="mb-4">{rightHeader}</div>
-          <div className="relative flex min-h-80 flex-1 items-center justify-center overflow-hidden rounded-pf-control border border-pf-editorial-line bg-pf-editorial-footer p-2 text-pf-editorial-ink">
+        <div
+          className={`flex h-full w-full flex-col ${desktopPanelClass}`}
+        >
+          <div className="mb-4 shrink-0">{rightHeader}</div>
+          <div
+            className={`relative flex ${rightBodyMinHeight} flex-1 items-center justify-center overflow-hidden rounded-pf-control border border-pf-editorial-line bg-pf-editorial-footer p-2 text-pf-editorial-ink`}
+          >
             {rightBody}
           </div>
         </div>
@@ -49,4 +69,6 @@ ToolWorkspaceShell.propTypes = {
   rightHeader: PropTypes.node.isRequired,
   rightBody: PropTypes.node.isRequired,
   minHeight: PropTypes.string,
+  rightBodyMinHeight: PropTypes.string,
+  desktopViewportFit: PropTypes.bool,
 };

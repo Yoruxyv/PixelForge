@@ -82,6 +82,7 @@ export default function WatermarkAdder() {
     <ToolPageWrapper>
       <ToolWorkspaceShell
         minHeight="min-h-96"
+        desktopViewportFit={Boolean(file)}
         leftHeader={
           <ClientSideHeader
             category="Edit / 05"
