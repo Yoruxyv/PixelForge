@@ -20,6 +20,9 @@ const BeforeAfterSlider = ({
   aspectClassName = 'aspect-video',
   imageClassName = 'object-cover',
   canvasClassName = 'bg-pf-editorial-raised',
+  prioritizeImages = false,
+  afterSrcSet,
+  afterSizes,
 }) => {
   const [sliderPosition, setSliderPosition] = useState(50);
 
@@ -33,7 +36,10 @@ const BeforeAfterSlider = ({
         src={afterImage}
         alt={`${altText} - After`}
         className={`pointer-events-none absolute inset-0 h-full w-full ${imageClassName}`}
-        loading="lazy"
+        loading={prioritizeImages ? 'eager' : 'lazy'}
+        fetchPriority={prioritizeImages ? 'high' : undefined}
+        srcSet={afterSrcSet}
+        sizes={afterSizes}
       />
 
       <img
@@ -41,7 +47,7 @@ const BeforeAfterSlider = ({
         alt={`${altText} - Before`}
         className={`pointer-events-none absolute inset-0 h-full w-full ${imageClassName}`}
         style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
-        loading="lazy"
+        loading={prioritizeImages ? 'eager' : 'lazy'}
       />
 
       <div
@@ -76,6 +82,9 @@ BeforeAfterSlider.propTypes = {
   aspectClassName: PropTypes.string,
   imageClassName: PropTypes.string,
   canvasClassName: PropTypes.string,
+  prioritizeImages: PropTypes.bool,
+  afterSrcSet: PropTypes.string,
+  afterSizes: PropTypes.string,
 };
 
 export default BeforeAfterSlider;

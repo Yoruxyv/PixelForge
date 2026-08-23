@@ -17,4 +17,22 @@ describe('CategoryShowcases', () => {
     expect(within(screen.getByRole('region', { name: 'Utilities' })).getAllByRole('link')).toHaveLength(2);
     expect(screen.getByText('#585059')).toBeInTheDocument();
   });
+
+  it('keeps utility artwork lazy and responsive', () => {
+    render(<MemoryRouter><CategoryShowcases /></MemoryRouter>);
+
+    const artwork = screen.getByAltText(
+      'Curated pigment tiles used for palette extraction',
+    );
+
+    expect(artwork).toHaveAttribute('loading', 'lazy');
+    expect(artwork).toHaveAttribute(
+      'srcset',
+      '/landing/utilities-palette-source-800.webp 800w, /landing/utilities-palette-source.webp 1536w',
+    );
+    expect(artwork).toHaveAttribute(
+      'sizes',
+      '(min-width: 1024px) calc(36.458vw - 2.24rem), (min-width: 640px) 58.75vw, calc(100vw - 2rem)',
+    );
+  });
 });

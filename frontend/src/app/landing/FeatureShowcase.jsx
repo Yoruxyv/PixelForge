@@ -7,13 +7,15 @@ const FEATURES = [
     name: 'Upscale',
     copy: 'Recover useful detail and enlarge an image for higher-resolution output.',
     before: '/demo/upscale_before.jpg',
-    after: '/demo/upscale_after.png',
+    after: '/demo/upscale_after.webp',
+    afterSrcSet: '/demo/upscale_after-768.webp 768w, /demo/upscale_after.webp 1024w',
+    afterSizes: '(min-width: 1280px) calc(58.333vw - 3.167rem), (min-width: 1024px) calc(66.667vw - 3.333rem), calc(100vw - 2rem)',
   },
   {
     id: 'background-removal',
     name: 'Background removal',
     copy: 'Isolate the subject and create a clean, transparent output.',
-    before: '/demo/rem_bg_before.jpg',
+    before: '/demo/rem_bg_before.webp',
     after: '/demo/rem_bg_after.png',
     imageClassName: 'object-contain',
     canvasClassName: 'pf-transparency-grid',
@@ -23,7 +25,7 @@ const FEATURES = [
     name: 'Color restoration',
     copy: 'Bring faded photographs back with balanced, natural-looking color.',
     before: '/demo/res_color_before.jpg',
-    after: '/demo/res_color_after.png',
+    after: '/demo/res_color_after.webp',
   },
   {
     id: 'object-removal',
@@ -93,6 +95,9 @@ export default function FeatureShowcase() {
           aspectClassName="aspect-[16/10]"
           imageClassName={activeFeature.imageClassName}
           canvasClassName={activeFeature.canvasClassName}
+          prioritizeImages={activeFeature.id === 'upscale'}
+          afterSrcSet={activeFeature.afterSrcSet}
+          afterSizes={activeFeature.afterSizes}
         />
       </div>
 

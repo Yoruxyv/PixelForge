@@ -13,6 +13,44 @@ describe('FeatureShowcase', () => {
 
   afterEach(() => vi.useRealTimers());
 
+  it('prioritizes only the initial Upscale comparison', () => {
+    render(<FeatureShowcase />);
+
+    const upscaleBefore = screen.getByAltText('Upscale example - Before');
+    const upscaleAfter = screen.getByAltText('Upscale example - After');
+
+    expect(upscaleBefore).toHaveAttribute('loading', 'eager');
+    expect(upscaleAfter).toHaveAttribute('loading', 'eager');
+    expect(upscaleBefore).not.toHaveAttribute('fetchpriority');
+    expect(upscaleAfter).toHaveAttribute('fetchpriority', 'high');
+    expect(upscaleAfter).toHaveAttribute(
+      'srcset',
+      '/demo/upscale_after-768.webp 768w, /demo/upscale_after.webp 1024w',
+    );
+    expect(upscaleAfter).toHaveAttribute(
+      'sizes',
+      '(min-width: 1280px) calc(58.333vw - 3.167rem), (min-width: 1024px) calc(66.667vw - 3.333rem), calc(100vw - 2rem)',
+    );
+
+    fireEvent.click(
+      screen.getByRole('tab', { name: /Background removal/ }),
+    );
+
+    const backgroundBefore = screen.getByAltText(
+      'Background removal example - Before',
+    );
+    const backgroundAfter = screen.getByAltText(
+      'Background removal example - After',
+    );
+
+    expect(backgroundBefore).toHaveAttribute('loading', 'lazy');
+    expect(backgroundAfter).toHaveAttribute('loading', 'lazy');
+    expect(backgroundBefore).not.toHaveAttribute('fetchpriority');
+    expect(backgroundAfter).not.toHaveAttribute('fetchpriority');
+    expect(backgroundAfter).not.toHaveAttribute('srcset');
+    expect(backgroundAfter).not.toHaveAttribute('sizes');
+  });
+
   it('switches workflows with pointer and arrow-key controls', () => {
     render(<FeatureShowcase />);
 
