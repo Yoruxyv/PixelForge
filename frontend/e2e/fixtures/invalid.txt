@@ -1,0 +1,1 @@
+PixelForge E2E invalid non-image fixture.
