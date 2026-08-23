@@ -182,6 +182,7 @@ const ObjectRemoveMaskCanvas = forwardRef(function ObjectRemoveMaskCanvas(
 
         <canvas
           ref={maskCanvasRef}
+          aria-label="Object removal mask"
           className="absolute inset-0 h-full w-full cursor-crosshair touch-none opacity-55"
           onMouseDown={handlePointerDown}
           onMouseMove={drawAt}

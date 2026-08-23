@@ -261,3 +261,7 @@ logs/
 
 .agents/
 skills-lock.json
+
+# Playwright
+frontend/playwright-report/
+frontend/test-results/

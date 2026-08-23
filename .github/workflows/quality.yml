@@ -39,6 +39,36 @@ jobs:
       - name: Build
         run: npm run build
 
+  frontend-e2e:
+    name: Frontend E2E (Chromium)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Playwright E2E
+        run: npm run test:e2e
+      - name: Upload Playwright diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            frontend/playwright-report/
+            frontend/test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
   backend-quality:
     name: Backend quality
     runs-on: ubuntu-latest
@@ -164,13 +194,14 @@ jobs:
   quality-gate:
     name: Quality gate
     if: ${{ always() }}
-    needs: [frontend-quality, backend-quality, backend-baseline, backend-compatibility]
+    needs: [frontend-quality, frontend-e2e, backend-quality, backend-baseline, backend-compatibility]
     runs-on: ubuntu-latest
     steps:
       - name: Confirm required checks passed
         env:
           FRONTEND: ${{ needs.frontend-quality.result }}
+          E2E: ${{ needs.frontend-e2e.result }}
           BACKEND: ${{ needs.backend-quality.result }}
           TYPING: ${{ needs.backend-baseline.result }}
           COMPATIBILITY: ${{ needs.backend-compatibility.result }}
-        run: '[[ "$FRONTEND" == success && "$BACKEND" == success && "$TYPING" == success && "$COMPATIBILITY" == success ]]'
+        run: '[[ "$FRONTEND" == success && "$E2E" == success && "$BACKEND" == success && "$TYPING" == success && "$COMPATIBILITY" == success ]]'
