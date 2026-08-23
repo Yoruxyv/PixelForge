@@ -101,7 +101,8 @@ export default function ColorPalette() {
   return (
     <ToolPageWrapper>
       <ToolWorkspaceShell
-        minHeight="min-h-96"
+        minHeight={file ? 'min-h-96' : 'min-h-0'}
+        rightBodyMinHeight={file ? 'min-h-80' : 'min-h-48'}
         leftHeader={
           <ClientSideHeader
             category="Utilities / 02"

@@ -174,10 +174,10 @@ const ObjectRemoveMaskCanvas = forwardRef(function ObjectRemoveMaskCanvas(
 
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center">
-      <div className="relative max-h-[68vh] max-w-full overflow-hidden border border-pf-editorial-line bg-pf-editorial-base">
+      <div className="relative max-h-[68vh] max-w-full overflow-hidden border border-pf-editorial-line bg-pf-editorial-base lg:max-h-[min(32rem,calc(100dvh-24rem))]">
         <canvas
           ref={imageCanvasRef}
-          className="block max-h-[68vh] max-w-full object-contain"
+          className="block max-h-[68vh] max-w-full object-contain lg:max-h-[min(32rem,calc(100dvh-24rem))]"
         />
 
         <canvas

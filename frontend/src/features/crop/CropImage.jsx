@@ -78,6 +78,30 @@ export default function CropImage() {
     [onFileChange],
   );
 
+  const cropEditor = (
+    <CropEditor
+      previewUrl={previewUrl}
+      crop={crop}
+      setCrop={setCrop}
+      setCompletedCrop={setCompletedCrop}
+      aspect={aspect}
+      applyAspect={applyAspect}
+      applyCrop={applyCrop}
+      canApply={canApply}
+      cropSizeLabel={cropSizeLabel}
+      onImageLoad={onImageLoad}
+      imgRef={imgRef}
+      fitMode={fitMode}
+      setFitMode={setFitMode}
+      imageSize={imageSize}
+      imageAspect={imageAspect}
+      onCancel={handleReset}
+      cleanupResult={cleanupResult}
+      aspectRatioOptions={CROP_ASPECT_RATIOS}
+      onFileSelect={handleFileSelectWrapper}
+    />
+  );
+
   return (
     <ToolPageWrapper>
       <input
@@ -94,47 +118,32 @@ export default function CropImage() {
             description="Set a precise frame, choose an aspect ratio, and export only the composition you need."
           />
         </div>
-        <ToolStateWrapper
-          file={file}
-          error={error}
-          isProcessing={isProcessing}
-          processingText="Applying precision crop..."
-          onFileSelect={handleFileSelectWrapper}
-          onReset={handleReset}
-        >
-          {resultUrl ? (
-            <WorkspaceSuccessCard
-              title="Crop ready"
-              description="Your image is ready to use."
-              resultUrl={resultUrl}
-              downloadName={downloadName}
-              onReset={handleReset}
-              resetText="Crop Another"
-              downloadText="Download Image"
-            />
-          ) : (
-            <CropEditor
-              previewUrl={previewUrl}
-              crop={crop}
-              setCrop={setCrop}
-              setCompletedCrop={setCompletedCrop}
-              aspect={aspect}
-              applyAspect={applyAspect}
-              applyCrop={applyCrop}
-              canApply={canApply}
-              cropSizeLabel={cropSizeLabel}
-              onImageLoad={onImageLoad}
-              imgRef={imgRef}
-              fitMode={fitMode}
-              setFitMode={setFitMode}
-              imageSize={imageSize}
-              imageAspect={imageAspect}
-              onCancel={handleReset}
-              cleanupResult={cleanupResult}
-              aspectRatioOptions={CROP_ASPECT_RATIOS}
-            />
-          )}
-        </ToolStateWrapper>
+        {!file ? (
+          cropEditor
+        ) : (
+          <ToolStateWrapper
+            file={file}
+            error={error}
+            isProcessing={isProcessing}
+            processingText="Applying precision crop..."
+            onFileSelect={handleFileSelectWrapper}
+            onReset={handleReset}
+          >
+            {resultUrl ? (
+              <WorkspaceSuccessCard
+                title="Crop ready"
+                description="Your image is ready to use."
+                resultUrl={resultUrl}
+                downloadName={downloadName}
+                onReset={handleReset}
+                resetText="Crop Another"
+                downloadText="Download Image"
+              />
+            ) : (
+              cropEditor
+            )}
+          </ToolStateWrapper>
+        )}
       </section>
     </ToolPageWrapper>
   );

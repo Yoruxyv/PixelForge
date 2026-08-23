@@ -3,8 +3,15 @@ import { test, expect } from '@playwright/test';
 const themeRoot = (page) => page.locator('[data-theme]').first();
 
 async function chooseTheme(page, currentLabel, nextLabel) {
-  await page.getByText(currentLabel, { exact: true }).first().click();
-  await page.getByRole('button', {
+  const trigger = page.locator('#desktop-theme-menu-trigger');
+  const menu = page.locator('#desktop-theme-menu');
+
+  await expect(trigger).toContainText(currentLabel);
+  await trigger.hover();
+  await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  await expect(menu).toHaveAttribute('aria-hidden', 'false');
+
+  await menu.getByRole('button', {
     name: nextLabel,
     exact: true,
   }).click();

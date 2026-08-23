@@ -82,19 +82,38 @@ test.describe('browser-side edit tools', () => {
     page,
   }) => {
     await page.goto('/crop-image');
+
+    await expect(
+      page.getByRole('heading', { name: 'Focus crop' }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Upload image file' }),
+    ).toBeVisible();
+
+    const applyButton = page.getByRole('button', {
+      name: 'Apply Crop',
+      exact: true,
+    });
+    await expect(applyButton).toBeDisabled();
+    await expect(
+      page.getByRole('button', {
+        name: 'Square (1:1)',
+        exact: true,
+      }),
+    ).toBeDisabled();
+
     await uploadDropzoneFile(page, fixturePaths.colorJpeg);
 
     await expect(page.getByAltText('Crop preview')).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Focus crop' }),
+    ).toBeVisible();
 
     await page.getByRole('button', {
       name: 'Square (1:1)',
       exact: true,
     }).click();
 
-    const applyButton = page.getByRole('button', {
-      name: 'Apply Crop',
-      exact: true,
-    });
     await expect(applyButton).toBeEnabled();
     await applyButton.click();
 
@@ -189,4 +208,52 @@ test.describe('browser-side edit tools', () => {
 
     expect(download.suggestedFilename()).toMatch(/watermarked.*\.jpg$/i);
   });
+  test('image editor keeps loaded actions visible on a short desktop', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await page.goto('/image-editor');
+    await uploadCardFile(page, fixturePaths.colorJpeg);
+
+    await expect(page.getByAltText('Edited preview')).toBeVisible();
+    await page.evaluate(() => window.scrollTo(0, 0));
+
+    await expect(
+      page.getByRole('button', {
+        name: 'Export Image',
+        exact: true,
+      }),
+    ).toBeInViewport();
+    await expect(
+      page.getByRole('button', {
+        name: 'Reset Filters',
+        exact: true,
+      }),
+    ).toBeInViewport();
+  });
+
+  test('watermark keeps placement actions visible on a short desktop', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await page.goto('/watermark-adder');
+    await uploadCardFile(page, fixturePaths.colorJpeg);
+
+    await expect(page.getByAltText('Base workspace')).toBeVisible();
+    await page.evaluate(() => window.scrollTo(0, 0));
+
+    await expect(
+      page.getByRole('button', {
+        name: 'Add Watermark',
+        exact: true,
+      }),
+    ).toBeInViewport();
+    await expect(
+      page.getByRole('button', {
+        name: 'Reset',
+        exact: true,
+      }),
+    ).toBeInViewport();
+  });
+
 });

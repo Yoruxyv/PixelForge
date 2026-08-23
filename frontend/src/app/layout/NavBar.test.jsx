@@ -1,15 +1,19 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import Navbar from './NavBar';
 
-const renderNavbar = () =>
+const renderNavbar = ({
+  theme = 'light',
+  themePreference = 'system',
+  onThemeChange = vi.fn(),
+} = {}) =>
   render(
     <MemoryRouter>
       <Navbar
-        theme="light"
-        themePreference="system"
-        onThemeChange={vi.fn()}
+        theme={theme}
+        themePreference={themePreference}
+        onThemeChange={onThemeChange}
       />
     </MemoryRouter>,
   );
@@ -191,22 +195,109 @@ describe('Navbar desktop dropdown interactions', () => {
 });
 
 describe('Navbar theme menu', () => {
-  it('selects a theme and closes the menu', () => {
+  const getThemeTrigger = () => getTrigger('System');
+
+  it('opens on desktop mouse hover and stays open while entering the menu', () => {
+    vi.useFakeTimers();
+    renderNavbar();
+    const trigger = getThemeTrigger();
+    const region = getDropdownRegion(trigger);
+    const menu = getMenu(trigger);
+
+    hover(region);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+    leave(region);
+    hover(menu);
+
+    act(() => {
+      vi.advanceTimersByTime(150);
+    });
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(menu).toHaveAttribute('aria-hidden', 'false');
+  });
+
+  it('closes after leaving the desktop theme trigger and menu region', () => {
+    vi.useFakeTimers();
+    renderNavbar();
+    const trigger = getThemeTrigger();
+    const region = getDropdownRegion(trigger);
+
+    hover(region);
+    leave(region);
+
+    act(() => {
+      vi.advanceTimersByTime(110);
+    });
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('keeps click toggle and second-click close behavior', () => {
+    renderNavbar();
+    const trigger = getThemeTrigger();
+
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('closes on Escape and restores focus to the desktop theme trigger', () => {
+    renderNavbar();
+    const trigger = getThemeTrigger();
+
+    fireEvent.click(trigger);
+    const darkOption = screen.getByRole('button', { name: 'Dark', exact: true });
+    darkOption.focus();
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(trigger).toHaveFocus();
+  });
+
+  it.each([
+    ['Light', 'light'],
+    ['Dark', 'dark'],
+    ['System', 'system'],
+  ])('selects %s and closes the desktop theme menu', (label, value) => {
     const onThemeChange = vi.fn();
-    const { container } = render(
-      <MemoryRouter>
-        <Navbar
-          theme="light"
-          themePreference="system"
-          onThemeChange={onThemeChange}
-        />
-      </MemoryRouter>,
+    renderNavbar({ onThemeChange });
+    const trigger = getThemeTrigger();
+
+    fireEvent.click(trigger);
+    fireEvent.click(
+      within(getMenu(trigger)).getByRole('button', {
+        name: label,
+        exact: true,
+      }),
     );
 
-    fireEvent.click(container.querySelector('summary'));
-    fireEvent.click(screen.getByRole('button', { name: 'Dark' }));
+    expect(onThemeChange).toHaveBeenCalledWith(value);
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('keeps mobile theme selection click-driven without hover', () => {
+    const onThemeChange = vi.fn();
+    renderNavbar({ onThemeChange });
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Open tool menu' }),
+    );
+
+    const mobileNavigation = document.getElementById('mobile-navigation');
+    const themeDetails = mobileNavigation.querySelector('details');
+    const summary = themeDetails.querySelector('summary');
+
+    fireEvent.click(summary);
+    fireEvent.click(
+      within(themeDetails).getByRole('button', { name: 'Dark' }),
+    );
 
     expect(onThemeChange).toHaveBeenCalledWith('dark');
-    expect(container.querySelector('details')).not.toHaveAttribute('open');
+    expect(themeDetails).not.toHaveAttribute('open');
   });
 });

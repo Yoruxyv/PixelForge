@@ -15,12 +15,14 @@ const AllowedFormatsText = FILE_LIMITS.ALLOWED_EXTENSIONS.map((e) =>
  * @param {Object} props
  * @param {(file: File) => void} props.onFileSelect - Callback executed when a valid image file is selected.
  * @param {boolean} [props.requireGrayscale=false] - Whether uploaded images must pass grayscale validation.
+ * @param {boolean} [props.compact=false] - Opt into a shorter editorial upload surface without changing upload behavior.
  * @returns {JSX.Element}
  */
 export default function UploadDropzone({
   onFileSelect,
   requireGrayscale = false,
   variant = 'default',
+  compact = false,
 }) {
   const errorId = useId();
   const { isDragging, error, inputRef, handlers } = useFileUpload({
@@ -57,8 +59,10 @@ export default function UploadDropzone({
         type="button"
         aria-label="Upload image file"
         aria-describedby={error ? errorId : undefined}
-        className={`flex w-full cursor-pointer items-center justify-center rounded-pf-control border border-dashed p-8 text-center transition-colors sm:p-10 ${
-          variant === 'editorial' ? 'min-h-[26rem]' : ''
+        className={`flex w-full cursor-pointer items-center justify-center rounded-pf-control border border-dashed text-center transition-colors ${
+          compact ? 'p-6 sm:p-8' : 'p-8 sm:p-10'
+        } ${
+          variant === 'editorial' && !compact ? 'min-h-[26rem]' : ''
         } ${getDropzoneStateClasses()}`}
         onDragOver={handlers.onDragOver}
         onDragLeave={handlers.onDragLeave}
@@ -159,4 +163,5 @@ UploadDropzone.propTypes = {
   onFileSelect: PropTypes.func.isRequired,
   requireGrayscale: PropTypes.bool,
   variant: PropTypes.oneOf(['default', 'editorial']),
+  compact: PropTypes.bool,
 };

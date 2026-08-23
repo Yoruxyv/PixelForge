@@ -165,41 +165,155 @@ ThemeGlyph.propTypes = {
   value: PropTypes.oneOf(['system', 'dark', 'light']).isRequired,
 };
 
-const ThemeControl = ({ theme, value, onChange, className = '', inline = false }) => {
-  const selectTheme = (event, nextTheme) => {
-    onChange(nextTheme);
-    event.currentTarget.closest('details')?.removeAttribute('open');
+const ThemeControl = ({
+  theme,
+  value,
+  onChange,
+  className = '',
+  inline = false,
+  isOpen = false,
+  onOpen,
+  onScheduleClose,
+  onToggle,
+  onClose,
+  triggerRef,
+}) => {
+  const openedByHoverRef = useRef(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      openedByHoverRef.current = false;
+    }
+  }, [isOpen]);
+
+  const selectedLabel =
+    themeOptions.find((option) => option.value === value)?.label ?? 'System';
+
+  const renderOptions = ({ desktop = false } = {}) =>
+    themeOptions.map((option) => (
+      <button
+        key={option.value}
+        type="button"
+        onClick={(event) => {
+          onChange(option.value);
+          if (desktop) {
+            onClose?.();
+          } else {
+            event.currentTarget.closest('details')?.removeAttribute('open');
+          }
+        }}
+        aria-pressed={value === option.value}
+        tabIndex={desktop && !isOpen ? -1 : undefined}
+        className={`grid w-full grid-cols-[1rem_1.25rem_1fr] items-center gap-2 rounded-[6px] px-3 py-2.5 text-left text-sm font-semibold transition-colors ${
+          value === option.value
+            ? 'bg-pf-editorial-accent-soft text-pf-editorial-ink'
+            : 'text-pf-editorial-muted hover:bg-pf-editorial-raised hover:text-pf-editorial-ink'
+        }`}
+      >
+        <span className="text-pf-editorial-accent" aria-hidden="true">
+          {value === option.value ? '✓' : ''}
+        </span>
+        <ThemeGlyph value={option.value} />
+        {option.label}
+      </button>
+    ));
+
+  if (inline) {
+    return (
+      <details className={`group/theme relative ${className}`}>
+        <summary className="flex w-full cursor-pointer list-none items-center justify-between gap-2 rounded-pf-control px-2 py-2 text-xs font-bold uppercase tracking-[0.1em] text-pf-editorial-muted transition-colors hover:bg-pf-editorial-raised hover:text-pf-editorial-ink [&::-webkit-details-marker]:hidden">
+          <span className="flex items-center gap-2">
+            <ThemeGlyph value={value === 'system' ? theme : value} />
+            <span>{selectedLabel}</span>
+          </span>
+          <svg className="h-3 w-3 transition-transform group-open/theme:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
+        </summary>
+        <div className="relative mt-2 w-full rounded-[8px] border border-pf-editorial-line bg-pf-editorial-surface p-1.5">
+          {renderOptions()}
+        </div>
+      </details>
+    );
+  }
+
+  const menuKey = 'theme';
+  const menuId = 'desktop-theme-menu';
+  const triggerId = `${menuId}-trigger`;
+
+  const handlePointerEnter = (event) => {
+    if (event.pointerType === 'mouse') {
+      if (!isOpen) {
+        openedByHoverRef.current = true;
+      }
+      onOpen?.(menuKey);
+    }
+  };
+
+  const handlePointerLeave = (event) => {
+    if (event.pointerType === 'mouse') {
+      onScheduleClose?.();
+    }
   };
 
   return (
-    <details className={`group/theme relative ${className}`}>
-      <summary className={`flex cursor-pointer list-none items-center gap-2 rounded-pf-control px-2 py-2 text-xs font-bold uppercase tracking-[0.1em] text-pf-editorial-muted transition-colors hover:bg-pf-editorial-raised hover:text-pf-editorial-ink [&::-webkit-details-marker]:hidden ${inline ? 'w-full justify-between' : ''}`}>
+    <div
+      className={`relative ${className}`}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
+    >
+      <button
+        ref={triggerRef}
+        id={triggerId}
+        type="button"
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+        aria-controls={menuId}
+        onClick={() => {
+          if (isOpen && openedByHoverRef.current) {
+            openedByHoverRef.current = false;
+            onOpen?.(menuKey);
+            return;
+          }
+          onToggle?.(menuKey);
+        }}
+        className="flex items-center gap-2 rounded-pf-control px-2 py-2 text-xs font-bold uppercase tracking-[0.1em] text-pf-editorial-muted transition-colors hover:bg-pf-editorial-raised hover:text-pf-editorial-ink"
+      >
         <ThemeGlyph value={value === 'system' ? theme : value} />
-        <span>{themeOptions.find((option) => option.value === value)?.label}</span>
-        <svg className="h-3 w-3 transition-transform group-open/theme:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
-      </summary>
-      <div className={`${inline ? 'relative mt-2 w-full' : 'absolute right-0 top-full z-30 mt-2 min-w-40 shadow-pf-float'} border border-pf-editorial-line bg-pf-editorial-surface p-1.5`}>
-        {themeOptions.map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            onClick={(event) => selectTheme(event, option.value)}
-            aria-pressed={value === option.value}
-            className={`grid w-full grid-cols-[1rem_1.25rem_1fr] items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold transition-colors ${
-              value === option.value
-                ? 'bg-pf-editorial-accent-soft text-pf-editorial-ink'
-                : 'text-pf-editorial-muted hover:bg-pf-editorial-raised hover:text-pf-editorial-ink'
-            }`}
-          >
-            <span className="text-pf-editorial-accent" aria-hidden="true">
-              {value === option.value ? '✓' : ''}
-            </span>
-            <ThemeGlyph value={option.value} />
-            {option.label}
-          </button>
-        ))}
+        <span>{selectedLabel}</span>
+        <svg
+          className={`h-3 w-3 transition-transform duration-150 motion-reduce:transition-none ${
+            isOpen ? 'rotate-180' : ''
+          }`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          aria-hidden="true"
+        >
+          <path d="m7 10 5 5 5-5" />
+        </svg>
+      </button>
+
+      <div
+        id={menuId}
+        aria-labelledby={triggerId}
+        aria-hidden={!isOpen}
+        onPointerEnter={(event) => {
+          if (event.pointerType === 'mouse') {
+            openedByHoverRef.current = false;
+            onOpen?.(menuKey);
+          }
+        }}
+        className={`absolute right-0 top-full z-30 min-w-40 pt-2 transition-[opacity,transform,visibility] duration-150 ease-out motion-reduce:transform-none motion-reduce:transition-none ${
+          isOpen
+            ? 'visible translate-y-0 opacity-100'
+            : 'pointer-events-none invisible -translate-y-[3px] opacity-0'
+        }`}
+      >
+        <div className="rounded-[8px] border border-pf-editorial-line bg-pf-editorial-surface p-1.5 shadow-pf-float">
+          {renderOptions({ desktop: true })}
+        </div>
       </div>
-    </details>
+    </div>
   );
 };
 
@@ -209,6 +323,12 @@ ThemeControl.propTypes = {
   onChange: PropTypes.func.isRequired,
   className: PropTypes.string,
   inline: PropTypes.bool,
+  isOpen: PropTypes.bool,
+  onOpen: PropTypes.func,
+  onScheduleClose: PropTypes.func,
+  onToggle: PropTypes.func,
+  onClose: PropTypes.func,
+  triggerRef: PropTypes.func,
 };
 
 /** Persistent product navigation for PixelForge tools. */
@@ -318,8 +438,21 @@ export default function Navbar({ theme, themePreference, onThemeChange }) {
                 }}
               />
             ))}
+            <ThemeControl
+              theme={theme}
+              value={themePreference}
+              onChange={onThemeChange}
+              className="ml-2 border-l border-pf-editorial-line pl-4"
+              isOpen={activeMenu === 'theme'}
+              onOpen={openMenu}
+              onScheduleClose={scheduleCloseMenu}
+              onToggle={toggleMenu}
+              onClose={closeMenu}
+              triggerRef={(node) => {
+                triggerRefs.current.theme = node;
+              }}
+            />
           </div>
-          <ThemeControl theme={theme} value={themePreference} onChange={onThemeChange} className="ml-2 border-l border-pf-editorial-line pl-4" />
           <a href="https://github.com/Yoruxyv/PixelForge" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm font-semibold text-pf-editorial-muted transition-colors hover:text-pf-editorial-ink">
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M12 .7a11.6 11.6 0 0 0-3.67 22.6c.58.1.8-.25.8-.56v-2.23c-3.25.7-3.94-1.38-3.94-1.38-.53-1.35-1.3-1.71-1.3-1.71-1.06-.73.08-.72.08-.72 1.18.08 1.8 1.21 1.8 1.21 1.04 1.8 2.74 1.28 3.41.98.1-.76.41-1.28.74-1.58-2.6-.3-5.33-1.3-5.33-5.74 0-1.27.45-2.3 1.2-3.12-.12-.3-.52-1.48.11-3.08 0 0 .98-.31 3.19 1.2A11.1 11.1 0 0 1 12 6.27c.99 0 1.97.13 2.9.39 2.21-1.51 3.19-1.2 3.19-1.2.63 1.6.23 2.78.11 3.08.75.82 1.2 1.85 1.2 3.12 0 4.46-2.74 5.44-5.34 5.73.42.37.79 1.09.79 2.2v3.15c0 .31.21.67.8.56A11.6 11.6 0 0 0 12 .7Z" />

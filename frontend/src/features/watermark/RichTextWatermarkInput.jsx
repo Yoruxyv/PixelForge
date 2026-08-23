@@ -3,10 +3,6 @@ import { useRef } from 'react';
 import { getTextSegmentStyle } from './watermarkUtils';
 
 const CustomStyles = `
-  .custom-textarea-scroll::-webkit-scrollbar { width: 6px; }
-  .custom-textarea-scroll::-webkit-scrollbar-track { background: transparent; margin: 4px 0; }
-  .custom-textarea-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 10px; }
-  .custom-textarea-scroll::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.8); }
   .hide-scrollbar::-webkit-scrollbar { display: none; }
   .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -109,7 +105,7 @@ export default function RichTextWatermarkInput({
           onClick={onInteraction}
           onScroll={handleScroll}
           spellCheck={false}
-          className="rich-text-input custom-textarea-scroll absolute inset-0 h-full w-full resize-none bg-transparent p-3 text-transparent caret-pf-editorial-ink outline-none"
+          className="rich-text-input absolute inset-0 h-full w-full resize-none bg-transparent p-3 text-transparent caret-pf-editorial-ink outline-none"
           style={{ lineHeight: '1.5rem', fontFamily: 'inherit' }}
         />
       </div>

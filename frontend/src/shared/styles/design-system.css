@@ -83,6 +83,9 @@
   --pf-z-popover: 40;
   --pf-z-overlay: 60;
   --pf-z-toast: 80;
+  --pf-scrollbar-track: var(--color-pf-editorial-base);
+  --pf-scrollbar-thumb: var(--color-pf-line-inverse);
+  --pf-scrollbar-thumb-hover: var(--color-pf-ink-inverse-muted);
 }
 
 [data-theme='dark'] {
@@ -100,6 +103,58 @@
   --color-pf-editorial-line: #c8c6bf;
   --color-pf-editorial-accent: #65598b;
   --color-pf-editorial-accent-soft: #ddd8e8;
+}
+
+html:has([data-theme='light']) {
+  color-scheme: light;
+  background: var(--color-pf-canvas);
+  --pf-scrollbar-track: var(--color-pf-canvas);
+  --pf-scrollbar-thumb: var(--color-pf-line-strong);
+  --pf-scrollbar-thumb-hover: var(--color-pf-ink-subtle);
+}
+
+html:has([data-theme='dark']) {
+  color-scheme: dark;
+  background: var(--color-pf-editorial-base);
+  --pf-scrollbar-track: var(--color-pf-editorial-base);
+  --pf-scrollbar-thumb: var(--color-pf-line-inverse);
+  --pf-scrollbar-thumb-hover: var(--color-pf-ink-inverse-muted);
+}
+
+@media (forced-colors: none) {
+  html,
+  [data-theme],
+  [data-theme] * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--pf-scrollbar-thumb) var(--pf-scrollbar-track);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--pf-scrollbar-track);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: var(--pf-scrollbar-track);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    min-width: 10px;
+    min-height: 10px;
+    border: 2px solid var(--pf-scrollbar-track);
+    border-radius: 0.35rem;
+    background: var(--pf-scrollbar-thumb);
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--pf-scrollbar-thumb-hover);
+    background-clip: padding-box;
+  }
 }
 
 @layer base {

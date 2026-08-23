@@ -286,4 +286,29 @@ test.describe('AI workspaces', () => {
       }),
     ).toBeVisible();
   });
+  test('object removal keeps mask actions visible on a short desktop', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await mockPixelForgeApi(page, {
+      usageSequences: { objectremove: [4] },
+    });
+    await page.goto('/object-remove');
+
+    await uploadDropzoneFile(page, fixturePaths.colorJpeg);
+    await page.evaluate(() => window.scrollTo(0, 0));
+
+    const mask = page.getByLabel('Object removal mask');
+    await expect(mask).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Clear Mask' }),
+    ).toBeInViewport();
+    await expect(
+      page.getByRole('button', {
+        name: 'Remove Object',
+        exact: true,
+      }),
+    ).toBeInViewport();
+  });
+
 });
