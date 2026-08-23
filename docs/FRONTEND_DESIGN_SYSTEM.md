@@ -60,12 +60,23 @@ token already expresses the intended role.
 | Surface | `pf-surface` | `#ffffff` | Primary controls and panels |
 | Subtle surface | `pf-surface-subtle` | `#eceff3` | Secondary grouping and inactive areas |
 | Strong surface | `pf-surface-strong` | `#dfe4eb` | Selected tracks and strong separation |
-| Inverse surface | `pf-surface-inverse` | `#1b2230` | High-contrast controls and image chrome |
+| Inverse surface | `pf-surface-inverse` | `#0d0e10` | High-contrast controls and image chrome |
 | Primary text | `pf-ink` | `#1b2230` | Headings and primary UI text |
 | Muted text | `pf-ink-muted` | `#5d6778` | Supporting copy and metadata |
 | Subtle text | `pf-ink-subtle` | `#7b8595` | Tertiary labels, never essential low-contrast text |
-| Accent | `pf-accent` | `#5658b9` | Primary actions, selection, and active navigation |
+| Accent | `pf-accent` | `#756aa1` | Primary actions, selection, and active navigation |
 | Focus | `pf-focus` | `#3f67cf` | Keyboard focus only |
+
+The workstation shell uses a second semantic set for theme-aware editorial
+surfaces. In dark mode, `pf-editorial-base`, `pf-editorial-surface`,
+`pf-editorial-raised`, and `pf-editorial-footer` resolve to `#0d0e10`,
+`#15171a`, `#1d2025`, and `#090a0c`. The corresponding ink, muted, line, and
+accent roles resolve to `#f0ede6`, `#aaa7a0`, `#2d3036`, and `#9185b3`.
+
+Light mode overrides the editorial roles rather than introducing parallel
+component styles: base `#f3f0e9`, surface `#e7e7e4`, raised `#dcdedc`, footer
+`#d4d1ca`, ink `#18191b`, muted `#676761`, line `#c8c6bf`, accent `#65598b`,
+and accent-soft `#ddd8e8`.
 
 Success, warning, and danger each have foreground and soft-surface tokens. They
 are semantic states, not additional brand accents. Avoid large decorative

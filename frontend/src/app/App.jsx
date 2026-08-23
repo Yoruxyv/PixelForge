@@ -94,13 +94,24 @@ export default function App() {
   return (
     <BrowserRouter>
       <div data-theme={theme} className="flex min-h-screen flex-col bg-pf-editorial-base text-pf-editorial-ink selection:bg-pf-editorial-accent-soft">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[var(--pf-z-toast)] focus:rounded-pf-control focus:bg-pf-editorial-ink focus:px-4 focus:py-3 focus:text-sm focus:font-bold focus:text-pf-editorial-base"
+        >
+          Skip to content
+        </a>
+
         <Navbar
           theme={theme}
           themePreference={themePreference}
           onThemeChange={changeTheme}
         />
 
-        <main className="relative flex min-h-0 w-full flex-1 flex-col">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="relative flex min-h-0 w-full flex-1 flex-col"
+        >
           <GlobalHeader />
 
           <Suspense fallback={<PageLoader />}>

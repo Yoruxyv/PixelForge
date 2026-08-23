@@ -204,7 +204,7 @@ cp frontend/.env.example frontend/.env
 ```env
 ENVIRONMENT=development
 
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/pixelforge
+DATABASE_URL=postgresql://postgres@localhost:5432/pixelforge
 AZURE_CONNECTION_STRING=
 REPLICATE_API_TOKEN=
 CLOUDFLARE_TURNSTILE_SECRET_KEY=

@@ -42,9 +42,23 @@ jobs:
   backend-quality:
     name: Backend quality
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-${{ github.run_id }}-${{ github.run_attempt }}
+          POSTGRES_DB: pixelforge_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d pixelforge_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
       ENVIRONMENT: test
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pixelforge_test
+      DATABASE_URL: postgresql://postgres:ci-${{ github.run_id }}-${{ github.run_attempt }}@127.0.0.1:5432/pixelforge_test
       AZURE_CONNECTION_STRING: ""
       CLOUDFLARE_TURNSTILE_SECRET_KEY: ""
       DISCORD_WEBHOOK_URL: ""
@@ -98,13 +112,27 @@ jobs:
   backend-compatibility:
     name: Backend compatibility (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-${{ github.run_id }}-${{ github.run_attempt }}
+          POSTGRES_DB: pixelforge_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d pixelforge_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.11", "3.12", "3.13"]
     env:
       ENVIRONMENT: test
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pixelforge_test
+      DATABASE_URL: postgresql://postgres:ci-${{ github.run_id }}-${{ github.run_attempt }}@127.0.0.1:5432/pixelforge_test
       AZURE_CONNECTION_STRING: ""
       CLOUDFLARE_TURNSTILE_SECRET_KEY: ""
       DISCORD_WEBHOOK_URL: ""
