@@ -1,8 +1,10 @@
 """OpenAPI documentation helpers for PixelForge API routes."""
 
+from typing import Any
+
 from fastapi import status
 
-COMMON_ERROR_RESPONSES = {
+COMMON_ERROR_RESPONSES: dict[int | str, dict[str, Any]] = {
     status.HTTP_400_BAD_REQUEST: {
         "description": "Invalid request or validation error.",
     },
@@ -14,7 +16,7 @@ COMMON_ERROR_RESPONSES = {
     },
 }
 
-AI_START_RESPONSES = {
+AI_START_RESPONSES: dict[int | str, dict[str, Any]] = {
     status.HTTP_202_ACCEPTED: {
         "description": "Job accepted and queued for background processing.",
     },
@@ -29,7 +31,7 @@ AI_START_RESPONSES = {
     },
 }
 
-AI_RESULT_RESPONSES = {
+AI_RESULT_RESPONSES: dict[int | str, dict[str, Any]] = {
     status.HTTP_200_OK: {
         "description": "Current job status: processing, ready, or failed.",
     },

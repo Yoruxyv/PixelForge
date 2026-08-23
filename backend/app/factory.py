@@ -18,7 +18,6 @@ from app.middleware import configure_middleware
 from app.routers import register_routers
 from core.config import settings
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -30,14 +29,10 @@ def validate_environment() -> None:
             Raised when required CORS configuration is missing or unsafe.
     """
     if not settings.ALLOWED_ORIGINS:
-        raise ValueError(
-            "CRITICAL: ALLOWED_ORIGINS must be defined in the environment."
-        )
+        raise ValueError("CRITICAL: ALLOWED_ORIGINS must be defined in the environment.")
 
     if "*" in settings.ALLOWED_ORIGINS:
-        raise ValueError(
-            "CRITICAL: Wildcard '*' is not allowed in ALLOWED_ORIGINS for production."
-        )
+        raise ValueError("CRITICAL: Wildcard '*' is not allowed in ALLOWED_ORIGINS for production.")
 
 
 def create_app() -> FastAPI:

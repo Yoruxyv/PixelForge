@@ -15,7 +15,6 @@ from fastapi.responses import JSONResponse
 
 from utils.error import codes
 
-
 DEFAULT_ERROR_MESSAGES: dict[str, str] = {
     codes.VALIDATION_ERROR: "Request validation failed.",
     codes.RATE_LIMITED: "Too many requests. Please wait a moment and try again.",
@@ -32,21 +31,12 @@ DEFAULT_ERROR_MESSAGES: dict[str, str] = {
         "Try a smaller image or use a lower upscale setting."
     ),
     codes.INVALID_COLOR_INPUT: (
-        "This image already has color. Please upload a black-and-white image "
-        "for color restoration."
+        "This image already has color. Please upload a black-and-white image for color restoration."
     ),
-    codes.PROVIDER_RATE_LIMITED: (
-        "The AI provider is busy right now. Please try again later."
-    ),
-    codes.PROVIDER_TIMEOUT: (
-        "The AI provider took too long to respond. Please try again."
-    ),
-    codes.PROVIDER_FAILED: (
-        "The AI provider could not process the image. Please try again later."
-    ),
-    codes.PROCESSING_FAILED: (
-        "AI processing failed. Please try again with a smaller image."
-    ),
+    codes.PROVIDER_RATE_LIMITED: ("The AI provider is busy right now. Please try again later."),
+    codes.PROVIDER_TIMEOUT: ("The AI provider took too long to respond. Please try again."),
+    codes.PROVIDER_FAILED: ("The AI provider could not process the image. Please try again later."),
+    codes.PROCESSING_FAILED: ("AI processing failed. Please try again with a smaller image."),
 }
 
 

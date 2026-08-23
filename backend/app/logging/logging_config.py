@@ -10,13 +10,11 @@ and log-level policy.
 
 import logging
 import sys
-
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 from app.logging.logging_formatter import build_log_formatter
 from core.config import settings
-
 
 NOISY_LOGGERS = {
     "azure": logging.WARNING,
@@ -134,14 +132,10 @@ def configure_logging() -> None:
     root_logger.handlers.clear()
     root_logger.setLevel(log_level)
 
-    root_logger.addHandler(
-        _create_console_handler(log_level)
-    )
+    root_logger.addHandler(_create_console_handler(log_level))
 
     if settings.LOG_TO_FILE:
-        root_logger.addHandler(
-            _create_file_handler(log_level)
-        )
+        root_logger.addHandler(_create_file_handler(log_level))
 
     _configure_uvicorn_loggers(log_level)
     _silence_noisy_loggers()

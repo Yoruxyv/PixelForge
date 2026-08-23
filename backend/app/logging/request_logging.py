@@ -17,7 +17,6 @@ from starlette.responses import Response
 
 from limiter.rate_limiter import get_real_client_ip
 
-
 logger = logging.getLogger("app.request")
 
 

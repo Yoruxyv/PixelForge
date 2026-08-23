@@ -14,8 +14,8 @@ Shutdown responsibilities:
 
 import asyncio
 import contextlib
-
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
 from database.db_pool import close_db_pool, init_db_pool
@@ -23,11 +23,11 @@ from services.maintenance.janitor_service import database_janitor_loop
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_app: FastAPI):
     """Manage PixelForge application startup and shutdown resources.
 
     Args:
-        app:
+        _app:
             FastAPI application instance supplied by the framework.
 
     Yields:
@@ -36,9 +36,7 @@ async def lifespan(app: FastAPI):
     """
     await init_db_pool()
 
-    janitor_task = asyncio.create_task(
-        database_janitor_loop()
-    )
+    janitor_task = asyncio.create_task(database_janitor_loop())
 
     yield
 

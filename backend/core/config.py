@@ -21,7 +21,6 @@ can be much larger than the uploaded file.
 """
 
 import os
-from typing import Dict, FrozenSet, List
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -77,26 +76,22 @@ class Settings(BaseSettings):
     LOG_BACKUP_COUNT: int = 5
 
     @staticmethod
-    def _split_csv(value: str) -> List[str]:
+    def _split_csv(value: str) -> list[str]:
         """Split a comma-separated setting and remove blank entries."""
-        return [
-            item.strip()
-            for item in (value or "").split(",")
-            if item.strip()
-        ]
+        return [item.strip() for item in (value or "").split(",") if item.strip()]
 
     @property
-    def cors_origins_list(self) -> List[str]:
+    def cors_origins_list(self) -> list[str]:
         """Return configured CORS origins as a clean list."""
         return self._split_csv(self.ALLOWED_ORIGINS)
 
     @property
-    def trusted_proxy_cidrs_list(self) -> List[str]:
+    def trusted_proxy_cidrs_list(self) -> list[str]:
         """Return CIDRs allowed to supply forwarded client-IP headers."""
         return self._split_csv(self.TRUSTED_PROXY_CIDRS)
 
     @property
-    def cloudflare_subnets_list(self) -> List[str]:
+    def cloudflare_subnets_list(self) -> list[str]:
         """Return configured Cloudflare IPv4 and IPv6 networks."""
         return self._split_csv(self.CLOUDFLARE_SUBNETS)
 
@@ -119,7 +114,7 @@ class Settings(BaseSettings):
     SAS_EXPIRATION_MINUTES: int = 11
 
     @property
-    def FEATURE_LIMITS(self) -> Dict[str, int]:
+    def FEATURE_LIMITS(self) -> dict[str, int]:
         """Map feature names to their 24-hour usage limits.
 
         Returns:
@@ -203,7 +198,7 @@ class Settings(BaseSettings):
     ALPHA_THRESHOLD: int = 20
 
     # --- Format Mapping ---
-    FORMAT_MAP: Dict[str, str] = {
+    FORMAT_MAP: dict[str, str] = {
         "jpeg": "jpg",
         "jpg": "jpg",
         "png": "png",
@@ -217,13 +212,8 @@ settings = Settings()
 # the SDK-compatible environment value synchronized with Pydantic settings.
 os.environ["REPLICATE_API_TOKEN"] = settings.REPLICATE_API_TOKEN
 
-ALLOWED_EXTENSIONS: FrozenSet[str] = frozenset(
-    settings.FORMAT_MAP.keys()
-)
+ALLOWED_EXTENSIONS: frozenset[str] = frozenset(settings.FORMAT_MAP.keys())
 
-ALLOWED_MIME_TYPES: FrozenSet[str] = frozenset(
-    [
-        f"image/{'jpeg' if ext == 'jpg' else ext}"
-        for ext in settings.FORMAT_MAP.values()
-    ]
+ALLOWED_MIME_TYPES: frozenset[str] = frozenset(
+    [f"image/{'jpeg' if ext == 'jpg' else ext}" for ext in settings.FORMAT_MAP.values()]
 )

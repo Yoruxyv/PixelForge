@@ -15,7 +15,6 @@ from core.config import settings
 from database.db_pool import get_db_pool
 from repository.usage_repo import UsageRepository
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -69,9 +68,7 @@ class UsageService:
         pool = get_db_pool()
 
         if pool is None:
-            logger.error(
-                "DB pool not initialized. Failing open for daily limit check."
-            )
+            logger.error("DB pool not initialized. Failing open for daily limit check.")
             return True
 
         feature_ip = cls._get_feature_key(
@@ -89,9 +86,7 @@ class UsageService:
                 return used < limit_24h
 
         except Exception:
-            logger.exception(
-                "Database error during limit check. Failing open."
-            )
+            logger.exception("Database error during limit check. Failing open.")
             return True
 
     @classmethod
@@ -126,9 +121,7 @@ class UsageService:
                 )
 
         except Exception:
-            logger.exception(
-                "Database error during usage increment."
-            )
+            logger.exception("Database error during usage increment.")
 
     @classmethod
     async def decrement_daily_limit(
@@ -162,9 +155,7 @@ class UsageService:
                 )
 
         except Exception:
-            logger.exception(
-                "Database error during usage refund."
-            )
+            logger.exception("Database error during usage refund.")
 
     @classmethod
     async def get_usage_status(
@@ -213,17 +204,9 @@ class UsageService:
                     feature_ip,
                 )
 
-            used = (
-                rec["used"]
-                if rec and rec["used"] is not None
-                else 0
-            )
+            used = rec["used"] if rec and rec["used"] is not None else 0
 
-            oldest_ms = (
-                rec["oldest_bucket_ms"]
-                if rec
-                else None
-            )
+            oldest_ms = rec["oldest_bucket_ms"] if rec else None
 
             uses_remaining = max(
                 0,
@@ -231,9 +214,7 @@ class UsageService:
             )
 
             reset_timestamp = (
-                int(oldest_ms + WINDOW_MS)
-                if used >= limit_24h and oldest_ms is not None
-                else None
+                int(oldest_ms + WINDOW_MS) if used >= limit_24h and oldest_ms is not None else None
             )
 
             return {
@@ -242,9 +223,7 @@ class UsageService:
             }
 
         except Exception:
-            logger.exception(
-                "Failed to get usage status."
-            )
+            logger.exception("Failed to get usage status.")
 
             return {
                 "uses_remaining": limit_24h,
@@ -262,9 +241,7 @@ class UsageService:
         pool = get_db_pool()
 
         if pool is None:
-            logger.warning(
-                "DB pool not ready for cleanup."
-            )
+            logger.warning("DB pool not ready for cleanup.")
             return 0
 
         try:

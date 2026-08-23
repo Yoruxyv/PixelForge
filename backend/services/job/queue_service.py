@@ -18,8 +18,8 @@ from utils.error.responses import build_error_payload
 logger = logging.getLogger(__name__)
 
 _pending_jobs = 0
-_pending_jobs_lock = None
-_active_jobs = set()
+_pending_jobs_lock: asyncio.Lock | None = None
+_active_jobs: set[str] = set()
 
 
 class QueueService:

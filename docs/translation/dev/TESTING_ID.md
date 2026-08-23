@@ -2,7 +2,7 @@
 
 Panduan ini berisi command verifikasi lokal untuk API backend, pipeline AI, usage limit, build frontend, dan workflow yang sensitif terhadap dokumentasi.
 
-Script PowerShell di `scripts/testing/` ditujukan untuk development lokal Windows. Script mengasumsikan backend berjalan lokal dan bypass Turnstile lokal diaktifkan bila diperlukan:
+Wrapper PowerShell dan Bash di `scripts/windows/testing/` and `scripts/unix/testing/` memakai implementasi Python bersama agar behavior konsisten di Windows, Linux, dan macOS. Check API mengasumsikan backend berjalan lokal dan bypass Turnstile lokal diaktifkan bila diperlukan:
 
 ```env
 ENVIRONMENT=development
@@ -15,44 +15,79 @@ Jangan pernah mengaktifkan manual bypass di production.
 
 ## Menjalankan Aplikasi
 
-Dari root repository:
+Dari root repository.
+
+Windows:
 
 ```powershell
-.\scripts\start_app.bat
+.\scripts\windows\start_app.bat
 ```
 
-Atau jalankan masing-masing secara manual:
+Linux/macOS:
 
-```powershell
-Push-Location .\backend
-.\venv\Scripts\python.exe run.py
-Pop-Location
+```bash
+./scripts/unix/start_app.sh
 ```
 
-```powershell
-Push-Location .\frontend
+Atau jalankan masing-masing secara manual.
+
+Backend:
+
+```bash
+cd backend
+uv sync --locked
+uv run python run.py
+```
+
+Frontend:
+
+```bash
+cd frontend
 npm run dev
-Pop-Location
 ```
 
 ---
 
 ## Pemeriksaan API Backend
 
+Windows PowerShell:
+
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_backend_limits_and_usage.ps1
+.\scripts\windows\testing\check_backend_limits_and_usage.ps1
+```
+
+Linux/macOS:
+
+```bash
+./scripts/unix/testing/check_backend_limits_and_usage.sh
 ```
 
 Memverifikasi `/api/limits`, `/api/usage`, bentuk feature limit, dan konsistensi runtime limit.
 
+Windows PowerShell:
+
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_backend_error_responses.ps1
+.\scripts\windows\testing\check_backend_error_responses.ps1
+```
+
+Linux/macOS:
+
+```bash
+./scripts/unix/testing/check_backend_error_responses.sh
 ```
 
 Memverifikasi structured error response backend.
 
+Windows PowerShell:
+
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_backend_invalid_image_upload.ps1
+.\scripts\windows\testing\check_backend_invalid_image_upload.ps1
+```
+
+Linux/macOS:
+
+```bash
+./scripts/unix/testing/check_backend_invalid_image_upload.sh
 ```
 
 Memverifikasi bahwa data gambar invalid gagal secara aman dengan structured error.
@@ -61,8 +96,16 @@ Memverifikasi bahwa data gambar invalid gagal secara aman dengan structured erro
 
 ## Pemeriksaan Usage Limit
 
+Windows PowerShell:
+
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_backend_usage_limit.ps1
+.\scripts\windows\testing\check_backend_usage_limit.ps1
+```
+
+Linux/macOS:
+
+```bash
+./scripts/unix/testing/check_backend_usage_limit.sh
 ```
 
 Script sementara mengisi usage table lokal, memanggil init endpoint, memvalidasi response `RATE_LIMITED`, lalu mengembalikan state jam berjalan sebelumnya.
@@ -80,27 +123,48 @@ Karena identitas quota saat ini berbasis IP, pemeriksaan ini memvalidasi behavio
 
 ## Pemeriksaan Keberhasilan AI
 
-Upscale:
+Upscale, Windows PowerShell:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_ai_feature_success.ps1 `
-  -Feature upscale
+.\scripts\windows\testing\check_ai_feature_success.ps1 -Feature upscale -Scale 2
 ```
 
-Remove Background:
+Upscale, Linux/macOS:
+
+```bash
+./scripts/unix/testing/check_ai_feature_success.sh --feature upscale --scale 2
+```
+
+Remove Background, Windows PowerShell:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_ai_feature_success.ps1 `
+.\scripts\windows\testing\check_ai_feature_success.ps1 `
   -Feature rembg `
   -FilePath ".\frontend\public\demo\rem_bg_before.jpg"
 ```
 
-Restore Color:
+Remove Background, Linux/macOS:
+
+```bash
+./scripts/unix/testing/check_ai_feature_success.sh \
+  --feature rembg \
+  --file-path "./frontend/public/demo/rem_bg_before.jpg"
+```
+
+Restore Color, Windows PowerShell:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_ai_feature_success.ps1 `
+.\scripts\windows\testing\check_ai_feature_success.ps1 `
   -Feature colorrestore `
   -FilePath ".\frontend\public\demo\res_color_before.jpg"
+```
+
+Restore Color, Linux/macOS:
+
+```bash
+./scripts/unix/testing/check_ai_feature_success.sh \
+  --feature colorrestore \
+  --file-path "./frontend/public/demo/res_color_before.jpg"
 ```
 
 Object Remove memerlukan source image dan mask dengan ukuran yang sama:
@@ -108,40 +172,25 @@ Object Remove memerlukan source image dan mask dengan ukuran yang sama:
 - Pixel hitam: pertahankan area
 - Pixel putih: hapus area
 
-Buat simple center mask bila diperlukan:
+Buat mask dengan Pillow atau image tool lain, lalu jalankan workflow object removal.
+
+Windows PowerShell:
 
 ```powershell
-@'
-from pathlib import Path
-from PIL import Image, ImageDraw
-
-src = Path("frontend/public/demo/object_remove_before.png")
-mask = Path("frontend/public/demo/object_remove_test_mask.png")
-
-if not src.exists():
-    raise SystemExit(f"Missing source image: {src}")
-
-with Image.open(src) as img:
-    width, height = img.size
-
-out = Image.new("L", (width, height), 0)
-draw = ImageDraw.Draw(out)
-box_width = int(width * 0.28)
-box_height = int(height * 0.28)
-left = (width - box_width) // 2
-top = (height - box_height) // 2
-draw.ellipse(
-    (left, top, left + box_width, top + box_height),
-    fill=255,
-)
-
-mask.parent.mkdir(parents=True, exist_ok=True)
-out.save(mask)
-print(f"Created mask: {mask} ({width}x{height})")
-'@ | .\backend\venv\Scripts\python.exe
+.\scripts\windows\testing\check_ai_feature_success.ps1 `
+  -Feature objectremove `
+  -FilePath ".\frontend\public\demo\object_remove_before.png" `
+  -MaskPath ".\frontend\public\demo\object_remove_test_mask.png"
 ```
 
-Kemudian jalankan success script object removal menggunakan argument source dan mask yang didukung `check_ai_feature_success.ps1`.
+Linux/macOS:
+
+```bash
+./scripts/unix/testing/check_ai_feature_success.sh \
+  --feature objectremove \
+  --file-path "./frontend/public/demo/object_remove_before.png" \
+  --mask-path "./frontend/public/demo/object_remove_test_mask.png"
+```
 
 ---
 
@@ -160,20 +209,32 @@ Kirim feedback sekali dan pastikan verifikasi dilakukan terpisah. Pada environme
 
 ## Pemeriksaan Frontend
 
-```powershell
-npm --prefix frontend run lint
-npm --prefix frontend run build
+Command berikut sama di Windows, Linux, dan macOS:
+
+```bash
+cd frontend
+npm ci
+npm run lint
+npm run test -- --run
+npm run build
 ```
 
 ---
 
-## Pemeriksaan Compile Backend
+## Pemeriksaan Quality Backend
 
-```powershell
-Push-Location .\backend
-python -m compileall api app core database domain limiter provider repository services utils
-Pop-Location
+```bash
+cd backend
+uv lock --check
+uv sync --locked
+uv run ruff check .
+uv run ruff format --check .
+uv run pytest
+uv run mypy
 ```
+
+Konfigurasi mypy saat ini bersifat blocking. Peningkatan ke kebijakan mypy yang
+lebih strict tetap menjadi task terpisah.
 
 ---
 
@@ -195,12 +256,10 @@ git diff --check
 git status --short
 ```
 
-Cari command lama atau personal absolute path dalam dokumentasi:
+Cari dependency workflow lama secara cross-platform:
 
-```powershell
-Get-ChildItem -Recurse -File -Include *.md,*.bat,*.ps1 |
-  Where-Object { $_.Name -notlike 'TESTING*.md' -and $_.Name -ne 'PACKAGE_NOTES.md' } |
-  Select-String -Pattern 'python -m venv \.venv|uvicorn main:app --reload$|E:\\GitHub\\pixelforge'
+```bash
+git grep -n -E 'requirements(-dev)?\.txt|python -m pip|pip install -r' -- '*.md' '*.yml' '*.yaml' '*.ps1' '*.sh' '*.bat' || true
 ```
 
-Command seharusnya tidak mengembalikan match dokumentasi yang outdated.
+Command seharusnya tidak mengembalikan reference dependency workflow lama.

@@ -33,7 +33,7 @@ class BackgroundRemover(ImagePipelineService):
 
     def __init__(
         self,
-        provider: BaseAIProvider = None,
+        provider: BaseAIProvider | None = None,
         max_concurrent_remote_jobs: int = settings.MAX_CONCURRENT_JOBS,
     ):
         """Initialize the background-removal service.
@@ -82,11 +82,12 @@ class BackgroundRemover(ImagePipelineService):
         with Image.open(io.BytesIO(result_bytes)) as img:
             img.load()
 
-            if img.mode not in ("RGBA", "LA"):
-                img = img.convert("RGBA")
+            normalized_img: Image.Image = img
+            if normalized_img.mode not in ("RGBA", "LA"):
+                normalized_img = normalized_img.convert("RGBA")
 
             out_stream = io.BytesIO()
-            img.save(
+            normalized_img.save(
                 out_stream,
                 format="PNG",
                 optimize=True,
@@ -94,7 +95,7 @@ class BackgroundRemover(ImagePipelineService):
             )
             return out_stream.getvalue()
 
-    async def postprocess_output(self, result_bytes: bytes, **kwargs) -> bytes:
+    async def postprocess_output(self, result_bytes: bytes, **kwargs) -> bytes:  # noqa: ARG002
         """Run output normalization outside the event loop.
 
         Args:

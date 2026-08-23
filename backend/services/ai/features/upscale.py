@@ -15,6 +15,7 @@ storage.
 
 import asyncio
 import io
+from typing import Any
 
 from PIL import Image
 
@@ -30,7 +31,7 @@ class AIUpscaler(ImagePipelineService):
 
     def __init__(
         self,
-        provider: BaseAIProvider = None,
+        provider: BaseAIProvider | None = None,
         max_concurrent_remote_jobs: int = settings.MAX_CONCURRENT_JOBS,
         max_concurrent_cpu_jobs: int = settings.MAX_CONCURRENT_CPU_JOBS,
     ):
@@ -111,7 +112,7 @@ class AIUpscaler(ImagePipelineService):
                 scale,
             )
 
-    async def postprocess_output(self, result_bytes: bytes, **kwargs) -> bytes:
+    async def postprocess_output(self, result_bytes: bytes, **kwargs) -> bytes:  # noqa: ARG002
         """Cap model output dimensions after remote execution.
 
         Final byte-size compression/shrinking is handled by the shared pipeline.
@@ -196,9 +197,7 @@ class AIUpscaler(ImagePipelineService):
         safe_scale = max(1, min(int(scale), 4))
 
         # Output pixels roughly equal input_pixels * scale^2.
-        scale_limited_input_pixels = (
-            settings.MAX_UPSCALE_OUTPUT_PIXELS // (safe_scale * safe_scale)
-        )
+        scale_limited_input_pixels = settings.MAX_UPSCALE_OUTPUT_PIXELS // (safe_scale * safe_scale)
 
         return max(
             1,
@@ -208,7 +207,7 @@ class AIUpscaler(ImagePipelineService):
     def _optimize_image_sync(
         self,
         raw_bytes: bytes,
-        job_id: str,
+        _job_id: str | None,
         scale: int,
     ) -> io.BytesIO:
         """Validate and optimize input image bytes for remote upscaling.
@@ -216,8 +215,8 @@ class AIUpscaler(ImagePipelineService):
         Args:
             raw_bytes:
                 Raw uploaded image bytes.
-            job_id:
-                Current job identifier. Kept for logging/debug compatibility.
+            _job_id:
+                Current job identifier. Kept for hook compatibility.
             scale:
                 Requested upscale multiplier.
 
@@ -225,34 +224,32 @@ class AIUpscaler(ImagePipelineService):
             io.BytesIO:
                 Prepared image stream for provider input.
         """
-        with io.BytesIO(raw_bytes) as img_stream:
-            with Image.open(img_stream) as img:
-                img.verify()
+        with io.BytesIO(raw_bytes) as img_stream, Image.open(img_stream) as img:
+            img.verify()
 
-        with io.BytesIO(raw_bytes) as img_stream:
-            with Image.open(img_stream) as img:
-                img.load()
-                save_format = img.format or "JPEG"
+        with io.BytesIO(raw_bytes) as img_stream, Image.open(img_stream) as img:
+            img.load()
+            save_format = img.format or "JPEG"
 
-                target_pixels = self._get_scale_aware_input_pixel_target(scale)
-                img = smart_downscale(img, target_pixels)
+            target_pixels = self._get_scale_aware_input_pixel_target(scale)
+            processed_img: Image.Image = smart_downscale(img, target_pixels)
 
-                if img.mode in ("RGBA", "P") and save_format.upper() != "PNG":
-                    img = img.convert("RGB")
+            if processed_img.mode in ("RGBA", "P") and save_format.upper() != "PNG":
+                processed_img = processed_img.convert("RGB")
 
-                output_stream = io.BytesIO()
-                save_kwargs = {"format": save_format}
+            output_stream = io.BytesIO()
+            save_kwargs: dict[str, Any] = {"format": save_format}
 
-                if save_format.upper() in ("JPEG", "JPG"):
-                    save_kwargs.update({"quality": 95, "optimize": True})
+            if save_format.upper() in ("JPEG", "JPG"):
+                save_kwargs.update({"quality": 95, "optimize": True})
 
-                if save_format.upper() == "PNG":
-                    save_kwargs.update({"optimize": True, "compress_level": 9})
+            if save_format.upper() == "PNG":
+                save_kwargs.update({"optimize": True, "compress_level": 9})
 
-                img.save(output_stream, **save_kwargs)
-                output_stream.seek(0)
+            processed_img.save(output_stream, **save_kwargs)
+            output_stream.seek(0)
 
-                return output_stream
+            return output_stream
 
     def _cap_output_dimension_sync(self, raw_bytes: bytes) -> bytes:
         """Cap AI output dimensions before shared byte-size enforcement.
@@ -265,27 +262,26 @@ class AIUpscaler(ImagePipelineService):
             bytes:
                 PNG-encoded bytes after maximum-dimension enforcement.
         """
-        with io.BytesIO(raw_bytes) as input_stream:
-            with Image.open(input_stream) as img:
-                img.load()
+        with io.BytesIO(raw_bytes) as input_stream, Image.open(input_stream) as img:
+            img.load()
 
-                if max(img.size) > settings.MAX_IMAGE_DIMENSION:
-                    img.thumbnail(
-                        (
-                            settings.MAX_IMAGE_DIMENSION,
-                            settings.MAX_IMAGE_DIMENSION,
-                        ),
-                        Image.Resampling.LANCZOS,
-                    )
-
-                output_stream = io.BytesIO()
-                img.save(
-                    output_stream,
-                    format="PNG",
-                    optimize=True,
-                    compress_level=9,
+            if max(img.size) > settings.MAX_IMAGE_DIMENSION:
+                img.thumbnail(
+                    (
+                        settings.MAX_IMAGE_DIMENSION,
+                        settings.MAX_IMAGE_DIMENSION,
+                    ),
+                    Image.Resampling.LANCZOS,
                 )
-                return output_stream.getvalue()
+
+            output_stream = io.BytesIO()
+            img.save(
+                output_stream,
+                format="PNG",
+                optimize=True,
+                compress_level=9,
+            )
+            return output_stream.getvalue()
 
 
 ai_upscaler = AIUpscaler()

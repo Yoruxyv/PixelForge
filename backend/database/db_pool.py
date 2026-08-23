@@ -9,6 +9,7 @@ to bootstrap local development and deployment databases consistently.
 """
 
 import asyncio
+import contextlib
 import logging
 
 import asyncpg
@@ -87,10 +88,8 @@ async def init_db_pool() -> None:
             )
 
             if _pool is not None:
-                try:
+                with contextlib.suppress(Exception):
                     await _pool.close()
-                except Exception:
-                    pass
 
                 _pool = None
 
@@ -98,9 +97,7 @@ async def init_db_pool() -> None:
                 logger.exception("Failed to initialize database.")
                 raise
 
-            await asyncio.sleep(
-                settings.INIT_BASE_DELAY_SECONDS * (2 ** (attempt - 1))
-            )
+            await asyncio.sleep(settings.INIT_BASE_DELAY_SECONDS * (2 ** (attempt - 1)))
 
 
 async def close_db_pool() -> None:

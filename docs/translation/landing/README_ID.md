@@ -254,13 +254,13 @@ cd PixelForge
 
 ## 2) Jalankan backend
 
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) terlebih
+dahulu. Workflow backend sama di Windows PowerShell, Linux, dan macOS:
+
 ```bash
 cd backend
-python -m venv venv
-source venv/bin/activate      # macOS/Linux
-# venv\Scripts\activate       # Windows
-pip install -r requirements.txt
-python run.py  # menjalankan Uvicorn tanpa menulis ulang proxy header
+uv sync --locked
+uv run python run.py  # menjalankan Uvicorn tanpa menulis ulang proxy header
 ```
 
 ## 3) Jalankan frontend
@@ -271,6 +271,18 @@ npm install
 npm run dev
 ```
 
+
+## 4) Quality check backend
+
+```bash
+cd backend
+uv lock --check
+uv sync --locked
+uv run ruff check .
+uv run ruff format --check .
+uv run pytest
+uv run mypy
+```
 
 ## 🔒 Catatan Keamanan
 
@@ -309,9 +321,12 @@ Script testing backend dan AI:
 - [Pengujian PixelForge](../dev/TESTING_ID.md) ([EN](../../TESTING.md), [ZH](../dev/TESTING_ZH.md))
 
 Skrip bantuan developer:
-- [Total Line Counter](../../../scripts/dev/get_total_lines.ps1) — skrip PowerShell Windows interaktif untuk menghitung jumlah baris project berdasarkan folder, ekstensi file, dan bagian project.
+- Total Line Counter: [PowerShell](../../../scripts/windows/dev/get_total_lines.ps1) / [Bash](../../../scripts/unix/dev/get_total_lines.sh)
+- Launcher aplikasi: [Windows BAT](../../../scripts/windows/start_app.bat) / [Bash](../../../scripts/unix/start_app.sh)
+- Reset usage: [Windows BAT](../../../scripts/windows/reset_usage.bat) / [Bash](../../../scripts/unix/reset_usage.sh)
 
-> Script PowerShell lokal dan file helper `.bat` ditujukan untuk environment development Windows.
+Wrapper berpasangan memakai logic project yang sama agar behavior tooling tetap
+konsisten di Windows, Linux, dan macOS.
 
 ## 🙏 Acknowledgements
 

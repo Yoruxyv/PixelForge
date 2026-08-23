@@ -6,7 +6,8 @@ capacity, schedules the background task, and returns a consistent accepted
 response.
 """
 
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from fastapi import BackgroundTasks, Request
 

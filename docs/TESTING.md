@@ -1,8 +1,23 @@
 # PixelForge Testing
 
-This guide lists local verification commands for the backend API, AI pipeline, usage limits, frontend build, and documentation-sensitive workflows.
+This guide lists local verification commands for the backend API, AI pipeline,
+usage limits, frontend build, and repository quality checks.
 
-The PowerShell scripts under `scripts/testing/` are intended for local Windows development. They assume the backend is running locally and local Turnstile bypass settings are enabled where required:
+The PowerShell and Bash wrappers under `scripts/windows/testing/` and `scripts/unix/testing/` call the same shared
+Python implementation in `backend/scripts/tooling/backend_checks.py`. This keeps
+arguments, validation, output, and failure semantics aligned across Windows,
+Linux, and macOS.
+
+## Prerequisites
+
+- `uv` for the backend environment and Python tooling.
+- `npm` for frontend checks.
+- A running local backend for API smoke checks.
+- PostgreSQL plus `DATABASE_URL` (environment or `backend/.env`) for the
+  usage-limit check.
+- Azure Blob Storage, Replicate, and a valid local backend configuration for
+  full AI success checks.
+- Local Turnstile bypass enabled where a test explicitly uses it:
 
 ```env
 ENVIRONMENT=development
@@ -15,57 +30,107 @@ Never enable the manual bypass in production.
 
 ## Start the Application
 
-From the repository root:
+Windows:
 
 ```powershell
-.\scripts\start_app.bat
+.\scripts\windows\start_app.bat
 ```
 
-Or start each side manually:
+Linux/macOS:
 
-```powershell
-Push-Location .\backend
-.\venv\Scripts\python.exe run.py
-Pop-Location
+```bash
+./scripts/unix/start_app.sh
 ```
 
-```powershell
-Push-Location .\frontend
+Or start each side manually in separate terminals.
+
+Backend:
+
+```bash
+cd backend
+uv sync --locked
+uv run python run.py
+```
+
+Frontend:
+
+```bash
+cd frontend
 npm run dev
-Pop-Location
 ```
 
 ---
 
 ## Backend API Checks
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_backend_limits_and_usage.ps1
-```
+### Public runtime limits and usage
 
-Verifies `/api/limits`, `/api/usage`, feature-limit shape, and runtime-limit consistency.
+Windows PowerShell:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_backend_error_responses.ps1
+.\scripts\windows\testing\check_backend_limits_and_usage.ps1
 ```
 
-Verifies structured backend error responses.
+Linux/macOS:
+
+```bash
+./scripts/unix/testing/check_backend_limits_and_usage.sh
+```
+
+Optional Bash arguments include `--api-base` and `--feature`. PowerShell exposes
+the equivalent `-ApiBase` and `-Feature` parameters.
+
+### Structured error responses
+
+Windows PowerShell:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_backend_invalid_image_upload.ps1
+.\scripts\windows\testing\check_backend_error_responses.ps1
 ```
 
-Verifies that invalid image data fails safely with a structured error.
+Linux/macOS:
+
+```bash
+./scripts/unix/testing/check_backend_error_responses.sh
+```
+
+### Invalid-image background failure
+
+Windows PowerShell:
+
+```powershell
+.\scripts\windows\testing\check_backend_invalid_image_upload.ps1
+```
+
+Linux/macOS:
+
+```bash
+./scripts/unix/testing/check_backend_invalid_image_upload.sh
+```
+
+This check requires a running backend and configured Azure storage. It uploads
+invalid bytes through the normal SAS upload path, starts a background job, and
+asserts the structured `INVALID_IMAGE` result.
 
 ---
 
 ## Usage-Limit Checks
 
+Windows PowerShell:
+
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_backend_usage_limit.ps1
+.\scripts\windows\testing\check_backend_usage_limit.ps1
 ```
 
-The script temporarily seeds the local usage table, calls the init endpoint, validates the structured `RATE_LIMITED` response, and restores the previous current-hour state.
+Linux/macOS:
+
+```bash
+./scripts/unix/testing/check_backend_usage_limit.sh
+```
+
+The check temporarily seeds the local PostgreSQL usage table to each selected
+feature limit, validates the structured HTTP 429 `RATE_LIMITED` response, and
+restores the previous current-hour state in a `finally` path.
 
 Covered features:
 
@@ -74,74 +139,78 @@ Covered features:
 - `colorrestore`
 - `objectremove`
 
-Because the current quota identity is IP-based, these checks validate backend behavior but do not remove the known shared-NAT/shared-proxy limitation.
+PowerShell accepts `-Features upscale,rembg`. Bash accepts
+`--features upscale,rembg`.
+
+Because quota identity is IP-based, these checks validate backend behavior but
+do not remove the known shared-NAT/shared-proxy limitation.
 
 ---
 
 ## AI Success Checks
 
-Upscale:
+The success wrappers exercise initialization, Azure upload, feature start,
+polling, and the final downloadable result URL.
+
+Upscale, Windows PowerShell:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_ai_feature_success.ps1 `
-  -Feature upscale
+.\scripts\windows\testing\check_ai_feature_success.ps1 -Feature upscale -Scale 2
+```
+
+Upscale, Linux/macOS:
+
+```bash
+./scripts/unix/testing/check_ai_feature_success.sh --feature upscale --scale 2
 ```
 
 Remove Background:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_ai_feature_success.ps1 `
+.\scripts\windows\testing\check_ai_feature_success.ps1 `
   -Feature rembg `
   -FilePath ".\frontend\public\demo\rem_bg_before.jpg"
+```
+
+```bash
+./scripts/unix/testing/check_ai_feature_success.sh \
+  --feature rembg \
+  --file-path "./frontend/public/demo/rem_bg_before.jpg"
 ```
 
 Restore Color:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_ai_feature_success.ps1 `
+.\scripts\windows\testing\check_ai_feature_success.ps1 `
   -Feature colorrestore `
   -FilePath ".\frontend\public\demo\res_color_before.jpg"
 ```
 
-Object Remove requires a source image and a same-size mask:
-
-- Black pixels: keep the area
-- White pixels: remove the area
-
-Generate a simple center mask when needed:
-
-```powershell
-@'
-from pathlib import Path
-from PIL import Image, ImageDraw
-
-src = Path("frontend/public/demo/object_remove_before.png")
-mask = Path("frontend/public/demo/object_remove_test_mask.png")
-
-if not src.exists():
-    raise SystemExit(f"Missing source image: {src}")
-
-with Image.open(src) as img:
-    width, height = img.size
-
-out = Image.new("L", (width, height), 0)
-draw = ImageDraw.Draw(out)
-box_width = int(width * 0.28)
-box_height = int(height * 0.28)
-left = (width - box_width) // 2
-top = (height - box_height) // 2
-draw.ellipse(
-    (left, top, left + box_width, top + box_height),
-    fill=255,
-)
-
-mask.parent.mkdir(parents=True, exist_ok=True)
-out.save(mask)
-print(f"Created mask: {mask} ({width}x{height})")
-'@ | .\backend\venv\Scripts\python.exe
+```bash
+./scripts/unix/testing/check_ai_feature_success.sh \
+  --feature colorrestore \
+  --file-path "./frontend/public/demo/res_color_before.jpg"
 ```
 
-Then run the object-removal success script with the source and mask arguments supported by `check_ai_feature_success.ps1`.
+Object Remove requires a source image and a same-size mask. Black mask pixels
+keep the area and white pixels remove the area.
+
+```powershell
+.\scripts\windows\testing\check_ai_feature_success.ps1 `
+  -Feature objectremove `
+  -FilePath ".\frontend\public\demo\object_remove_before.png" `
+  -MaskPath ".\frontend\public\demo\object_remove_test_mask.png"
+```
+
+```bash
+./scripts/unix/testing/check_ai_feature_success.sh \
+  --feature objectremove \
+  --file-path "./frontend/public/demo/object_remove_before.png" \
+  --mask-path "./frontend/public/demo/object_remove_test_mask.png"
+```
+
+Create the mask with Pillow or another image tool before running the object
+removal check.
 
 ---
 
@@ -154,37 +223,42 @@ For every AI job:
 3. Complete or fail the job.
 4. Start another job and confirm a fresh token is requested.
 
-Also submit feedback once and confirm it performs its own verification. In a non-development environment, temporarily removing the secret must cause verification to fail closed rather than bypassing protection.
+Also submit feedback once and confirm it performs its own verification. In a
+non-development environment, temporarily removing the secret must cause
+verification to fail closed rather than bypassing protection.
 
 ---
 
 ## Frontend Checks
 
-```powershell
-Push-Location .\frontend
+These commands are the same on Windows, Linux, and macOS:
+
+```bash
+cd frontend
 npm ci
 npm run lint
 npm run test -- --run
 npm run build
-Pop-Location
 ```
 
 ---
 
 ## Backend Quality Checks
 
-```powershell
-Push-Location .\backend
-python -m pip install -r requirements-dev.txt
-ruff check --no-fix .
-ruff format --check .
-mypy
-pytest
-Pop-Location
+These commands are also cross-platform:
+
+```bash
+cd backend
+uv lock --check
+uv sync --locked
+uv run ruff check .
+uv run ruff format --check .
+uv run pytest
+uv run mypy
 ```
 
-CI reports the existing Ruff formatting and mypy failures in an explicit
-non-blocking baseline job until their production-source remediation is approved.
+Ruff formatting, linting, pytest, and the current mypy configuration are
+blocking quality checks. Expanding to a stricter mypy policy is a separate task.
 
 ---
 
@@ -195,23 +269,17 @@ non-blocking baseline job until their production-source remediation is approved.
 3. Confirm the preview remains correct.
 4. Confirm the AI job reaches a ready result.
 5. Run a second job and confirm Turnstile obtains a fresh token.
-6. Test from two networks when checking proxy/IP behavior; do not assume a managed platform's direct peer is the visitor IP.
+6. Test from two networks when checking proxy/IP behavior; do not assume a
+   managed platform's direct peer is the visitor IP.
 
 ---
 
 ## Final Repository Checks
 
-```powershell
+```bash
 git diff --check
 git status --short
+git grep -n -E 'requirements(-dev)?\.txt|python -m pip|pip install -r' -- '*.md' '*.yml' '*.yaml' '*.ps1' '*.sh' '*.bat' || true
 ```
 
-Search documentation for obsolete commands or personal absolute paths:
-
-```powershell
-Get-ChildItem -Recurse -File -Include *.md,*.bat,*.ps1 |
-  Where-Object { $_.Name -notlike 'TESTING*.md' -and $_.Name -ne 'PACKAGE_NOTES.md' } |
-  Select-String -Pattern 'python -m venv \.venv|uvicorn main:app --reload$|E:\\GitHub\\pixelforge'
-```
-
-The command should return no outdated documentation matches.
+The final grep should return no stale dependency-workflow references.

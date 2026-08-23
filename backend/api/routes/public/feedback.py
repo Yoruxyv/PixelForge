@@ -7,6 +7,7 @@ send operation as a background task.
 
 from fastapi import APIRouter, BackgroundTasks, Request
 
+from api.docs import COMMON_ERROR_RESPONSES
 from api.schemas.feedback import FeedbackRequest
 from core.config import settings
 from limiter.rate_limiter import limiter
@@ -15,7 +16,6 @@ from services.notification.discord_webhooks import (
     send_discord_message,
 )
 from services.security.turnstile_service import verify_turnstile
-from api.docs import COMMON_ERROR_RESPONSES
 
 router = APIRouter(tags=["feedback"])
 
@@ -32,7 +32,7 @@ router = APIRouter(tags=["feedback"])
 )
 @limiter.limit(f"{settings.FEEDBACK_RATE_LIMIT};{settings.FEEDBACK_DAILY_USAGE_LIMIT}/day")
 async def submit_feedback(
-    request: Request,
+    request: Request,  # noqa: ARG001
     payload: FeedbackRequest,
     background_tasks: BackgroundTasks,
 ):

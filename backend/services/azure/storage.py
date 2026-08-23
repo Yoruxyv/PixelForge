@@ -17,7 +17,7 @@ import json
 import logging
 import os
 from contextlib import asynccontextmanager
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from azure.storage.blob import BlobSasPermissions, generate_blob_sas
 from azure.storage.blob.aio import BlobServiceClient
@@ -29,6 +29,7 @@ from services.azure.storage_utils import get_marker_filename, parse_azure_creden
 logger = logging.getLogger(__name__)
 DEFAULT_FAILURE_CODE = "PROCESSING_FAILED"
 DEFAULT_FAILURE_MESSAGE = "AI processing failed. Please try again with a smaller image."
+
 
 def _ensure_azure_configured() -> None:
     """Ensure Azure connection settings exist before storage operations.
@@ -103,8 +104,7 @@ class StorageService:
                 blob_name=secure_name,
                 account_key=account_key,
                 permission=BlobSasPermissions(write=True, create=True),
-                expiry=datetime.now(timezone.utc)
-                + timedelta(minutes=settings.SAS_EXPIRATION_MINUTES),
+                expiry=datetime.now(UTC) + timedelta(minutes=settings.SAS_EXPIRATION_MINUTES),
             )
             return (
                 f"https://{account_name}.blob.core.windows.net/"
@@ -238,8 +238,7 @@ class StorageService:
                 blob_name=secure_name,
                 account_key=account_key,
                 permission=BlobSasPermissions(read=True),
-                expiry=datetime.now(timezone.utc)
-                + timedelta(minutes=settings.SAS_EXPIRATION_MINUTES),
+                expiry=datetime.now(UTC) + timedelta(minutes=settings.SAS_EXPIRATION_MINUTES),
             )
             return (
                 f"https://{account_name}.blob.core.windows.net/"
@@ -283,7 +282,7 @@ class StorageService:
                 Number of deleted blobs.
         """
         deleted_count = 0
-        cutoff_time = datetime.now(timezone.utc) - timedelta(minutes=expiration_minutes)
+        cutoff_time = datetime.now(UTC) - timedelta(minutes=expiration_minutes)
         try:
             async with cls._get_container_client(settings.RESULT_CONTAINER) as container:
                 async for blob in container.list_blobs():
@@ -317,12 +316,13 @@ class StorageService:
         marker_filename = get_marker_filename(secure_job_id)
         payload = {
             "code": code or DEFAULT_FAILURE_CODE,
-            "message": message
-            or DEFAULT_FAILURE_MESSAGE,
+            "message": message or DEFAULT_FAILURE_MESSAGE,
         }
 
         try:
-            async with cls._get_blob_client(settings.RESULT_CONTAINER, marker_filename) as blob_client:
+            async with cls._get_blob_client(
+                settings.RESULT_CONTAINER, marker_filename
+            ) as blob_client:
                 await blob_client.upload_blob(
                     json.dumps(payload).encode("utf-8"),
                     overwrite=True,
@@ -348,7 +348,9 @@ class StorageService:
         marker_filename = get_marker_filename(secure_job_id)
 
         try:
-            async with cls._get_blob_client(settings.RESULT_CONTAINER, marker_filename) as blob_client:
+            async with cls._get_blob_client(
+                settings.RESULT_CONTAINER, marker_filename
+            ) as blob_client:
                 if not await blob_client.exists():
                     return None
 
@@ -372,10 +374,7 @@ class StorageService:
 
                 return {
                     "code": str(payload.get("code") or DEFAULT_FAILURE_CODE),
-                    "message": str(
-                        payload.get("message")
-                        or DEFAULT_FAILURE_MESSAGE
-                    ),
+                    "message": str(payload.get("message") or DEFAULT_FAILURE_MESSAGE),
                 }
         except Exception as e:
             logger.error("Failed to read failure marker for job %s in Azure: %s", secure_job_id, e)

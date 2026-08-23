@@ -253,13 +253,13 @@ cd PixelForge
 
 ## 2) 运行后端
 
+先安装 [uv](https://docs.astral.sh/uv/getting-started/installation/)。Windows
+PowerShell、Linux 和 macOS 使用相同后端工作流：
+
 ```bash
 cd backend
-python -m venv venv
-source venv/bin/activate      # macOS/Linux
-# venv\Scripts\activate       # Windows
-pip install -r requirements.txt
-python run.py  # 启动 Uvicorn，并禁用代理头重写
+uv sync --locked
+uv run python run.py  # 启动 Uvicorn，并禁用代理头重写
 ```
 
 ## 3) 运行前端
@@ -270,6 +270,18 @@ npm install
 npm run dev
 ```
 
+
+## 4) 后端质量检查
+
+```bash
+cd backend
+uv lock --check
+uv sync --locked
+uv run ruff check .
+uv run ruff format --check .
+uv run pytest
+uv run mypy
+```
 
 ## 🔒 安全说明
 
@@ -307,9 +319,11 @@ npm run dev
 - [PixelForge 测试](../dev/TESTING_ZH.md) ([EN](../../TESTING.md), [ID](../dev/TESTING_ID.md))
 
 开发者辅助脚本：
-- [Total Line Counter](../../../scripts/dev/get_total_lines.ps1) — 交互式 Windows PowerShell 脚本，可按文件夹、文件扩展名和项目区域统计代码行数。
+- Total Line Counter：[PowerShell](../../../scripts/windows/dev/get_total_lines.ps1) / [Bash](../../../scripts/unix/dev/get_total_lines.sh)
+- 应用启动器：[Windows BAT](../../../scripts/windows/start_app.bat) / [Bash](../../../scripts/unix/start_app.sh)
+- Usage 重置：[Windows BAT](../../../scripts/windows/reset_usage.bat) / [Bash](../../../scripts/unix/reset_usage.sh)
 
-> 本地 PowerShell 脚本和 `.bat` 辅助文件仅面向 Windows 开发环境。
+配对 wrapper 共享同一项目逻辑，使 Windows、Linux 和 macOS 的工具行为保持一致。
 
 ## 🙏 致谢
 

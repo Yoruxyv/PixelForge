@@ -14,7 +14,6 @@ helpers remain the source of truth because browser validation can be bypassed.
 
 import io
 import logging
-from typing import Tuple
 
 from fastapi import HTTPException, status
 from PIL import Image
@@ -64,7 +63,7 @@ def smart_downscale(img: Image.Image, max_pixels: int) -> Image.Image:
     return img
 
 
-def load_and_validate_structure(file_bytes: bytes) -> Tuple[Image.Image, str]:
+def load_and_validate_structure(file_bytes: bytes) -> tuple[Image.Image, str]:
     """Load image bytes and validate that the format is supported.
 
     Args:
@@ -160,7 +159,7 @@ def validate_image_bytes_resolution(
     file_bytes: bytes,
     max_pixels: int | None = None,
     max_megapixels: float | None = None,
-) -> Tuple[int, int, int]:
+) -> tuple[int, int, int]:
     """Validate uploaded image bytes and return width, height, and pixel count.
 
     This helper is used by the direct-to-Azure AI job flow after the backend
@@ -195,7 +194,7 @@ def validate_image_bytes_resolution(
     return width, height, width * height
 
 
-def normalize_image(img: Image.Image, ext: str) -> Tuple[Image.Image, str]:
+def normalize_image(img: Image.Image, ext: str) -> tuple[Image.Image, str]:
     """Normalize image mode and output extension for AI compatibility.
 
     Args:
@@ -248,10 +247,7 @@ def image_has_alpha(img: Image.Image) -> bool:
             ``True`` when the image has an alpha channel or palette
             transparency metadata.
     """
-    return (
-        img.mode in ("RGBA", "LA")
-        or (img.mode == "P" and "transparency" in img.info)
-    )
+    return img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info)
 
 
 def encode_png_under_size(
@@ -285,10 +281,7 @@ def encode_png_under_size(
         bytes:
             PNG-encoded image bytes under ``max_bytes``.
     """
-    if image_has_alpha(img):
-        working_img = img.convert("RGBA")
-    else:
-        working_img = img.convert("RGB")
+    working_img = img.convert("RGBA") if image_has_alpha(img) else img.convert("RGB")
 
     while True:
         output_stream = io.BytesIO()
@@ -353,13 +346,12 @@ def fit_image_bytes_under_size(
         bytes:
             PNG-encoded bytes under ``max_bytes``.
     """
-    with io.BytesIO(image_bytes) as input_stream:
-        with Image.open(input_stream) as img:
-            img.load()
+    with io.BytesIO(image_bytes) as input_stream, Image.open(input_stream) as img:
+        img.load()
 
-            return encode_png_under_size(
-                img,
-                max_bytes,
-                min_dimension=min_dimension,
-                shrink_step=shrink_step,
-            )
+        return encode_png_under_size(
+            img,
+            max_bytes,
+            min_dimension=min_dimension,
+            shrink_step=shrink_step,
+        )

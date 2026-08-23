@@ -257,6 +257,7 @@ class JobManager:
         client_ip: str,
     ) -> None:
         """Execute an image upscaling job."""
+
         async def _run():
             return await ai_upscaler.run_upscale(
                 safe_filename=safe_filename,
@@ -281,6 +282,7 @@ class JobManager:
         client_ip: str,
     ) -> None:
         """Execute a background-removal job."""
+
         async def _run():
             return await bg_remover.run_removal(
                 safe_filename=safe_filename,
@@ -303,6 +305,7 @@ class JobManager:
         client_ip: str,
     ) -> None:
         """Execute a color-restoration job."""
+
         async def _run():
             return await color_restorer.run_restore(
                 safe_filename=safe_filename,
@@ -326,6 +329,7 @@ class JobManager:
         client_ip: str,
     ) -> None:
         """Execute an object-removal job and clean up its mask upload."""
+
         async def _run():
             return await object_remover.run_object_remove(
                 safe_filename=safe_filename,

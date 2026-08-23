@@ -1,6 +1,5 @@
 import os
 
-
 TEST_ENV = {
     "ENVIRONMENT": "test",
     "DATABASE_URL": "postgresql://postgres@localhost:5432/pixelforge_test",

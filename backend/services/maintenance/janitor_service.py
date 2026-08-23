@@ -21,15 +21,12 @@ async def database_janitor_loop() -> None:
 
     loop_ratio = max(
         1,
-        settings.DB_SWEEP_INTERVAL_SECONDS
-        // settings.AZURE_SWEEP_INTERVAL_SECONDS,
+        settings.DB_SWEEP_INTERVAL_SECONDS // settings.AZURE_SWEEP_INTERVAL_SECONDS,
     )
 
     while True:
         try:
-            logger.info(
-                "Janitor Heartbeat: Sweeping expired files and records..."
-            )
+            logger.info("Janitor Heartbeat: Sweeping expired files and records...")
 
             await StorageService.cleanup_expired_results(
                 expiration_minutes=settings.SAS_EXPIRATION_MINUTES,
@@ -46,6 +43,4 @@ async def database_janitor_loop() -> None:
                 e,
             )
 
-        await asyncio.sleep(
-            settings.AZURE_SWEEP_INTERVAL_SECONDS
-        )
+        await asyncio.sleep(settings.AZURE_SWEEP_INTERVAL_SECONDS)

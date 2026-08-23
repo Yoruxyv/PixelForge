@@ -37,7 +37,7 @@ async def verify_turnstile(token: str) -> None:
     is_development = env in _DEVELOPMENT_ENVIRONMENTS
     allow_bypass = settings.ALLOW_TURNSTILE_TEST_BYPASS
 
-    if token == "manual_test_bypass" and is_development and allow_bypass:
+    if token == "manual_test_bypass" and is_development and allow_bypass:  # noqa: S105
         logger.info("🛡️ Turnstile bypass engaged for local testing.")
         return
 
@@ -46,15 +46,11 @@ async def verify_turnstile(token: str) -> None:
     if not secret_key:
         if is_development:
             logger.warning(
-                "Turnstile secret key is missing in development; "
-                "verification is being skipped."
+                "Turnstile secret key is missing in development; verification is being skipped."
             )
             return
 
-        logger.error(
-            "Turnstile secret key is missing outside development; "
-            "rejecting verification."
-        )
+        logger.error("Turnstile secret key is missing outside development; rejecting verification.")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=build_error_payload(

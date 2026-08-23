@@ -26,11 +26,12 @@ streams.
 """
 
 import asyncio
-from dataclasses import dataclass
 import io
 import logging
 import time
 import urllib.parse
+from dataclasses import dataclass
+from typing import Any
 
 import aiohttp
 from fastapi import HTTPException, status
@@ -100,7 +101,7 @@ class ImagePipelineService:
     def __init__(
         self,
         model_type: str,
-        provider: BaseAIProvider = None,
+        provider: BaseAIProvider | None = None,
         max_concurrent_remote_jobs: int = settings.MAX_CONCURRENT_JOBS,
         max_file_size_bytes: int = settings.MAX_FILE_SIZE_BYTES,
         max_result_file_size_bytes: int = settings.MAX_RESULT_FILE_SIZE_BYTES,
@@ -214,12 +215,11 @@ class ImagePipelineService:
 
         except Exception as e:
             failure = self._failure_from_exception(e)
-            logger.error(
+            logger.exception(
                 "%s error (Job #%s): %s",
                 self.model_type,
                 job_id,
                 e,
-                exc_info=True,
             )
             return failure
 
@@ -420,7 +420,7 @@ class ImagePipelineService:
             shrink_step=settings.OUTPUT_SHRINK_STEP,
         )
 
-    async def preprocess_input(self, raw_bytes: bytes, **kwargs) -> io.BytesIO:
+    async def preprocess_input(self, raw_bytes: bytes, **kwargs) -> io.BytesIO:  # noqa: ARG002
         """Prepare uploaded image bytes for provider input.
 
         The shared default behavior validates image structure and downscales
@@ -452,31 +452,33 @@ class ImagePipelineService:
             io.BytesIO:
                 Encoded image stream suitable for the remote AI provider.
         """
-        with io.BytesIO(raw_bytes) as input_stream:
-            with Image.open(input_stream) as img:
-                img.load()
-                save_format = img.format or "JPEG"
+        with io.BytesIO(raw_bytes) as input_stream, Image.open(input_stream) as img:
+            img.load()
+            save_format = img.format or "JPEG"
 
-                img = smart_downscale(img, settings.OPTIMIZATION_TARGET_PIXELS)
+            processed_img: Image.Image = smart_downscale(
+                img,
+                settings.OPTIMIZATION_TARGET_PIXELS,
+            )
 
-                if img.mode in ("RGBA", "P") and save_format.upper() != "PNG":
-                    img = img.convert("RGB")
+            if processed_img.mode in ("RGBA", "P") and save_format.upper() != "PNG":
+                processed_img = processed_img.convert("RGB")
 
-                output_stream = io.BytesIO()
-                save_kwargs = {"format": save_format}
+            output_stream = io.BytesIO()
+            save_kwargs: dict[str, Any] = {"format": save_format}
 
-                if save_format.upper() in ("JPEG", "JPG"):
-                    save_kwargs.update({"quality": 95, "optimize": True})
+            if save_format.upper() in ("JPEG", "JPG"):
+                save_kwargs.update({"quality": 95, "optimize": True})
 
-                if save_format.upper() == "PNG":
-                    save_kwargs.update({"optimize": True, "compress_level": 9})
+            if save_format.upper() == "PNG":
+                save_kwargs.update({"optimize": True, "compress_level": 9})
 
-                img.save(output_stream, **save_kwargs)
-                output_stream.seek(0)
+            processed_img.save(output_stream, **save_kwargs)
+            output_stream.seek(0)
 
-                return output_stream
+            return output_stream
 
-    async def postprocess_output(self, result_bytes: bytes, **kwargs) -> bytes:
+    async def postprocess_output(self, result_bytes: bytes, **kwargs) -> bytes:  # noqa: ARG002
         """Prepare provider output bytes for result storage.
 
         Args:
@@ -492,7 +494,7 @@ class ImagePipelineService:
         """
         return result_bytes
 
-    def build_model_params(self, **kwargs) -> dict:
+    def build_model_params(self, **kwargs) -> dict:  # noqa: ARG002
         """Build provider parameters for the configured model type.
 
         Args:
@@ -550,8 +552,10 @@ class ImagePipelineService:
 
         timeout = aiohttp.ClientTimeout(total=60)
 
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            async with session.get(url) as resp:
-                if resp.status != 200:
-                    raise ValueError(f"Failed to download result: {resp.status}")
-                return await resp.read()
+        async with (
+            aiohttp.ClientSession(timeout=timeout) as session,
+            session.get(url) as resp,
+        ):
+            if resp.status != 200:
+                raise ValueError(f"Failed to download result: {resp.status}")
+            return await resp.read()
