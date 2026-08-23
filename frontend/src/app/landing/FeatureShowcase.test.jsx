@@ -1,6 +1,14 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import FeatureShowcase from './FeatureShowcase';
+
+const renderShowcase = () =>
+  render(
+    <MemoryRouter>
+      <FeatureShowcase />
+    </MemoryRouter>,
+  );
 
 describe('FeatureShowcase', () => {
   beforeEach(() => {
@@ -14,7 +22,7 @@ describe('FeatureShowcase', () => {
   afterEach(() => vi.useRealTimers());
 
   it('prioritizes only the initial Upscale comparison', () => {
-    render(<FeatureShowcase />);
+    renderShowcase();
 
     const upscaleBefore = screen.getByAltText('Upscale example - Before');
     const upscaleAfter = screen.getByAltText('Upscale example - After');
@@ -52,7 +60,7 @@ describe('FeatureShowcase', () => {
   });
 
   it('switches workflows with pointer and arrow-key controls', () => {
-    render(<FeatureShowcase />);
+    renderShowcase();
 
     const upscaleTab = screen.getByRole('tab', { name: /Upscale/ });
     const backgroundTab = screen.getByRole('tab', {
@@ -64,15 +72,26 @@ describe('FeatureShowcase', () => {
     expect(
       screen.getByAltText('Background removal example - After'),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /OPEN BACKGROUND REMOVAL/i }),
+    ).toHaveAttribute('href', '/remove-bg');
+    expect(screen.getByRole('tabpanel')).toHaveClass(
+      'animate__animated',
+      'animate__lightSpeedInLeft',
+      'animate__faster',
+    );
 
     fireEvent.keyDown(backgroundTab, { key: 'ArrowLeft' });
     expect(upscaleTab).toHaveAttribute('aria-selected', 'true');
     expect(upscaleTab).toHaveFocus();
+    expect(
+      screen.getByRole('link', { name: /OPEN UPSCALE/i }),
+    ).toHaveAttribute('href', '/upscale');
   });
 
   it('rotates slowly until the user chooses a workflow', () => {
     vi.useFakeTimers();
-    render(<FeatureShowcase />);
+    renderShowcase();
 
     const backgroundTab = screen.getByRole('tab', {
       name: /Background removal/,
@@ -97,19 +116,37 @@ describe('FeatureShowcase', () => {
     expect(objectTab).toHaveAttribute('aria-selected', 'true');
   });
 
-  it('does not rotate when reduced motion is requested', () => {
+  it('does not rotate or animate when reduced motion is requested', () => {
     vi.useFakeTimers();
     window.matchMedia = vi.fn().mockReturnValue({
       matches: true,
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
     });
-    render(<FeatureShowcase />);
+    renderShowcase();
 
     act(() => vi.advanceTimersByTime(12000));
     expect(screen.getByRole('tab', { name: /Upscale/ })).toHaveAttribute(
       'aria-selected',
       'true',
+    );
+    expect(screen.getByRole('tabpanel')).not.toHaveClass(
+      'animate__animated',
+      'animate__lightSpeedInLeft',
+      'animate__faster',
+    );
+
+    fireEvent.click(
+      screen.getByRole('tab', { name: /Background removal/ }),
+    );
+    expect(
+      screen.getByAltText('Background removal example - After'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /OPEN BACKGROUND REMOVAL/i }),
+    ).toHaveAttribute('href', '/remove-bg');
+    expect(screen.getByRole('tabpanel')).not.toHaveClass(
+      'animate__lightSpeedInLeft',
     );
   });
 });
