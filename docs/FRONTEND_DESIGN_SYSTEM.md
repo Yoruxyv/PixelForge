@@ -223,11 +223,10 @@ controls, copy, validation, and workflow states remain feature-owned. A visual
 pattern may become shared only after multiple independent consumers prove the
 same responsibility.
 
-Phase 05 establishes the foundation. Later phases adopt it in order:
+Phase 05 established this foundation. Phases 06 through 09 applied it across
+the app shell, landing experience, AI workspaces, browser-side tools, responsive
+layouts, accessibility, and user-visible states.
 
-1. app shell, landing, upload, and shared workspace;
-2. AI tools;
-3. editing, optimization, and utility tools;
-4. responsive, accessibility, and state hardening.
-
-Do not restyle a future-phase screen opportunistically while adopting a token.
+Phase 10 keeps this document as the maintained frontend design contract. Future
+changes should continue to use these tokens and interaction rules, and should
+only extend the shared system when current product evidence justifies it.

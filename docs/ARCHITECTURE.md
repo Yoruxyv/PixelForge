@@ -1,6 +1,6 @@
 # PixelForge Architecture
 
-PixelForge is an open-source image studio that provides browser-based image tools and AI-assisted image processing through a React frontend and FastAPI backend.
+PixelForge is an open-source image-processing workstation that provides browser-based image tools and AI-assisted processing through a React frontend and FastAPI backend.
 
 The system is designed around a clear split:
 
@@ -168,7 +168,7 @@ behavior.
 - `navigation/` owns route-discovery labels and links;
 - `routing/` composes lazy route entries and application fallbacks.
 
-Navigation categories such as AI, Smart Edit, Optimize, and Utilities are route
+Navigation categories such as AI, Edit, Optimize, and Utilities are route
 groups, not feature modules.
 
 ### 4.2 `features`: product ownership

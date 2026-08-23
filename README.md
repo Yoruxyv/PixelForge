@@ -20,14 +20,14 @@
 <div align="center">
 
 # ✨ PixelForge
-### The open-source image studio that blends AI cloud power with pro-grade browser editing
+### An open-source image-processing workstation for AI enhancement, browser editing, inspection, and export
 </div>
 
 ## 🚀 Why PixelForge
 
 <div style="max-width: 720px;">
 
-PixelForge started as a single-purpose AI upscaler and evolved into a full-stack image processing platform.
+PixelForge started as a single-purpose AI upscaler and evolved into a full-stack image-processing workstation.
 It combines **AI-powered cloud processing** (upscale, background removal, restoration) with fast **client-side editing tools** (resize, compress, transform, metadata cleaning).
 The system is designed to handle real-world constraints such as rate limits, long-running AI jobs, and storage lifecycle management through an async queue-based architecture.</div>
 
@@ -36,7 +36,7 @@ The system is designed to handle real-world constraints such as rate limits, lon
 - ⚡ AI where it matters, instant client-side tools where it’s faster  
 - 🔐 Security-first pipeline (Turnstile, signed URLs, validation, anti-spoof proxy strategy)  
 - 🧠 Reliable architecture (async jobs, usage limits, janitor cleanup, session recovery)  
-- 🎨 Beautiful UX with before/after comparisons and staged progress feedback  
+- 🎨 Image-first workspaces with before/after comparison and clear processing states  
 - 🛠️ Open-source and extensible provider architecture  
 
 

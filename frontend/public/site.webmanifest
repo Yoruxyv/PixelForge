@@ -1,11 +1,11 @@
 {
-  "name": "PixelForge Image Studio",
+  "name": "PixelForge Image Workstation",
   "short_name": "PixelForge",
-  "description": "AI-powered image upscaling, background removal, and browser editing.",
+  "description": "Image-processing workstation for AI enhancement and browser-based editing.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
+  "background_color": "#f4f5f7",
+  "theme_color": "#f4f5f7",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
