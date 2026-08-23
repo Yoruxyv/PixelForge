@@ -78,4 +78,72 @@ test.describe('application shell', () => {
       page.getByRole('link', { name: 'Return to Safety' }),
     ).toHaveAttribute('href', '/');
   });
+  test('AI showcase tabs update preview and contextual navigation', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/');
+
+    const cases = [
+      {
+        tab: 'Upscale',
+        preview: 'Upscale example - After',
+        cta: /OPEN UPSCALE/i,
+        href: '/upscale',
+      },
+      {
+        tab: 'Background removal',
+        preview: 'Background removal example - After',
+        cta: /OPEN BACKGROUND REMOVAL/i,
+        href: '/remove-bg',
+      },
+      {
+        tab: 'Color restoration',
+        preview: 'Color restoration example - After',
+        cta: /OPEN COLOR RESTORATION/i,
+        href: '/color-restoration',
+      },
+      {
+        tab: 'Object removal',
+        preview: 'Object removal example - After',
+        cta: /OPEN OBJECT REMOVAL/i,
+        href: '/object-remove',
+      },
+    ];
+
+    for (const showcaseCase of cases) {
+      await page.getByRole('tab', { name: showcaseCase.tab }).click();
+
+      await expect(page).toHaveURL(/\/$/);
+      await expect(page.getByAltText(showcaseCase.preview)).toBeVisible();
+      await expect(
+        page.getByRole('link', { name: showcaseCase.cta }),
+      ).toHaveAttribute('href', showcaseCase.href);
+    }
+
+    await page
+      .getByRole('link', { name: /OPEN OBJECT REMOVAL/i })
+      .click();
+
+    await expect(page).toHaveURL(/\/object-remove$/);
+  });
+
+  test('AI showcase remains functional with reduced motion', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/');
+
+    await page.getByRole('tab', { name: 'Color restoration' }).click();
+
+    await expect(
+      page.getByAltText('Color restoration example - After'),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: /OPEN COLOR RESTORATION/i }),
+    ).toHaveAttribute('href', '/color-restoration');
+    await expect(page).toHaveURL(/\/$/);
+  });
+
 });
