@@ -60,7 +60,10 @@ test.describe('application shell', () => {
       page.getByRole('button', { name: 'Close tool menu' }),
     ).toBeVisible();
 
-    await page.getByRole('link', { name: 'Color Palette' }).click();
+    await page
+      .locator('#mobile-navigation')
+      .getByRole('link', { name: 'Color Palette', exact: true })
+      .click();
 
     await expect(page).toHaveURL(/\/color-palette$/);
     await expect(

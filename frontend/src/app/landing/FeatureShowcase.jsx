@@ -112,24 +112,26 @@ export default function FeatureShowcase() {
         <span>Drag to compare</span>
       </div>
 
-      <div
-        key={activeFeature.id}
-        role="tabpanel"
-        id="feature-panel"
-        aria-labelledby={`feature-tab-${activeFeature.id}`}
-        className={presentationAnimationClassName}
-      >
-        <BeforeAfterSlider
-          beforeImage={activeFeature.before}
-          afterImage={activeFeature.after}
-          altText={`${activeFeature.name} example`}
-          aspectClassName="aspect-[16/10]"
-          imageClassName={activeFeature.imageClassName}
-          canvasClassName={activeFeature.canvasClassName}
-          prioritizeImages={activeFeature.id === 'upscale'}
-          afterSrcSet={activeFeature.afterSrcSet}
-          afterSizes={activeFeature.afterSizes}
-        />
+      <div className="overflow-hidden">
+        <div
+          key={activeFeature.id}
+          role="tabpanel"
+          id="feature-panel"
+          aria-labelledby={`feature-tab-${activeFeature.id}`}
+          className={presentationAnimationClassName}
+        >
+          <BeforeAfterSlider
+            beforeImage={activeFeature.before}
+            afterImage={activeFeature.after}
+            altText={`${activeFeature.name} example`}
+            aspectClassName="aspect-[16/10]"
+            imageClassName={activeFeature.imageClassName}
+            canvasClassName={activeFeature.canvasClassName}
+            prioritizeImages={activeFeature.id === 'upscale'}
+            afterSrcSet={activeFeature.afterSrcSet}
+            afterSizes={activeFeature.afterSizes}
+          />
+        </div>
       </div>
 
       <div className="grid border-b border-pf-editorial-line lg:grid-cols-[minmax(15rem,0.8fr)_minmax(0,1.2fr)]">

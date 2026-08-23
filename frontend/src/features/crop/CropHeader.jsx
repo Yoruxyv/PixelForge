@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
  * @param {boolean} props.canApply
  * @param {Function} props.onCancel
  * @param {Function} props.applyCrop
+ * @param {boolean} [props.showCancel=true]
  * @returns {JSX.Element}
  */
 export default function CropHeader({
@@ -13,6 +14,7 @@ export default function CropHeader({
   canApply,
   onCancel,
   applyCrop,
+  showCancel = true,
 }) {
   return (
     <header className="z-10 flex flex-none items-center justify-between border-b border-pf-editorial-line bg-pf-editorial-surface px-5 py-4 sm:px-6">
@@ -25,12 +27,15 @@ export default function CropHeader({
         )}
       </div>
       <div className="flex items-center gap-4">
-        <button
-          onClick={onCancel}
-          className="text-sm font-semibold text-pf-editorial-muted transition-colors hover:text-pf-editorial-ink"
-        >
-          Cancel
-        </button>
+        {showCancel ? (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="text-sm font-semibold text-pf-editorial-muted transition-colors hover:text-pf-editorial-ink"
+          >
+            Cancel
+          </button>
+        ) : null}
         <button
           onClick={applyCrop}
           disabled={!canApply}
@@ -48,6 +53,7 @@ CropHeader.propTypes = {
   canApply: PropTypes.bool.isRequired,
   onCancel: PropTypes.func.isRequired,
   applyCrop: PropTypes.func.isRequired,
+  showCancel: PropTypes.bool,
 };
 
 CropHeader.defaultProps = {

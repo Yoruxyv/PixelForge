@@ -97,6 +97,15 @@ test.describe('browser-side optimize tools', () => {
     page,
   }) => {
     await page.goto('/metadata');
+
+    await expect(
+      page.getByRole('heading', { name: 'What PixelForge inspects' }),
+    ).toBeVisible();
+    await expect(page.getByText('Processed locally')).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Upload image file' }),
+    ).toBeVisible();
+
     await uploadDropzoneFile(page, fixturePaths.metadataJpeg);
 
     await expect(page.getByText('Detected metadata')).toBeVisible();

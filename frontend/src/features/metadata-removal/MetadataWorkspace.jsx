@@ -9,6 +9,7 @@ import { useMemo } from 'react';
 import ToolPageWrapper from '@/shared/components/workspace/ToolPageWrapper';
 import ToolStateWrapper from '@/shared/components/workspace/ToolStateWrapper';
 import ClientSideHeader from '@/shared/components/workspace/ClientSideHeader';
+import UploadDropzone from '@/shared/components/upload/UploadDropzone';
 import { useObjectUrlCleanup } from '@/shared/hooks/useObjectUrlCleanup';
 import { bytesToMB } from '@/shared/lib/fileUtils';
 import { useMetadataProcessor } from './useMetadataProcessor';
@@ -54,7 +55,59 @@ export default function MetadataWorkspace() {
           />
         </div>
 
-        <ToolStateWrapper
+        {!selectedFile ? (
+          <div className="grid overflow-hidden rounded-pf-card border border-pf-editorial-line bg-pf-editorial-surface lg:grid-cols-[1.05fr_0.95fr]">
+            <div className="p-5 sm:p-6">
+              <UploadDropzone
+                onFileSelect={handleFileSelect}
+                variant="editorial"
+                compact
+              />
+            </div>
+
+            <aside
+              className="border-t border-pf-editorial-line bg-pf-editorial-base p-6 lg:border-l lg:border-t-0"
+              aria-labelledby="metadata-inspection-heading"
+            >
+              <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-pf-editorial-accent">
+                Privacy scan
+              </p>
+              <h2
+                id="metadata-inspection-heading"
+                className="mt-2 text-xl font-semibold tracking-[-0.02em] text-pf-editorial-ink"
+              >
+                What PixelForge inspects
+              </h2>
+
+              <dl className="mt-5 border-y border-pf-editorial-line">
+                <div className="grid gap-1 border-b border-pf-editorial-line py-3 sm:grid-cols-[9rem_1fr] sm:gap-4">
+                  <dt className="text-sm font-semibold text-pf-editorial-ink">EXIF fields</dt>
+                  <dd className="text-sm leading-5 text-pf-editorial-muted">Readable embedded EXIF values</dd>
+                </div>
+                <div className="grid gap-1 border-b border-pf-editorial-line py-3 sm:grid-cols-[9rem_1fr] sm:gap-4">
+                  <dt className="text-sm font-semibold text-pf-editorial-ink">Camera details</dt>
+                  <dd className="text-sm leading-5 text-pf-editorial-muted">Readable camera fields when present</dd>
+                </div>
+                <div className="grid gap-1 border-b border-pf-editorial-line py-3 sm:grid-cols-[9rem_1fr] sm:gap-4">
+                  <dt className="text-sm font-semibold text-pf-editorial-ink">Location data</dt>
+                  <dd className="text-sm leading-5 text-pf-editorial-muted">Readable location fields when present</dd>
+                </div>
+                <div className="grid gap-1 py-3 sm:grid-cols-[9rem_1fr] sm:gap-4">
+                  <dt className="text-sm font-semibold text-pf-editorial-ink">Other readable tags</dt>
+                  <dd className="text-sm leading-5 text-pf-editorial-muted">Additional string or numeric metadata returned by the parser</dd>
+                </div>
+              </dl>
+
+              <div className="mt-5 border-l-2 border-pf-editorial-accent pl-4">
+                <p className="text-sm font-semibold text-pf-editorial-ink">Processed locally</p>
+                <p className="mt-1 text-sm leading-5 text-pf-editorial-muted">
+                  The scan and clean-copy generation stay in your browser.
+                </p>
+              </div>
+            </aside>
+          </div>
+        ) : (
+          <ToolStateWrapper
           file={selectedFile}
           error={null}
           isProcessing={isProcessing}
@@ -161,7 +214,8 @@ export default function MetadataWorkspace() {
               </article>
             </div>
           ) : null}
-        </ToolStateWrapper>
+          </ToolStateWrapper>
+        )}
       </section>
     </ToolPageWrapper>
   );

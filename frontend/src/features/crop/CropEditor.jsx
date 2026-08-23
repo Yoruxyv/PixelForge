@@ -3,6 +3,7 @@ import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import PropTypes from 'prop-types';
 
+import UploadDropzone from '@/shared/components/upload/UploadDropzone';
 import FitModeToggle from '@/shared/components/image-viewer/FitModeToggle';
 import Magnifier, {
   ZoomButton,
@@ -32,6 +33,7 @@ import CropHeader from './CropHeader';
  * @param {Function} props.onCancel
  * @param {Function} props.cleanupResult
  * @param {Array<{label: string, value: number|null}>} props.aspectRatioOptions
+ * @param {Function} props.onFileSelect
  * @returns {JSX.Element}
  */
 export default function CropEditor({
@@ -53,7 +55,10 @@ export default function CropEditor({
   onCancel,
   cleanupResult,
   aspectRatioOptions,
+  onFileSelect,
 }) {
+  const hasImage = Boolean(previewUrl);
+
   const handleToggleFitMode = () => {
     setFitMode((prev) => (prev === 'fit' ? 'scroll' : 'fit'));
   };
@@ -67,9 +72,11 @@ export default function CropEditor({
         canApply={canApply}
         onCancel={onCancel}
         applyCrop={applyCrop}
+        showCancel={hasImage}
       />
 
       <div className="relative flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-pf-editorial-footer">
+        {hasImage ? (
         <Magnifier
           containerClassName={`flex-1 w-full h-full p-4 sm:p-8 ${
             fitMode === 'fit'
@@ -149,19 +156,30 @@ export default function CropEditor({
             </ReactCrop>
           )}
         </Magnifier>
+        ) : (
+          <div className="flex min-h-0 flex-1 items-center justify-center p-4 sm:p-8">
+            <div className="w-full max-w-2xl">
+              <UploadDropzone
+                onFileSelect={onFileSelect}
+                variant="editorial"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <AspectRatioControls
         aspect={aspect}
         onApplyAspect={applyAspect}
         options={aspectRatioOptions}
+        disabled={!hasImage}
       />
     </div>
   );
 }
 
 CropEditor.propTypes = {
-  previewUrl: PropTypes.string.isRequired,
+  previewUrl: PropTypes.string,
   crop: PropTypes.object,
   setCrop: PropTypes.func.isRequired,
   setCompletedCrop: PropTypes.func.isRequired,
@@ -189,9 +207,11 @@ CropEditor.propTypes = {
       value: PropTypes.number,
     }),
   ).isRequired,
+  onFileSelect: PropTypes.func.isRequired,
 };
 
 CropEditor.defaultProps = {
+  previewUrl: '',
   crop: undefined,
   aspect: null,
   cropSizeLabel: '',
