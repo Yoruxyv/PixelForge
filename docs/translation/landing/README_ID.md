@@ -21,14 +21,14 @@
 <div align="center">
 
 # ✨ PixelForge
-### Studio gambar open-source yang menggabungkan kekuatan AI cloud dengan editing browser tingkat profesional
+### Workstation pemrosesan gambar open-source untuk AI, editing browser, inspeksi hasil, dan ekspor
 </div>
 
 ## 🚀 Mengapa PixelForge
 
 <div style="max-width: 720px;">
 
-PixelForge dimulai sebagai AI upscaler satu fungsi dan berkembang menjadi platform pemrosesan gambar full-stack.
+PixelForge dimulai sebagai AI upscaler satu fungsi dan berkembang menjadi workstation pemrosesan gambar full-stack.
 Platform ini menggabungkan **pemrosesan berbasis AI di cloud** (upscale, penghapusan background, restorasi foto) dengan **alat editing cepat di sisi browser** (resize, kompresi, transformasi, pembersihan metadata).
 Sistem ini dirancang untuk menangani batasan dunia nyata seperti rate limit, job AI yang berjalan lama, dan manajemen siklus hidup storage melalui arsitektur asinkron berbasis antrean.</div>
 
@@ -37,7 +37,7 @@ Sistem ini dirancang untuk menangani batasan dunia nyata seperti rate limit, job
 - ⚡ AI digunakan saat benar-benar dibutuhkan, alat client-side instan digunakan saat lebih cepat  
 - 🔐 Pipeline berorientasi keamanan (Turnstile, signed URL, validasi, strategi anti-spoof proxy)  
 - 🧠 Arsitektur andal (job asinkron, batas penggunaan, janitor cleanup, pemulihan sesi)  
-- 🎨 UX yang indah dengan perbandingan sebelum/sesudah dan feedback progres bertahap  
+- 🎨 Workspace image-first dengan perbandingan sebelum/sesudah dan status pemrosesan yang jelas  
 - 🛠️ Open-source dan mudah dikembangkan melalui arsitektur provider  
 
 

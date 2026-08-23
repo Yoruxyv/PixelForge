@@ -6,11 +6,7 @@
 
 # PixelForge 架构
 
-PixelForge 是一个开源图片工作室，通过 React 前端与 FastAPI 后端提供浏览器端图像工具和 AI 辅助图像处理能力。
-
-> **同步说明：** 本译文中的前端结构仍描述 Phase 04 feature-layer
-> 稳定化之前的架构。涉及当前 `app`、`features`、`shared`、依赖规则与路由时，
-> 请以[英文架构文档](../../ARCHITECTURE.md)为准。
+PixelForge 是一个开源图像处理工作站，通过 React 前端与 FastAPI 后端提供浏览器端图像工具和 AI 辅助处理能力。
 
 系统围绕清晰的职责拆分进行设计：
 
@@ -131,21 +127,23 @@ PixelForge/
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── components/
-│   │   ├── content/
-│   │   │   ├── bot/
-│   │   │   ├── feature/
-│   │   │   ├── modals/
-│   │   │   └── navigation/
-│   │   ├── hooks/
-│   │   ├── pages/
-│   │   ├── routes/
-│   │   ├── services/
-│   │   ├── utils/
-│   │   ├── App.jsx
-│   │   ├── config.js
+│   │   ├── app/
+│   │   │   ├── landing/
+│   │   │   ├── layout/
+│   │   │   ├── navigation/
+│   │   │   └── routing/
+│   │   ├── features/
+│   │   ├── shared/
+│   │   │   ├── api/
+│   │   │   ├── components/
+│   │   │   ├── config/
+│   │   │   ├── hooks/
+│   │   │   ├── lib/
+│   │   │   ├── storage/
+│   │   │   └── validation/
+│   │   ├── assets/
 │   │   ├── main.jsx
-│   │   └── routes.js
+│   │   └── index.css
 │   ├── public/
 │   └── vite.config.js
 │
@@ -156,162 +154,86 @@ PixelForge/
 
 ## 4. 前端架构
 
-前端围绕可复用 workspace 组件和功能页面进行组织。
-
-### 4.1 应用外壳
-
-`frontend/src/App.jsx` 负责主应用布局：
-
-- 浏览器路由
-- 全局导航
-- 全局 Header
-- Footer 与法律模态框
-- FAQ 聊天机器人组件
-- 懒加载页面的 Suspense loader
-
-Routes 按类别分组在：
+前端采用 feature-layer 架构。应用组合、产品功能和跨功能平台代码分别拥有明确的职责边界：
 
 ```txt
-frontend/src/routes/
+main.jsx -> app -> features -> shared
 ```
 
-根 route 文件仍然保留为 facade：
+`assets/` 与 `index.css` 继续作为 source root 资源存在，不负责产品行为。
 
-```txt
-frontend/src/routes.js
-```
+### 4.1 `app`：应用组合
 
-`App.jsx` 只导入这个 facade，而 facade 会组合来自不同类别的 route arrays，例如 AI features、smart edit tools、optimize tools、utilities、landing pages 和 special pages。每个 route 仍然使用 lazy import 加载对应 page component，以减小 initial bundle size。
+`frontend/src/app` 负责浏览器应用外壳，而不是具体工具行为：
 
----
+- `App.jsx` 挂载路由、持久布局、法律模态框与聊天机器人；
+- `layout/` 负责全局 Header、导航和 Footer；
+- `landing/` 负责应用的 landing/discovery 页面；
+- `navigation/` 负责 route discovery 的标签与链接；
+- `routing/` 组合 lazy route entries 与应用 fallback。
 
-### 4.2 页面分类
+AI、Edit、Optimize、Utilities 等导航分类只是 route 分组，不是 feature 模块。
 
-前端页面按工具类型分组：
+### 4.2 `features`：产品功能归属
 
-```txt
-pages/
-├── AiFeatures/
-│   ├── UpscaleImage.jsx
-│   ├── RemoveBackground.jsx
-│   ├── ColorRestoration.jsx
-│   └── ObjectRemover.jsx
-├── SmartEdit/
-│   ├── ImageEditor.jsx
-│   ├── ResizeImage.jsx
-│   ├── CropImage.jsx
-│   └── RotateFlip.jsx
-├── Optimize/
-│   ├── CompressImage.jsx
-│   ├── ConvertFormat.jsx
-│   └── MetadataWorkspace.jsx
-├── Utilities/
-│   ├── ColorPalette.jsx
-│   └── WatermarkAdder.jsx
-└── Special/
-    ├── ComingSoon.jsx
-    ├── FaqChatbotWidget.jsx
-    └── NotFound.jsx
-```
+`frontend/src/features` 下的每个目录负责一个产品能力。一起变化的 page、
+controls、hooks、service adapter、validators、helpers、content、state 与 tests
+保留在同一个 feature 中。
 
----
+当前 feature roots 包括 AI 工具（`upscale`、`background-removal`、
+`color-restoration`、`object-removal`），浏览器端工具（`image-editor`、
+`resize`、`rotate-flip`、`compress`、`convert`、`metadata-removal`、`palette`、
+`watermark`、`crop`），以及 `chatbot` 和 `feedback`。
 
-### 4.3 AI 功能页面
+feature root 中的 page 文件是有意保留的 route entry point。若一个 feature
+需要被另一个 feature 使用，应暴露一个小型公共 `index.js`；consumer 不得
+直接导入兄弟 feature 的内部文件。
 
-AI 功能页面使用共享 workspace 组件：
+### 4.3 `shared`：已证实的跨功能代码
 
-```txt
-components/Workspace/AiFeatureWorkspace.jsx
-```
+`frontend/src/shared` 只容纳拥有多个独立 consumer 的职责：
 
-每个 AI 页面都会将特定功能所需的内容接入共享 workspace：
+- `api/`：通用 HTTP、Azure 上传与 job polling transport；
+- `components/ai/`：共享 AI upload/process/result workspace 展示；
+- `components/upload/` 与 `components/workspace/`：可复用浏览器 workspace UI；
+- `config/`：共享 validation、session 与 AI fallback contracts；
+- `hooks/`：共享 upload、object URL、workspace 与 AI lifecycle state；
+- `lib/`：与具体产品功能无关的 file、image、time helpers；
+- `storage/`：IndexedDB 与 feature-scoped session persistence；
+- `styles/`：应用级 design tokens 与 accessibility baseline；
+- `validation/`：浏览器上传验证与 backend runtime-limit fallback。
 
-| 页面 | Pipeline Hook | 控制组件 | Feature Key |
-|---|---|---|---|
-| `UpscaleImage.jsx` | `useUpscalePipeline` | `UpscaleControls` | `upscale` |
-| `RemoveBackground.jsx` | `useRemBGPipeline` | `RemoveBgControls` | `rembg` |
-| `ColorRestoration.jsx` | `useColorRestorePipeline` | `ColorRestoreControls` | `colorrestore` |
-| `ObjectRemover.jsx` | `useObjectRemovePipeline` | `ObjectRemoveControls` + mask canvas | `objectremove` |
+只有当前 consumer 证明某职责独立于单一产品 feature 时，代码才可以进入
+`shared`。仅仅外观相似的 controls 或 processing logic，如果 behavior 与
+lifecycle 不同，仍应保留在各自 feature 中。
 
-AI 页面刻意保持轻量。页面只负责进度、scale、brush size、mask readiness 等页面级状态；共享 pipeline hook 负责上传、轮询、取消、Turnstile token、结果 URL 与使用限制状态。
+### 4.4 依赖规则
 
----
+- `shared` 不得导入 `app` 或 `features`。
+- feature 可以导入 `shared` 与自身文件。
+- 跨 feature import 必须通过目标 feature 的公共 `index.js`，不得深度导入
+  其内部模块。
+- `app` 可以导入 feature route entry points 与公共 surface。
+- route 文件负责组合 lazy feature entries，不拥有 feature logic。
+- 没有具体需求时，不引入递归 barrel exports、中央 feature registry 或
+  generic factory。
 
-### 4.4 前端 Pipeline Hooks
+### 4.5 添加前端 feature
 
-AI 工作流通过 pipeline 和 action hooks 抽象：
+1. 创建 `frontend/src/features/<feature>/`，只加入当前确实需要的文件。
+2. 将 page、controls、hooks、service adapter、content、helpers 与 tests 放在
+   feature 内。
+3. 只有当契约无需 feature-specific branching 即可复用时，才使用现有
+   `shared` upload、validation、workspace、API 或 lifecycle 代码。
+4. 在 `frontend/src/app/routing/` 添加 lazy route entry，并在需要时于
+   `frontend/src/app/navigation/` 添加 discovery link。
+5. 只有其他 feature 确实需要明确公共 surface 时，才添加小型 `index.js`。
+6. 验证 route、validation、processing、result、reset 与 restoration flows，
+   然后运行 frontend lint、tests 与 build。
 
-```txt
-hooks/
-├── actions/
-│   ├── useActions.js
-│   ├── useUpscaleActions.js
-│   ├── useRemBGActions.js
-│   ├── useColorRestoreActions.js
-│   └── useObjectRemoveActions.js
-├── pipeline/
-│   ├── usePipeline.js
-│   ├── useUpscalePipeline.js
-│   ├── useRemBGPipeline.js
-│   ├── useColorRestorePipeline.js
-│   └── useObjectRemovePipeline.js
-└── auth/
-    └── useUsageLimit.js
-```
-
-通用 pipeline 处理共享行为：
-
-- 选择文件状态
-- 预览 URL 状态
-- Turnstile token 处理
-- 启动任务
-- 轮询结果
-- 结果 URL 状态
-- 取消行为
-- 使用限制显示状态
-- Alert 状态
-
-功能专属 action hook 负责 API 调用和 payload 差异。
-
----
-
-### 4.5 浏览器端工具
-
-非 AI 工具大多直接在浏览器中运行，并使用 client hooks/utilities：
-
-```txt
-hooks/client/
-hooks/workspace/
-utils/image/
-utils/file/
-  fileValidation.js
-  validators/
-    errorMessages.js
-    runtimeLimits.js
-    mimeValidation.js
-    imageMetadata.js
-    imageOptimization.js
-    resolutionValidation.js
-    grayscaleValidation.js
-utils/storage/
-```
-
-`utils/file/fileValidation.js` 仍然作为文件验证的公共入口点，而 `utils/file/validators/` 则包含更专注的辅助模块，用于运行时限制、MIME 检查、图像元数据加载、浏览器端分辨率优化、分辨率检查、灰度检查以及验证消息。
-
-对于 AI 上传，前端可以在上传到 Azure 之前对超过公开像素限制的图像进行降采样。这可以改善用户体验并减少 provider 负载，但后端验证仍然是安全边界，因为浏览器端检查可以被绕过。
-
-示例：
-
-- 图像 resize
-- 图像 crop
-- 旋转与翻转
-- 压缩
-- 格式转换
-- 元数据移除
-- 水印渲染
-- 调色板提取
-
-这让轻量图像操作保持快速、私密，并且不依赖后端 AI 任务。
+AI feature 共享 polling、Turnstile、usage、session 与 result lifecycle。
+浏览器端 feature 保留自身 canvas 与 processing logic。backend 继续作为
+安全边界与 API contract 边界。
 
 ---
 

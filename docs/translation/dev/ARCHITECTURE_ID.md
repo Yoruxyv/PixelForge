@@ -6,12 +6,7 @@
 
 # Arsitektur PixelForge
 
-PixelForge adalah studio gambar open-source yang menyediakan alat gambar berbasis browser dan pemrosesan gambar berbantuan AI melalui frontend React dan backend FastAPI.
-
-> **Catatan sinkronisasi:** Bagian struktur frontend dalam terjemahan ini masih
-> menggambarkan arsitektur sebelum stabilisasi feature-layer Phase 04. Gunakan
-> [dokumen bahasa Inggris](../../ARCHITECTURE.md) sebagai sumber utama untuk
-> struktur `app`, `features`, `shared`, aturan dependensi, dan routing saat ini.
+PixelForge adalah workstation pemrosesan gambar open-source yang menyediakan alat gambar berbasis browser dan pemrosesan berbantuan AI melalui frontend React dan backend FastAPI.
 
 Sistem ini dirancang dengan pemisahan tanggung jawab yang jelas:
 
@@ -132,21 +127,23 @@ PixelForge/
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── components/
-│   │   ├── content/
-│   │   │   ├── bot/
-│   │   │   ├── feature/
-│   │   │   ├── modals/
-│   │   │   └── navigation/
-│   │   ├── hooks/
-│   │   ├── pages/
-│   │   ├── routes/
-│   │   ├── services/
-│   │   ├── utils/
-│   │   ├── App.jsx
-│   │   ├── config.js
+│   │   ├── app/
+│   │   │   ├── landing/
+│   │   │   ├── layout/
+│   │   │   ├── navigation/
+│   │   │   └── routing/
+│   │   ├── features/
+│   │   ├── shared/
+│   │   │   ├── api/
+│   │   │   ├── components/
+│   │   │   ├── config/
+│   │   │   ├── hooks/
+│   │   │   ├── lib/
+│   │   │   ├── storage/
+│   │   │   └── validation/
+│   │   ├── assets/
 │   │   ├── main.jsx
-│   │   └── routes.js
+│   │   └── index.css
 │   ├── public/
 │   └── vite.config.js
 │
@@ -157,162 +154,95 @@ PixelForge/
 
 ## 4. Arsitektur Frontend
 
-Frontend disusun di sekitar komponen workspace yang reusable dan halaman feature-specific.
-
-### 4.1 Application Shell
-
-`frontend/src/App.jsx` memiliki tanggung jawab utama layout aplikasi:
-
-- Browser routing
-- Navigasi global
-- Global header
-- Footer dan legal modal
-- FAQ chatbot widget
-- Suspense loader untuk halaman lazy-loaded
-
-Routes dikelompokkan berdasarkan kategori di:
+Frontend menggunakan arsitektur feature-layer. Komposisi aplikasi, fitur produk,
+dan kode platform lintas fitur memiliki owner yang terpisah:
 
 ```txt
-frontend/src/routes/
+main.jsx -> app -> features -> shared
 ```
 
-File route root tetap dipertahankan sebagai facade:
+`assets/` dan `index.css` tetap menjadi resource di root source dan tidak
+memiliki behavior produk.
 
-```txt
-frontend/src/routes.js
-```
+### 4.1 `app`: komposisi aplikasi
 
-`App.jsx` hanya mengimpor facade tersebut, sementara facade menggabungkan route array dari kategori seperti AI features, smart edit tools, optimize tools, utilities, landing pages, dan special pages. Setiap route tetap menggunakan lazy import terhadap page component agar initial bundle size lebih kecil.
+`frontend/src/app` memiliki browser shell, bukan behavior tool:
 
----
+- `App.jsx` memasang router, layout persisten, legal modal, dan chatbot;
+- `layout/` memiliki header global, navigasi, dan footer;
+- `landing/` memiliki halaman landing/discovery aplikasi;
+- `navigation/` memiliki label dan link untuk discovery route;
+- `routing/` menyusun lazy route dan fallback aplikasi.
 
-### 4.2 Kategori Halaman
+Kategori navigasi seperti AI, Edit, Optimize, dan Utilities adalah grup route,
+bukan modul fitur.
 
-Halaman frontend dikelompokkan berdasarkan jenis tool:
+### 4.2 `features`: ownership produk
 
-```txt
-pages/
-├── AiFeatures/
-│   ├── UpscaleImage.jsx
-│   ├── RemoveBackground.jsx
-│   ├── ColorRestoration.jsx
-│   └── ObjectRemover.jsx
-├── SmartEdit/
-│   ├── ImageEditor.jsx
-│   ├── ResizeImage.jsx
-│   ├── CropImage.jsx
-│   └── RotateFlip.jsx
-├── Optimize/
-│   ├── CompressImage.jsx
-│   ├── ConvertFormat.jsx
-│   └── MetadataWorkspace.jsx
-├── Utilities/
-│   ├── ColorPalette.jsx
-│   └── WatermarkAdder.jsx
-└── Special/
-    ├── ComingSoon.jsx
-    ├── FaqChatbotWidget.jsx
-    └── NotFound.jsx
-```
+Setiap folder di `frontend/src/features` memiliki satu kapabilitas produk.
+Page, controls, hooks, service adapter, validators, helpers, content, state, dan
+test yang berubah bersama tetap berada di feature yang sama.
 
----
+Feature root saat ini mencakup AI tools (`upscale`, `background-removal`,
+`color-restoration`, dan `object-removal`), browser tools (`image-editor`,
+`resize`, `rotate-flip`, `compress`, `convert`, `metadata-removal`, `palette`,
+`watermark`, dan `crop`), serta `chatbot` dan `feedback`.
 
-### 4.3 Halaman Fitur AI
+File page di root feature merupakan route entry point yang disengaja. Jika satu
+feature perlu digunakan feature lain, feature tersebut mengekspos `index.js`
+publik yang kecil; consumer tidak boleh mengimpor file internal milik feature
+lain.
 
-Halaman fitur AI menggunakan shared workspace component:
+### 4.3 `shared`: kode lintas fitur yang terbukti
 
-```txt
-components/Workspace/AiFeatureWorkspace.jsx
-```
+`frontend/src/shared` hanya berisi responsibility dengan beberapa consumer
+independen:
 
-Setiap halaman AI menghubungkan bagian khusus fitur ke shared workspace:
+- `api/`: HTTP generik, upload Azure, dan transport polling job;
+- `components/ai/`: presentasi workspace upload/process/result AI bersama;
+- `components/upload/` dan `components/workspace/`: UI browser-workspace reusable;
+- `config/`: kontrak validasi, session, dan AI fallback bersama;
+- `hooks/`: state upload, object URL, workspace, dan lifecycle AI bersama;
+- `lib/`: helper file, gambar, dan waktu yang product-neutral;
+- `storage/`: IndexedDB dan persistensi session yang feature-scoped;
+- `styles/`: design token dan baseline accessibility aplikasi;
+- `validation/`: validasi upload browser dan fallback runtime limit backend.
 
-| Page | Pipeline Hook | Controls | Feature Key |
-|---|---|---|---|
-| `UpscaleImage.jsx` | `useUpscalePipeline` | `UpscaleControls` | `upscale` |
-| `RemoveBackground.jsx` | `useRemBGPipeline` | `RemoveBgControls` | `rembg` |
-| `ColorRestoration.jsx` | `useColorRestorePipeline` | `ColorRestoreControls` | `colorrestore` |
-| `ObjectRemover.jsx` | `useObjectRemovePipeline` | `ObjectRemoveControls` + mask canvas | `objectremove` |
+Kode hanya boleh masuk `shared` jika consumer saat ini membuktikan responsibility
+tersebut independen dari satu feature produk. Kontrol atau processing logic yang
+hanya terlihat mirip tetap feature-owned jika behavior dan lifecycle-nya
+berbeda.
 
-Halaman AI sengaja dibuat tipis. Halaman hanya memiliki state UI spesifik seperti progress, scale, brush size, dan mask readiness. Shared pipeline hooks memiliki state upload, polling, cancellation, Turnstile token, result URL, dan usage-limit.
+### 4.4 Aturan dependensi
 
----
+- `shared` tidak boleh mengimpor `app` atau `features`.
+- Feature boleh mengimpor `shared` dan file miliknya sendiri.
+- Import lintas feature harus melalui `index.js` publik feature lain, bukan file
+  internalnya.
+- `app` boleh mengimpor route entry point dan public surface feature.
+- File route menyusun lazy feature entries; file tersebut tidak memiliki logic
+  feature.
+- Recursive barrel export, registry feature terpusat, dan generic factory tidak
+  digunakan tanpa kebutuhan konkret.
 
-### 4.4 Frontend Pipeline Hooks
+### 4.5 Menambahkan feature frontend
 
-Workflow AI diabstraksikan melalui pipeline dan action hooks:
+1. Buat `frontend/src/features/<feature>/` hanya dengan file yang benar-benar
+   dibutuhkan feature tersebut.
+2. Simpan page, controls, hooks, service adapter, content, helpers, dan test di
+   dalam folder feature.
+3. Gunakan kembali upload, validation, workspace, API, atau lifecycle dari
+   `shared` hanya jika kontraknya cocok tanpa branching khusus feature.
+4. Tambahkan lazy route entry di `frontend/src/app/routing/` dan link discovery
+   di `frontend/src/app/navigation/` jika diperlukan.
+5. Tambahkan `index.js` kecil hanya jika feature lain membutuhkan public surface
+   yang disengaja.
+6. Verifikasi route, validasi, processing, result, reset, dan restoration flow,
+   lalu jalankan lint, test, dan build frontend.
 
-```txt
-hooks/
-├── actions/
-│   ├── useActions.js
-│   ├── useUpscaleActions.js
-│   ├── useRemBGActions.js
-│   ├── useColorRestoreActions.js
-│   └── useObjectRemoveActions.js
-├── pipeline/
-│   ├── usePipeline.js
-│   ├── useUpscalePipeline.js
-│   ├── useRemBGPipeline.js
-│   ├── useColorRestorePipeline.js
-│   └── useObjectRemovePipeline.js
-└── auth/
-    └── useUsageLimit.js
-```
-
-Pipeline generik menangani perilaku bersama:
-
-- State file terpilih
-- State preview URL
-- Penanganan Turnstile token
-- Start job
-- Polling
-- State result URL
-- Cancel behavior
-- State tampilan usage limit
-- State alert
-
-Feature-specific action hook menangani API call dan perbedaan payload.
-
----
-
-### 4.5 Client-Side Tools
-
-Tool non-AI sebagian besar berjalan di browser dan menggunakan client hooks/utilities:
-
-```txt
-hooks/client/
-hooks/workspace/
-utils/image/
-utils/file/
-  fileValidation.js
-  validators/
-    errorMessages.js
-    runtimeLimits.js
-    mimeValidation.js
-    imageMetadata.js
-    imageOptimization.js
-    resolutionValidation.js
-    grayscaleValidation.js
-utils/storage/
-```
-
-`utils/file/fileValidation.js` tetap menjadi entrypoint publik untuk validasi file, sedangkan `utils/file/validators/` berisi modul helper yang lebih fokus untuk runtime limits, pemeriksaan MIME, pembacaan metadata gambar, optimisasi resolusi di browser, pemeriksaan resolusi, pemeriksaan grayscale, dan pesan validasi.
-
-Untuk upload AI, frontend dapat melakukan downscale pada gambar yang melewati batas pixel publik sebelum mengunggahnya ke Azure. Ini meningkatkan pengalaman pengguna dan mengurangi beban provider, tetapi validasi backend tetap menjadi batas keamanan utama karena validasi browser dapat dilewati.
-
-Contoh:
-
-- Image resize
-- Image crop
-- Rotate dan flip
-- Compression
-- Format conversion
-- Metadata removal
-- Watermark rendering
-- Color palette extraction
-
-Ini membuat operasi gambar ringan tetap cepat, privat, dan tidak bergantung pada job AI backend.
+Feature berbasis AI berbagi polling, Turnstile, usage, session, dan result
+lifecycle. Browser-side feature tetap memiliki canvas dan processing logic
+sendiri. Backend tetap menjadi batas keamanan dan kontrak API.
 
 ---
 
