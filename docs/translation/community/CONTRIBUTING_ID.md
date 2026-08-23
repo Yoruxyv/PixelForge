@@ -57,19 +57,18 @@ Untuk perubahan besar, buka issue terlebih dahulu agar scope dapat didiskusikan.
 
 ### Backend
 
+Install `uv`, lalu gunakan workflow yang sama di Windows, Linux, dan macOS:
+
 ```bash
 cd backend
-python -m venv venv
-source venv/bin/activate      # macOS/Linux
-# venv\Scripts\activate       # Windows
-pip install -r requirements.txt
-python run.py
+uv sync --locked
+uv run python run.py
 ```
 
 `backend/run.py` menjalankan Uvicorn dengan reload aktif dan `proxy_headers=False`. Perintah langsung yang setara:
 
 ```bash
-uvicorn main:app --reload --no-proxy-headers
+uv run uvicorn main:app --reload --no-proxy-headers
 ```
 
 ### Frontend
@@ -89,7 +88,12 @@ npm --prefix frontend run build
 
 ```bash
 cd backend
-python -m compileall api app core database domain limiter provider repository services utils
+uv lock --check
+uv sync --locked
+uv run ruff check .
+uv run ruff format --check .
+uv run pytest
+uv run mypy
 ```
 
 Lihat [TESTING_ID.md](../dev/TESTING_ID.md) untuk pemeriksaan backend dan workflow AI.

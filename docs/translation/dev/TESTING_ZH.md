@@ -2,7 +2,7 @@
 
 本指南列出后端 API、AI pipeline、使用限制、前端构建以及文档相关工作流的本地验证命令。
 
-`scripts/testing/` 下的 PowerShell 脚本用于 Windows 本地开发。脚本假设后端在本地运行，并在需要时启用本地 Turnstile bypass：
+`scripts/windows/testing/` and `scripts/unix/testing/` 下的 PowerShell 与 Bash wrapper 共享同一套 Python 实现，使 Windows、Linux 与 macOS 的行为保持一致。API 检查假设后端在本地运行，并在需要时启用本地 Turnstile bypass：
 
 ```env
 ENVIRONMENT=development
@@ -15,44 +15,79 @@ Production 中绝不能启用手动 bypass。
 
 ## 启动应用
 
-从仓库根目录运行：
+从仓库根目录运行。
+
+Windows：
 
 ```powershell
-.\scripts\start_app.bat
+.\scripts\windows\start_app.bat
 ```
 
-也可以分别手动启动：
+Linux/macOS：
 
-```powershell
-Push-Location .\backend
-.\venv\Scripts\python.exe run.py
-Pop-Location
+```bash
+./scripts/unix/start_app.sh
 ```
 
-```powershell
-Push-Location .\frontend
+也可以分别手动启动。
+
+Backend：
+
+```bash
+cd backend
+uv sync --locked
+uv run python run.py
+```
+
+Frontend：
+
+```bash
+cd frontend
 npm run dev
-Pop-Location
 ```
 
 ---
 
 ## 后端 API 检查
 
+Windows PowerShell：
+
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_backend_limits_and_usage.ps1
+.\scripts\windows\testing\check_backend_limits_and_usage.ps1
+```
+
+Linux/macOS：
+
+```bash
+./scripts/unix/testing/check_backend_limits_and_usage.sh
 ```
 
 验证 `/api/limits`、`/api/usage`、feature limit 结构以及 runtime limit 一致性。
 
+Windows PowerShell：
+
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_backend_error_responses.ps1
+.\scripts\windows\testing\check_backend_error_responses.ps1
+```
+
+Linux/macOS：
+
+```bash
+./scripts/unix/testing/check_backend_error_responses.sh
 ```
 
 验证结构化后端错误响应。
 
+Windows PowerShell：
+
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_backend_invalid_image_upload.ps1
+.\scripts\windows\testing\check_backend_invalid_image_upload.ps1
+```
+
+Linux/macOS：
+
+```bash
+./scripts/unix/testing/check_backend_invalid_image_upload.sh
 ```
 
 验证无效图像数据会以结构化错误安全失败。
@@ -61,8 +96,16 @@ powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_backend_invalid
 
 ## Usage Limit 检查
 
+Windows PowerShell：
+
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_backend_usage_limit.ps1
+.\scripts\windows\testing\check_backend_usage_limit.ps1
+```
+
+Linux/macOS：
+
+```bash
+./scripts/unix/testing/check_backend_usage_limit.sh
 ```
 
 脚本会临时写入本地 usage table、调用 init endpoint、验证结构化 `RATE_LIMITED` 响应，并恢复当前小时之前的状态。
@@ -80,27 +123,48 @@ powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_backend_usage_l
 
 ## AI 成功流程检查
 
-Upscale:
+Upscale，Windows PowerShell：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_ai_feature_success.ps1 `
-  -Feature upscale
+.\scripts\windows\testing\check_ai_feature_success.ps1 -Feature upscale -Scale 2
 ```
 
-Remove Background：
+Upscale，Linux/macOS：
+
+```bash
+./scripts/unix/testing/check_ai_feature_success.sh --feature upscale --scale 2
+```
+
+Remove Background，Windows PowerShell：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_ai_feature_success.ps1 `
+.\scripts\windows\testing\check_ai_feature_success.ps1 `
   -Feature rembg `
   -FilePath ".\frontend\public\demo\rem_bg_before.jpg"
 ```
 
-Restore Color：
+Remove Background，Linux/macOS：
+
+```bash
+./scripts/unix/testing/check_ai_feature_success.sh \
+  --feature rembg \
+  --file-path "./frontend/public/demo/rem_bg_before.jpg"
+```
+
+Restore Color，Windows PowerShell：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\testing\check_ai_feature_success.ps1 `
+.\scripts\windows\testing\check_ai_feature_success.ps1 `
   -Feature colorrestore `
   -FilePath ".\frontend\public\demo\res_color_before.jpg"
+```
+
+Restore Color，Linux/macOS：
+
+```bash
+./scripts/unix/testing/check_ai_feature_success.sh \
+  --feature colorrestore \
+  --file-path "./frontend/public/demo/res_color_before.jpg"
 ```
 
 Object Remove 需要源图像以及相同尺寸的 mask：
@@ -108,40 +172,25 @@ Object Remove 需要源图像以及相同尺寸的 mask：
 - 黑色像素：保留区域
 - 白色像素：移除区域
 
-需要时生成一个简单中心 mask：
+先使用 Pillow 或其他图像工具创建 mask，然后运行 object removal 流程。
+
+Windows PowerShell：
 
 ```powershell
-@'
-from pathlib import Path
-from PIL import Image, ImageDraw
-
-src = Path("frontend/public/demo/object_remove_before.png")
-mask = Path("frontend/public/demo/object_remove_test_mask.png")
-
-if not src.exists():
-    raise SystemExit(f"Missing source image: {src}")
-
-with Image.open(src) as img:
-    width, height = img.size
-
-out = Image.new("L", (width, height), 0)
-draw = ImageDraw.Draw(out)
-box_width = int(width * 0.28)
-box_height = int(height * 0.28)
-left = (width - box_width) // 2
-top = (height - box_height) // 2
-draw.ellipse(
-    (left, top, left + box_width, top + box_height),
-    fill=255,
-)
-
-mask.parent.mkdir(parents=True, exist_ok=True)
-out.save(mask)
-print(f"Created mask: {mask} ({width}x{height})")
-'@ | .\backend\venv\Scripts\python.exe
+.\scripts\windows\testing\check_ai_feature_success.ps1 `
+  -Feature objectremove `
+  -FilePath ".\frontend\public\demo\object_remove_before.png" `
+  -MaskPath ".\frontend\public\demo\object_remove_test_mask.png"
 ```
 
-然后使用 `check_ai_feature_success.ps1` 支持的 source 和 mask 参数运行 object-removal 成功流程脚本。
+Linux/macOS：
+
+```bash
+./scripts/unix/testing/check_ai_feature_success.sh \
+  --feature objectremove \
+  --file-path "./frontend/public/demo/object_remove_before.png" \
+  --mask-path "./frontend/public/demo/object_remove_test_mask.png"
+```
 
 ---
 
@@ -160,20 +209,31 @@ print(f"Created mask: {mask} ({width}x{height})")
 
 ## 前端检查
 
-```powershell
-npm --prefix frontend run lint
-npm --prefix frontend run build
+以下命令在 Windows、Linux 与 macOS 上相同：
+
+```bash
+cd frontend
+npm ci
+npm run lint
+npm run test -- --run
+npm run build
 ```
 
 ---
 
-## 后端编译检查
+## 后端质量检查
 
-```powershell
-Push-Location .\backend
-python -m compileall api app core database domain limiter provider repository services utils
-Pop-Location
+```bash
+cd backend
+uv lock --check
+uv sync --locked
+uv run ruff check .
+uv run ruff format --check .
+uv run pytest
+uv run mypy
 ```
+
+当前 mypy 配置为 blocking check；更严格的 mypy 策略仍属于后续独立任务。
 
 ---
 
@@ -195,12 +255,10 @@ git diff --check
 git status --short
 ```
 
-搜索文档中的旧命令或个人绝对路径：
+跨平台搜索旧 dependency workflow：
 
-```powershell
-Get-ChildItem -Recurse -File -Include *.md,*.bat,*.ps1 |
-  Where-Object { $_.Name -notlike 'TESTING*.md' -and $_.Name -ne 'PACKAGE_NOTES.md' } |
-  Select-String -Pattern 'python -m venv \.venv|uvicorn main:app --reload$|E:\\GitHub\\pixelforge'
+```bash
+git grep -n -E 'requirements(-dev)?\.txt|python -m pip|pip install -r' -- '*.md' '*.yml' '*.yaml' '*.ps1' '*.sh' '*.bat' || true
 ```
 
-该命令不应返回过时文档匹配。
+该命令不应返回旧 dependency workflow 引用。

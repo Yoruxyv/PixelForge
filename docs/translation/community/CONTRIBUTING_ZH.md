@@ -57,19 +57,18 @@ PixelForge 是一个开源图片工作室，将 AI 云端处理与快速浏览�
 
 ### Backend
 
+安装 `uv` 后，Windows、Linux 和 macOS 使用相同工作流：
+
 ```bash
 cd backend
-python -m venv venv
-source venv/bin/activate      # macOS/Linux
-# venv\Scripts\activate       # Windows
-pip install -r requirements.txt
-python run.py
+uv sync --locked
+uv run python run.py
 ```
 
 `backend/run.py` 会启用 Uvicorn reload，并设置 `proxy_headers=False`。等效直接命令：
 
 ```bash
-uvicorn main:app --reload --no-proxy-headers
+uv run uvicorn main:app --reload --no-proxy-headers
 ```
 
 ### Frontend
@@ -89,7 +88,12 @@ npm --prefix frontend run build
 
 ```bash
 cd backend
-python -m compileall api app core database domain limiter provider repository services utils
+uv lock --check
+uv sync --locked
+uv run ruff check .
+uv run ruff format --check .
+uv run pytest
+uv run mypy
 ```
 
 后端和 AI 工作流检查请参阅 [TESTING_ZH.md](../dev/TESTING_ZH.md)。

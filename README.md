@@ -254,13 +254,13 @@ cd PixelForge
 
 ## 2) Run backend
 
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) first. The
+backend workflow is the same on Windows PowerShell, Linux, and macOS:
+
 ```bash
 cd backend
-python -m venv venv
-source venv/bin/activate      # macOS/Linux
-# venv\Scripts\activate       # Windows
-pip install -r requirements.txt
-python run.py  # starts Uvicorn with proxy header rewriting disabled
+uv sync --locked
+uv run python run.py  # starts Uvicorn with proxy header rewriting disabled
 ```
 
 ## 3) Run frontend
@@ -269,6 +269,18 @@ python run.py  # starts Uvicorn with proxy header rewriting disabled
 cd frontend
 npm install
 npm run dev
+```
+
+## 4) Backend quality checks
+
+```bash
+cd backend
+uv lock --check
+uv sync --locked
+uv run ruff check .
+uv run ruff format --check .
+uv run pytest
+uv run mypy
 ```
 
 ## 🔒 Security Notes
@@ -306,9 +318,12 @@ Backend and AI test scripts:
 - [Testing PixelForge](docs/TESTING.md) ([ID](docs/translation/dev/TESTING_ID.md), [ZH](docs/translation/dev/TESTING_ZH.md))
 
 Developer helper scripts:
-- [Total Line Counter](scripts/dev/get_total_lines.ps1) — interactive Windows PowerShell script for counting project lines by folder, extension, and section.
+- Total Line Counter: [PowerShell](scripts/windows/dev/get_total_lines.ps1) / [Bash](scripts/unix/dev/get_total_lines.sh)
+- Application launcher: [Windows BAT](scripts/windows/start_app.bat) / [Bash](scripts/unix/start_app.sh)
+- Usage reset helper: [Windows BAT](scripts/windows/reset_usage.bat) / [Bash](scripts/unix/reset_usage.sh)
 
-> Local PowerShell scripts and `.bat` helper files are intended for Windows development environments.
+The paired wrappers use shared project logic so Windows, Linux, and macOS follow
+the same backend tooling behavior.
 
 ## 🙏 Acknowledgements
 

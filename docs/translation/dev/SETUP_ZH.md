@@ -513,33 +513,14 @@ VITE_DEBUG_API=false
 
 ### Backend
 
+先安装 [uv](https://docs.astral.sh/uv/getting-started/installation/)。不再需要手动激活虚拟环境。
+
+Windows PowerShell、Linux 和 macOS 使用相同命令：
+
 ```bash
 cd backend
-python -m venv venv
-```
-
-macOS/Linux：
-
-```bash
-source venv/bin/activate
-```
-
-Windows PowerShell：
-
-```powershell
-venv\Scripts\Activate.ps1
-```
-
-安装依赖：
-
-```bash
-pip install -r requirements.txt
-```
-
-运行 backend：
-
-```bash
-python run.py
+uv sync --locked
+uv run python run.py
 ```
 
 `backend/run.py` 会启用 Uvicorn reload，并设置 `proxy_headers=False`，使应用级客户端 IP resolver 获取直接 socket peer。

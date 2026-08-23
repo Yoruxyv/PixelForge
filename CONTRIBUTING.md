@@ -53,19 +53,18 @@ For large changes, open an issue first so the scope can be discussed before impl
 
 ### Backend
 
+Install `uv`, then use the same workflow on Windows, Linux, and macOS:
+
 ```bash
 cd backend
-python -m venv venv
-source venv/bin/activate      # macOS/Linux
-# venv\Scripts\activate       # Windows
-pip install -r requirements.txt
-python run.py
+uv sync --locked
+uv run python run.py
 ```
 
 `backend/run.py` starts Uvicorn with reload enabled and `proxy_headers=False`. The equivalent direct command is:
 
 ```bash
-uvicorn main:app --reload --no-proxy-headers
+uv run uvicorn main:app --reload --no-proxy-headers
 ```
 
 ### Frontend
@@ -88,15 +87,16 @@ npm run test -- --run
 npm run build
 ```
 
-Install backend development dependencies, then run its quality gate:
+Run the locked backend quality gate:
 
 ```bash
 cd backend
-pip install -r requirements-dev.txt
-ruff check --no-fix .
-ruff format --check .
-mypy
-pytest
+uv lock --check
+uv sync --locked
+uv run ruff check .
+uv run ruff format --check .
+uv run pytest
+uv run mypy
 ```
 
 See [docs/TESTING.md](docs/TESTING.md) for backend and AI workflow checks.

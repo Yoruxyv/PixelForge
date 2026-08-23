@@ -513,33 +513,15 @@ VITE_DEBUG_API=false
 
 ### Backend
 
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/). Aktivasi
+virtual environment secara manual tidak diperlukan.
+
+Windows PowerShell, Linux, dan macOS memakai command yang sama:
+
 ```bash
 cd backend
-python -m venv venv
-```
-
-macOS/Linux:
-
-```bash
-source venv/bin/activate
-```
-
-Windows PowerShell:
-
-```powershell
-venv\Scripts\Activate.ps1
-```
-
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Jalankan backend melalui project runner:
-
-```bash
-python run.py
+uv sync --locked
+uv run python run.py
 ```
 
 `backend/run.py` menjalankan Uvicorn dengan reload aktif dan `proxy_headers=False`, sehingga resolver client IP pada aplikasi menerima direct socket peer.
