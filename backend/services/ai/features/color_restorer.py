@@ -28,7 +28,7 @@ class ColorRestorer(ImagePipelineService):
 
     def __init__(
         self,
-        provider: BaseAIProvider = None,
+        provider: BaseAIProvider | None = None,
         max_concurrent_remote_jobs: int = settings.MAX_CONCURRENT_JOBS,
     ):
         """Initialize the color-restoration service.

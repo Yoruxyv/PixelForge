@@ -1,3 +1,5 @@
+"""Operational health endpoint for PixelForge."""
+
 from fastapi import APIRouter
 
 router = APIRouter(tags=["health"])
@@ -10,6 +12,7 @@ router = APIRouter(tags=["health"])
     response_description="API health status.",
 )
 async def root() -> dict:
+    """Return basic API availability metadata."""
     return {
         "status": "online",
         "message": "PixelForge API is running",

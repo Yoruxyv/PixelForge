@@ -6,15 +6,25 @@ IDs, default parameters, and input key names instead of hard-coding provider
 details throughout the pipeline.
 """
 
-from typing import Dict, List
+from typing import Any, ClassVar, NotRequired, TypedDict
 
 from core.config import settings
+
+
+class _ModelConfig(TypedDict):
+    """Typed configuration for one registered AI model."""
+
+    replicate_id: str
+    default_scale: NotRequired[int]
+    face_enhance: NotRequired[bool]
+    input_key: NotRequired[str]
+    mask_key: NotRequired[str]
 
 
 class ModelRegistry:
     """Registry of supported AI models and provider-specific configuration."""
 
-    _MODELS = {
+    _MODELS: ClassVar[dict[str, _ModelConfig]] = {
         "general": {
             "replicate_id": "nightmareai/real-esrgan:42fed1c4974146d4d2414e2be2c5277c7fcf05fcc3a73abf41610695738c1d7b",
             "default_scale": settings.DEFAULT_SCALE,
@@ -55,7 +65,11 @@ class ModelRegistry:
         return cls._MODELS[model_type]["replicate_id"]
 
     @classmethod
-    def get_params(cls, model_type: str, scale: int = settings.DEFAULT_SCALE) -> Dict:
+    def get_params(
+        cls,
+        model_type: str,
+        scale: int = settings.DEFAULT_SCALE,
+    ) -> dict[str, Any]:
         """Build provider input parameters for a registered model.
 
         Args:
@@ -109,7 +123,7 @@ class ModelRegistry:
         return cls._MODELS[model_type].get("input_key", "image")
 
     @classmethod
-    def list_models(cls) -> List[str]:
+    def list_models(cls) -> list[str]:
         """Return the registered internal model keys."""
         return list(cls._MODELS.keys())
 

@@ -180,25 +180,19 @@ def get_real_client_ip(request: Request) -> str:
     # Cloudflare documents CF-Connecting-IP as the single original visitor IP.
     # It is authoritative here only when the socket peer itself is Cloudflare.
     if peer_is_cloudflare:
-        cloudflare_client = _parse_ip(
-            request.headers.get("CF-Connecting-IP")
-        )
+        cloudflare_client = _parse_ip(request.headers.get("CF-Connecting-IP"))
         if cloudflare_client is not None:
             return str(cloudflare_client)
 
-    forwarded_chain = _parse_forwarded_for(
-        request.headers.get("X-Forwarded-For")
-    )
+    forwarded_chain = _parse_forwarded_for(request.headers.get("X-Forwarded-For"))
 
     cloudflare_in_chain = peer_is_cloudflare or any(
-        _is_in_networks(address, cloudflare_networks)
-        for address in forwarded_chain
+        _is_in_networks(address, cloudflare_networks) for address in forwarded_chain
     )
 
     if settings.REQUIRE_CLOUDFLARE_PROXY and not cloudflare_in_chain:
         logger.debug(
-            "Ignoring forwarded chain without a verified Cloudflare hop; "
-            "direct peer=%s",
+            "Ignoring forwarded chain without a verified Cloudflare hop; direct peer=%s",
             peer_ip,
         )
         return str(peer_ip)

@@ -15,9 +15,10 @@ import logging
 import sys
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 from core.config import settings
 from database.db_pool import close_db_pool, get_db_pool, init_db_pool
-from dotenv import load_dotenv
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 
@@ -46,8 +47,7 @@ async def reset_usage_limits() -> None:
 
     if environment not in DEVELOPMENT_ENVIRONMENTS:
         logger.error(
-            "Security Halt: destructive scripts are only permitted in a "
-            "development environment."
+            "Security Halt: destructive scripts are only permitted in a development environment."
         )
         raise SystemExit(1)
 
@@ -60,9 +60,7 @@ async def reset_usage_limits() -> None:
             raise SystemExit(1)
 
         async with pool.acquire() as conn:
-            await conn.execute(
-                f"TRUNCATE TABLE {TABLE_TO_TRUNCATE} RESTART IDENTITY CASCADE;"
-            )
+            await conn.execute(f"TRUNCATE TABLE {TABLE_TO_TRUNCATE} RESTART IDENTITY CASCADE;")
 
         logger.info("Developer usage limits successfully reset.")
 

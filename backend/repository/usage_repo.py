@@ -106,9 +106,9 @@ class UsageRepository:
             int:
                 Number of deleted rows parsed from asyncpg's command status.
         """
-        sql = f"""
+        sql = """
         DELETE FROM ip_usage_hourly
-        WHERE bucket_start < NOW() - INTERVAL '{retention_hours} hours';
+        WHERE bucket_start < NOW() - ($1 * INTERVAL '1 hour');
         """
-        result = await conn.execute(sql)
+        result = await conn.execute(sql, retention_hours)
         return int(result.split()[-1])

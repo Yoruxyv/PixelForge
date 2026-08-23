@@ -12,12 +12,13 @@ Important boundary:
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import Any, cast
 
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from slowapi.errors import RateLimitExceeded
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.types import ExceptionHandler
 
 from utils.error import codes
 from utils.error.error import (
@@ -180,7 +181,7 @@ async def http_exception_handler(
     )
 
 
-async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+async def rate_limit_handler(request: Request, _exc: RateLimitExceeded):
     """Handle SlowAPI rate-limit errors with PixelForge's error shape."""
     logger.info("Rate limit exceeded path=%s", request.url.path)
 
@@ -193,7 +194,11 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
 
 async def unhandled_exception_handler(request: Request, exc: Exception):
     """Handle unexpected request-time exceptions safely."""
-    logger.exception("Unhandled exception path=%s", request.url.path)
+    logger.error(
+        "Unhandled exception path=%s",
+        request.url.path,
+        exc_info=(type(exc), exc, exc.__traceback__),
+    )
 
     return error_response(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -209,13 +214,25 @@ def register_exception_handlers(app: FastAPI) -> None:
         app:
             FastAPI application instance.
     """
-    app.add_exception_handler(RateLimitExceeded, rate_limit_handler)
-    app.add_exception_handler(RequestValidationError, request_validation_handler)
-    app.add_exception_handler(MissingEnvironmentVariableError, missing_environment_handler)
-    app.add_exception_handler(ReplicateRateLimitError, provider_rate_limit_handler)
-    app.add_exception_handler(ReplicateTimeoutError, provider_timeout_handler)
-    app.add_exception_handler(ReplicateUnknownError, provider_unknown_handler)
-    app.add_exception_handler(AppError, app_error_handler)
-    app.add_exception_handler(HTTPException, http_exception_handler)
-    app.add_exception_handler(StarletteHTTPException, http_exception_handler)
-    app.add_exception_handler(Exception, unhandled_exception_handler)
+    app.add_exception_handler(RateLimitExceeded, cast(ExceptionHandler, rate_limit_handler))
+    app.add_exception_handler(
+        RequestValidationError, cast(ExceptionHandler, request_validation_handler)
+    )
+    app.add_exception_handler(
+        MissingEnvironmentVariableError, cast(ExceptionHandler, missing_environment_handler)
+    )
+    app.add_exception_handler(
+        ReplicateRateLimitError, cast(ExceptionHandler, provider_rate_limit_handler)
+    )
+    app.add_exception_handler(
+        ReplicateTimeoutError, cast(ExceptionHandler, provider_timeout_handler)
+    )
+    app.add_exception_handler(
+        ReplicateUnknownError, cast(ExceptionHandler, provider_unknown_handler)
+    )
+    app.add_exception_handler(AppError, cast(ExceptionHandler, app_error_handler))
+    app.add_exception_handler(HTTPException, cast(ExceptionHandler, http_exception_handler))
+    app.add_exception_handler(
+        StarletteHTTPException, cast(ExceptionHandler, http_exception_handler)
+    )
+    app.add_exception_handler(Exception, cast(ExceptionHandler, unhandled_exception_handler))

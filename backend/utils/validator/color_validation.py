@@ -36,14 +36,8 @@ def calculate_color_ratio(
         return 0.0
 
     rgb_int = rgb.astype(np.int16)
-    diff = (
-        np.max(rgb_int, axis=2)
-        - np.min(rgb_int, axis=2)
-    )
-    colored_mask = (
-        (diff > settings.COLOR_DIFF_THRESHOLD)
-        & valid_mask
-    )
+    diff = np.max(rgb_int, axis=2) - np.min(rgb_int, axis=2)
+    colored_mask = (diff > settings.COLOR_DIFF_THRESHOLD) & valid_mask
 
     colored_pixel_count = np.sum(colored_mask)
     return colored_pixel_count / valid_pixel_count
@@ -70,8 +64,8 @@ def validate_grayscale_image(file_bytes: bytes) -> bool:
     """
     try:
         with Image.open(io.BytesIO(file_bytes)) as img:
-            img = img.convert("RGBA")
-            data = np.array(img)
+            rgba_img = img.convert("RGBA")
+            data = np.array(rgba_img)
 
         alpha = data[:, :, 3]
         valid_mask = alpha >= settings.ALPHA_THRESHOLD
@@ -85,8 +79,5 @@ def validate_grayscale_image(file_bytes: bytes) -> bool:
         return bool(color_ratio < settings.COLOR_PIXEL_RATIO_THRESHOLD)
 
     except Exception as exc:
-        print(
-            "[Validation Error] "
-            f"Could not process image for grayscale check: {exc}"
-        )
+        print(f"[Validation Error] Could not process image for grayscale check: {exc}")
         return False

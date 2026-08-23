@@ -18,7 +18,6 @@ import io
 import logging
 import os
 import uuid
-from typing import Tuple
 
 import filetype
 from fastapi import HTTPException, UploadFile, status
@@ -114,7 +113,7 @@ async def _read_file_with_limit(file: UploadFile) -> bytes:
     return bytes(file_bytes)
 
 
-def _process_image_cpu(file_bytes: bytes) -> Tuple[str, str, bytes]:
+def _process_image_cpu(file_bytes: bytes) -> tuple[str, str, bytes]:
     """Validate, normalize, and encode image bytes on a worker thread.
 
     Args:
@@ -153,7 +152,7 @@ def _process_image_cpu(file_bytes: bytes) -> Tuple[str, str, bytes]:
             ),
         ) from e
     except Exception as e:
-        logger.error("Image processing failed: %s", e, exc_info=True)
+        logger.exception("Image processing failed: %s", e)
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=build_error_payload(
@@ -163,7 +162,7 @@ def _process_image_cpu(file_bytes: bytes) -> Tuple[str, str, bytes]:
         ) from e
 
 
-async def process_and_sanitize_image(file: UploadFile) -> Tuple[str, str, io.BytesIO]:
+async def process_and_sanitize_image(file: UploadFile) -> tuple[str, str, io.BytesIO]:
     """Sanitize an uploaded image and return a safe in-memory stream.
 
     Args:

@@ -26,6 +26,7 @@ import re
 
 from fastapi import APIRouter, HTTPException, Request, status
 
+from api.docs import AI_RESULT_RESPONSES, COMMON_ERROR_RESPONSES
 from api.schemas.ai_tools import InitRequest
 from core.config import settings
 from domain.ai_features import FeatureType
@@ -36,7 +37,6 @@ from services.azure.storage_utils import get_result_filename
 from services.job.job_initializer import JobInitializer
 from utils.error import codes
 from utils.error.responses import build_error_payload
-from api.docs import AI_RESULT_RESPONSES, COMMON_ERROR_RESPONSES
 
 router = APIRouter(tags=["ai_jobs"])
 
@@ -70,7 +70,7 @@ def get_feature_limit(feature: FeatureType) -> int:
     response_description="Runtime limits grouped by upload, result, upscale, and feature usage.",
 )
 @limiter.limit(settings.POLL_RATE_LIMIT)
-async def get_runtime_limits(request: Request):
+async def get_runtime_limits(request: Request):  # noqa: ARG001
     """Return public upload, resolution, and generated-result limits.
 
     The frontend uses this endpoint to avoid hardcoding upload size and
@@ -172,7 +172,7 @@ async def init_feature(
     responses=AI_RESULT_RESPONSES,
 )
 @limiter.limit(settings.POLL_RATE_LIMIT)
-async def get_result(request: Request, job_id: str):
+async def get_result(request: Request, job_id: str):  # noqa: ARG001
     """Return the processing status for a specific AI job.
 
     The status is inferred from Azure Blob Storage:

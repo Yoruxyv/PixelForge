@@ -74,10 +74,7 @@ class JobInitializer:
                 Job ID, safe upload filename, and upload SAS URL. Object
                 removal jobs also include mask upload metadata.
         """
-        if not (
-            cf_turnstile_response == "manual_test_bypass"
-            and cls.is_manual_bypass_allowed()
-        ):
+        if not (cf_turnstile_response == "manual_test_bypass" and cls.is_manual_bypass_allowed()):
             await verify_turnstile(cf_turnstile_response)
 
         is_allowed = await UsageService.check_daily_limit(

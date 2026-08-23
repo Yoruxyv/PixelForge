@@ -26,7 +26,7 @@ class ObjectRemover(ImagePipelineService):
 
     def __init__(
         self,
-        provider: BaseAIProvider = None,
+        provider: BaseAIProvider | None = None,
         max_concurrent_remote_jobs: int = settings.MAX_CONCURRENT_JOBS,
     ):
         """Initialize the object-removal service.
@@ -95,13 +95,17 @@ class ObjectRemover(ImagePipelineService):
         with Image.open(io.BytesIO(mask_bytes)) as mask_img:
             mask_img.load()
 
-            if mask_img.size != source_size:
-                mask_img = mask_img.resize(source_size, Image.Resampling.NEAREST)
+            prepared_mask: Image.Image = mask_img
+            if prepared_mask.size != source_size:
+                prepared_mask = prepared_mask.resize(
+                    source_size,
+                    Image.Resampling.NEAREST,
+                )
 
-            mask_img = mask_img.convert("RGBA")
+            prepared_mask = prepared_mask.convert("RGBA")
 
             mask_stream = io.BytesIO()
-            mask_img.save(
+            prepared_mask.save(
                 mask_stream,
                 format="PNG",
                 optimize=True,

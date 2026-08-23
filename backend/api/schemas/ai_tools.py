@@ -19,6 +19,7 @@ from pydantic import BaseModel, Field
 
 INITIALIZED_JOB_ID_DESCRIPTION = "Initialized job identifier."
 
+
 class InitRequest(BaseModel):
     """Payload used to initialize an AI processing job.
 

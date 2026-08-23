@@ -7,7 +7,6 @@ one place reduces typo risk when adding or refactoring AI tools.
 
 from typing import Literal
 
-
 FeatureType = Literal[
     "upscale",
     "rembg",

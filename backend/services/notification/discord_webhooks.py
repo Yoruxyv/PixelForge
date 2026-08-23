@@ -5,7 +5,7 @@ webhook endpoint. It is currently used for public feedback submissions.
 """
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import httpx
 
@@ -56,7 +56,7 @@ def build_feedback_payload(name: str, email: str, message: str) -> dict:
                 "footer": {
                     "text": "PixelForge System Automated Alert",
                 },
-                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "timestamp": datetime.now(UTC).isoformat(),
             }
         ],
     }

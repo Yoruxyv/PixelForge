@@ -63,9 +63,7 @@ class ReplicateError(PublicAppError):
 
     default_code = codes.PROVIDER_FAILED
     default_status_code = status.HTTP_502_BAD_GATEWAY
-    default_message = (
-        "The AI provider could not process the image. Please try again later."
-    )
+    default_message = "The AI provider could not process the image. Please try again later."
 
 
 class ReplicateRateLimitError(ReplicateError):
@@ -89,6 +87,4 @@ class ReplicateUnknownError(ReplicateError):
 
     default_code = codes.PROVIDER_FAILED
     default_status_code = status.HTTP_502_BAD_GATEWAY
-    default_message = (
-        "The AI provider could not process the image. Please try again later."
-    )
+    default_message = "The AI provider could not process the image. Please try again later."

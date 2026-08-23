@@ -7,7 +7,6 @@ readable during local development and production debugging.
 
 import logging
 
-
 LOGGER_DISPLAY_NAMES = {
     "app.factory": "app",
     "app.request": "request",
@@ -94,9 +93,6 @@ def build_log_formatter() -> PixelForgeFormatter:
             Formatter with timestamp, severity, component, and message fields.
     """
     return PixelForgeFormatter(
-        fmt=(
-            "%(asctime)s | %(levelname)-8s | "
-            "%(component)-22s | %(message)s"
-        ),
+        fmt=("%(asctime)s | %(levelname)-8s | %(component)-22s | %(message)s"),
         datefmt="%Y-%m-%d %H:%M:%S",
     )

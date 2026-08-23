@@ -26,7 +26,6 @@ class FeedbackRequest(BaseModel):
         ...,
         min_length=1,
         max_length=100,
-        strip_whitespace=True,
         description="Name of the user submitting feedback.",
     )
     email: EmailStr = Field(
@@ -38,7 +37,6 @@ class FeedbackRequest(BaseModel):
         ...,
         min_length=10,
         max_length=1000,
-        strip_whitespace=True,
         description="Feedback message content.",
     )
     cf_turnstile_response: str = Field(

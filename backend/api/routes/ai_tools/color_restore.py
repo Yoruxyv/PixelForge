@@ -14,8 +14,8 @@ Expected workflow:
 
 from fastapi import APIRouter, BackgroundTasks, Request, status
 
-from api.schemas.ai_tools import StartColorRestoreRequest
 from api.docs import AI_START_RESPONSES
+from api.schemas.ai_tools import StartColorRestoreRequest
 from core.config import settings
 from limiter.rate_limiter import limiter
 from services.job.job_dispatcher import reserve_and_queue_job
