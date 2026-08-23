@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import logoIcon from '@/assets/PixelForge.png';
@@ -12,11 +12,10 @@ const Icon = ({ d, className = 'h-5 w-5' }) => (
 
 Icon.propTypes = { d: PropTypes.string.isRequired, className: PropTypes.string };
 
-const ToolLink = ({ item, onClick, tabIndex }) => (
+const ToolLink = ({ item, onClick }) => (
   <NavLink
     to={item.to}
     onClick={onClick}
-    tabIndex={tabIndex}
     className={({ isActive }) =>
       `group flex items-center gap-3 rounded-pf-control px-3 py-2.5 text-sm transition-colors ${
         isActive
@@ -39,108 +38,27 @@ ToolLink.propTypes = {
     isAi: PropTypes.bool,
   }).isRequired,
   onClick: PropTypes.func,
-  tabIndex: PropTypes.number,
 };
 
-const CLOSE_GRACE_MS = 100;
-
-const NavDropdown = ({
-  category,
-  menuKey,
-  isOpen,
-  alignRight = false,
-  onOpen,
-  onScheduleClose,
-  onToggle,
-  onClose,
-  triggerRef,
-}) => {
-  const menuId = `desktop-menu-${menuKey}`;
-  const triggerId = `${menuId}-trigger`;
-
-  const handlePointerEnter = (event) => {
-    if (event.pointerType === 'mouse') {
-      onOpen(menuKey);
-    }
-  };
-
-  const handlePointerLeave = (event) => {
-    if (event.pointerType === 'mouse') {
-      onScheduleClose();
-    }
-  };
-
-  return (
-    <div
-      className="relative"
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
-    >
-      <button
-        ref={triggerRef}
-        id={triggerId}
-        type="button"
-        aria-expanded={isOpen}
-        aria-haspopup="true"
-        aria-controls={menuId}
-        onClick={() => onToggle(menuKey)}
-        className="flex items-center gap-1.5 rounded-pf-control px-2 py-2 text-sm font-semibold text-pf-editorial-muted transition-colors hover:bg-pf-editorial-raised hover:text-pf-editorial-ink"
-      >
-        {category.title}
-        <svg
-          className={`h-3.5 w-3.5 transition-transform duration-150 motion-reduce:transition-none ${
-            isOpen ? 'rotate-180' : ''
-          }`}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      </button>
-
-      <div
-        id={menuId}
-        aria-labelledby={triggerId}
-        aria-hidden={!isOpen}
-        onPointerEnter={handlePointerEnter}
-        className={`absolute top-full z-20 w-68 pt-2 transition-[opacity,transform,visibility] duration-150 ease-out motion-reduce:transform-none motion-reduce:transition-none ${
-          isOpen
-            ? 'visible translate-y-0 opacity-100'
-            : 'pointer-events-none invisible -translate-y-[3px] opacity-0'
-        } ${alignRight ? 'right-0' : 'left-0'}`}
-      >
-        <div className="rounded-pf-card border border-pf-editorial-line bg-pf-editorial-surface p-2 shadow-pf-float">
-          {category.items.map((item) => (
-            <ToolLink
-              key={item.id}
-              item={item}
-              onClick={onClose}
-              tabIndex={isOpen ? undefined : -1}
-            />
-          ))}
-        </div>
+const NavDropdown = ({ category, alignRight = false }) => (
+  <div className="group relative">
+    <button className="flex items-center gap-1.5 rounded-pf-control px-2 py-2 text-sm font-semibold text-pf-editorial-muted transition-colors hover:bg-pf-editorial-raised hover:text-pf-editorial-ink">
+      {category.title}
+      <svg className="h-3.5 w-3.5 transition-transform group-hover:rotate-180 group-focus-within:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+    <div className={`invisible absolute top-full z-20 w-68 pt-2 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 ${alignRight ? 'right-0' : 'left-0'}`}>
+      <div className="rounded-pf-card border border-pf-editorial-line bg-pf-editorial-surface p-2 shadow-pf-float">
+        {category.items.map((item) => <ToolLink key={item.id} item={item} />)}
       </div>
     </div>
-  );
-};
+  </div>
+);
 
 NavDropdown.propTypes = {
   category: PropTypes.object.isRequired,
-  menuKey: PropTypes.string.isRequired,
-  isOpen: PropTypes.bool.isRequired,
   alignRight: PropTypes.bool,
-  onOpen: PropTypes.func.isRequired,
-  onScheduleClose: PropTypes.func.isRequired,
-  onToggle: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
-  triggerRef: PropTypes.func.isRequired,
 };
 
 const themeOptions = [
@@ -214,83 +132,7 @@ ThemeControl.propTypes = {
 /** Persistent product navigation for PixelForge tools. */
 export default function Navbar({ theme, themePreference, onThemeChange }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeMenu, setActiveMenu] = useState(null);
-  const closeTimerRef = useRef(null);
-  const desktopMenusRef = useRef(null);
-  const triggerRefs = useRef({});
-  const categories = Object.values(NavLinks).map((category) => ({
-    ...category,
-    menuKey: category.title.toLowerCase(),
-  }));
-
-  const clearCloseTimer = useCallback(() => {
-    if (closeTimerRef.current !== null) {
-      window.clearTimeout(closeTimerRef.current);
-      closeTimerRef.current = null;
-    }
-  }, []);
-
-  const openMenu = useCallback(
-    (menuKey) => {
-      clearCloseTimer();
-      setActiveMenu(menuKey);
-    },
-    [clearCloseTimer],
-  );
-
-  const closeMenu = useCallback(() => {
-    clearCloseTimer();
-    setActiveMenu(null);
-  }, [clearCloseTimer]);
-
-  const toggleMenu = useCallback(
-    (menuKey) => {
-      clearCloseTimer();
-      setActiveMenu((current) => (current === menuKey ? null : menuKey));
-    },
-    [clearCloseTimer],
-  );
-
-  const scheduleCloseMenu = useCallback(() => {
-    clearCloseTimer();
-    closeTimerRef.current = window.setTimeout(() => {
-      closeTimerRef.current = null;
-      setActiveMenu(null);
-    }, CLOSE_GRACE_MS);
-  }, [clearCloseTimer]);
-
-  useEffect(() => () => clearCloseTimer(), [clearCloseTimer]);
-
-  useEffect(() => {
-    if (activeMenu === null) {
-      return undefined;
-    }
-
-    const handleOutsidePointerDown = (event) => {
-      if (!desktopMenusRef.current?.contains(event.target)) {
-        closeMenu();
-      }
-    };
-
-    const handleEscape = (event) => {
-      if (event.key !== 'Escape') {
-        return;
-      }
-
-      event.preventDefault();
-      const trigger = triggerRefs.current[activeMenu];
-      closeMenu();
-      trigger?.focus();
-    };
-
-    document.addEventListener('pointerdown', handleOutsidePointerDown);
-    document.addEventListener('keydown', handleEscape);
-
-    return () => {
-      document.removeEventListener('pointerdown', handleOutsidePointerDown);
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [activeMenu, closeMenu]);
+  const categories = Object.values(NavLinks);
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-pf-editorial-line bg-pf-editorial-base/95 backdrop-blur-lg" aria-label="Primary navigation">
@@ -301,24 +143,13 @@ export default function Navbar({ theme, themePreference, onThemeChange }) {
         </Link>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <div ref={desktopMenusRef} className="flex items-center gap-2">
-            {categories.map((category, index) => (
-              <NavDropdown
-                key={category.menuKey}
-                category={category}
-                menuKey={category.menuKey}
-                isOpen={activeMenu === category.menuKey}
-                alignRight={index === categories.length - 1}
-                onOpen={openMenu}
-                onScheduleClose={scheduleCloseMenu}
-                onToggle={toggleMenu}
-                onClose={closeMenu}
-                triggerRef={(node) => {
-                  triggerRefs.current[category.menuKey] = node;
-                }}
-              />
-            ))}
-          </div>
+          {categories.map((category, index) => (
+            <NavDropdown
+              key={category.title}
+              category={category}
+              alignRight={index === categories.length - 1}
+            />
+          ))}
           <ThemeControl theme={theme} value={themePreference} onChange={onThemeChange} className="ml-2 border-l border-pf-editorial-line pl-4" />
           <a href="https://github.com/Yoruxyv/PixelForge" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm font-semibold text-pf-editorial-muted transition-colors hover:text-pf-editorial-ink">
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
