@@ -227,7 +227,33 @@ git clone https://github.com/Yoruxyv/PixelForge.git
 cd PixelForge
 ```
 
-### 2) Run backend
+### 2) Start without Docker
+
+Docker is optional. The launchers validate the local frontend dependencies,
+install them from `package-lock.json` when missing or incomplete, synchronize
+the backend environment from `uv.lock`, then start both development servers.
+Node.js/npm and [uv](https://docs.astral.sh/uv/getting-started/installation/)
+must already be installed.
+
+Windows:
+
+```bat
+scripts\windows\start_app.bat
+```
+
+Linux and macOS:
+
+```bash
+./scripts/unix/start_app.sh
+```
+
+On later runs, existing dependencies are reused so the application starts
+immediately. The frontend opens at `http://localhost:5173`; the backend runs at
+`http://127.0.0.1:8000`.
+
+### 3) Start manually
+
+Backend:
 
 Install [uv](https://docs.astral.sh/uv/getting-started/installation/) first. The
 backend workflow is the same on Windows PowerShell, Linux, and macOS:
@@ -238,7 +264,7 @@ uv sync --locked
 uv run python run.py  # starts Uvicorn with proxy header rewriting disabled
 ```
 
-### 3) Run frontend
+Frontend:
 
 ```bash
 cd frontend
@@ -246,7 +272,28 @@ npm install
 npm run dev
 ```
 
-### 4) Frontend quality checks
+### 4) Run the complete stack with Docker Compose
+
+For a production-like local frontend, backend, and PostgreSQL stack, install
+Docker Desktop or Docker Engine with Compose, then run:
+
+```bash
+cp .env.docker.example .env
+docker compose up -d --build
+```
+
+Windows PowerShell: `Copy-Item .env.docker.example .env`.
+
+Open `http://localhost:8080`, inspect the stack with `docker compose ps` or
+`docker compose logs`, and stop it with `docker compose down`. PostgreSQL data
+persists in a named volume. External AI workflows still require valid Azure,
+Replicate, and Turnstile credentials in the root `.env` file.
+
+See the [Docker Compose setup guide](SETUP.md#docker-compose-production-like-local-stack)
+for configuration, networking, persistence, and troubleshooting details. Native
+development remains available and does not require Docker.
+
+### 5) Frontend quality checks
 
 The same blocking frontend checks run in GitHub Actions. Install Playwright's
 Chromium browser once before the first end-to-end run:
@@ -265,7 +312,7 @@ Use `npm run test:e2e:ui` when debugging Playwright scenarios interactively.
 Failed CI runs upload the Playwright report, screenshots, and traces when they
 are available.
 
-### 5) Backend quality checks
+### 6) Backend quality checks
 
 ```bash
 cd backend
