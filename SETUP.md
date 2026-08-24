@@ -27,6 +27,7 @@ PixelForge uses:
 - [6. Backend Environment Variables](#6-backend-environment-variables)
 - [7. Frontend Environment Variables](#7-frontend-environment-variables)
 - [8. Run PixelForge Locally](#8-run-pixelforge-locally)
+  - [Docker Compose local stack](#docker-compose-production-like-local-stack)
 - [9. Final Setup Checklist](#9-final-setup-checklist)
 - [10. Common Issues](#10-common-issues)
 - [11. Official References](#11-official-references)
@@ -547,6 +548,103 @@ Default frontend URL:
 ```txt
 http://localhost:5173
 ```
+
+---
+
+### Docker Compose (production-like local stack)
+
+Docker Compose provides an additive local runtime for the production frontend
+build, FastAPI, and PostgreSQL. It does not replace the native development
+commands above and is not a deployment configuration.
+
+Prerequisites:
+
+- Docker Desktop, or Docker Engine with Compose v2
+- enough local resources to build the Node and Python dependency layers
+
+Create the Docker-specific root environment file:
+
+```bash
+cp .env.docker.example .env
+```
+
+Windows PowerShell:
+
+```powershell
+Copy-Item .env.docker.example .env
+```
+
+The committed example contains local-only PostgreSQL defaults and blank external
+service credentials. Replace the blank Azure, Replicate, Turnstile, and Discord
+values only when those workflows are needed. `VITE_TURNSTILE_SITE_KEY` is public
+and is embedded when the frontend image builds; rebuild the image after changing
+it. `ALLOW_TURNSTILE_TEST_BYPASS` remains disabled in the container stack.
+
+The local topology is:
+
+```txt
+browser :8080
+  -> non-root Nginx frontend
+      -> /api/* proxy
+          -> FastAPI backend:8000
+              -> PostgreSQL db:5432
+```
+
+Only the frontend port is published. Nginx proxies `/api/` to the private backend
+service, so browser API requests remain same-origin. PostgreSQL is available only
+to other Compose services. Proxy-header trust stays disabled; this local stack is
+intended for a single developer, not as a public reverse-proxy deployment.
+
+Build and start the services:
+
+```bash
+docker compose up -d --build
+docker compose ps
+```
+
+Local URLs:
+
+- Frontend: `http://localhost:8080`
+- Backend health through the proxy: `http://localhost:8080/api/`
+- API documentation through the proxy: `http://localhost:8080/api/docs`
+
+The frontend server falls back to `index.html` for application routes such as
+`/upscale`, while real assets such as `/robots.txt`, `/site.webmanifest`,
+`/fonts/*`, and `/assets/*` are served directly. The frontend is built with
+`VITE_API_BASE_URL=/api`; no container hostname is exposed to browser code.
+
+Inspect status and logs:
+
+```bash
+docker compose ps
+docker compose logs --no-color --tail=200
+docker compose logs -f backend
+```
+
+The backend runs `main:app` with Uvicorn on `0.0.0.0:8000`, without reload or
+trusted proxy headers. Its lifespan waits for PostgreSQL, creates the existing
+usage table and index when needed, starts maintenance, and closes the pool on
+shutdown. With Azure credentials blank, basic health and browser-only tools work,
+but AI operations remain unavailable and the maintenance log can report that
+Azure storage is not configured.
+
+Stop the stack without deleting database data:
+
+```bash
+docker compose down
+```
+
+The `pixelforge_postgres_data` named volume survives ordinary restarts and
+`docker compose down`. Use `docker compose down -v` only when you intentionally
+want to permanently discard the local container database.
+
+The default database password is explicitly for local containers. Override the
+PostgreSQL values in the root `.env` when needed, using URL-safe credentials so
+the derived `DATABASE_URL` remains valid. If the frontend port changes, update
+`PIXELFORGE_ALLOWED_ORIGINS` and the external-service browser allowlists too.
+
+For Docker-based AI uploads, Azure Blob CORS and Turnstile hostname settings must
+also allow `http://localhost:8080` (or the selected frontend origin).
 
 ---
 
