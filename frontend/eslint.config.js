@@ -60,4 +60,10 @@ export default defineConfig([
       'jsx-a11y/aria-role': 'warn',
     },
   },
+  {
+    files: ['scripts/**/*.js'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
 ])
