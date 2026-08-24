@@ -10,7 +10,7 @@ export const legalModalData = {
     title: "Privacy Policy",
     content: (
       <>
-        <p className="font-semibold text-slate-800 text-base">We respect your privacy.</p>
+        <p className="text-base font-bold text-pf-editorial-ink">We respect your privacy.</p>
         <p>At Pixel Forge, we believe that your data is yours. Because this application processes images using cloud GPUs, here is exactly what happens to your files:</p>
         <ul className="list-disc pl-5 space-y-2 mt-2">
           <li><strong>Temporary Processing Storage:</strong> Uploaded images are stored in Azure Blob Storage only to run the upscaling workflow and deliver results.</li>
@@ -25,7 +25,7 @@ export const legalModalData = {
     title: "Terms of Service",
     content: (
       <>
-        <p className="font-semibold text-slate-800 text-base">Usage Guidelines</p>
+        <p className="text-base font-bold text-pf-editorial-ink">Usage Guidelines</p>
         <p>By using Pixel Forge, you agree to the following terms:</p>
         <ul className="list-disc pl-5 space-y-2 mt-2">
           <li><strong>Acceptable Use:</strong> You may not upload illegal, explicit, or malicious content. The platform employs automated basic security checks to reject non-image file types.</li>
@@ -40,7 +40,7 @@ export const legalModalData = {
     title: "Security Measures",
     content: (
       <>
-        <p className="font-semibold text-slate-800 text-base">Keeping Your Data Safe</p>
+        <p className="text-base font-bold text-pf-editorial-ink">Keeping Your Data Safe</p>
         <p>We take security seriously. Here are the measures we have in place to protect your data:</p>
         <ul className="list-disc pl-5 space-y-2 mt-2">
           <li><strong>Secure Uploads:</strong> All images are uploaded over HTTPS to ensure encryption in transit.</li>
