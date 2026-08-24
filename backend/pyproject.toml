@@ -74,6 +74,7 @@ convention = "google"
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+exclude = ["scripts/reset_usage.py"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
