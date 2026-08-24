@@ -7,7 +7,7 @@
 
 import { useEffect, useMemo } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { FILE_LIMITS } from '@/shared/config/imageValidation';
+import { BROWSER_UPLOAD_HELPER_TEXT } from '@/shared/config/imageValidation';
 
 import UploadCard from '@/shared/components/upload/UploadCard';
 import ToolWorkspaceShell from '@/shared/components/workspace/ToolWorkspaceShell';
@@ -97,7 +97,7 @@ export default function WatermarkAdder() {
                 inputId="wm-file-input"
                 inputRef={fileInputRef}
                 onChange={onFileChange}
-                helperText={`Any format up to ${FILE_LIMITS.MAX_FILE_SIZE_MB}MB`}
+                helperText={BROWSER_UPLOAD_HELPER_TEXT}
                 hasActiveFile={false}
               />
             ) : (

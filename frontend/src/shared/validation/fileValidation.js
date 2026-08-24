@@ -20,9 +20,11 @@
 
 import { ERROR_MESSAGES, invalidResult } from './validators/errorMessages';
 import {
+  getFallbackLimits,
   getRuntimeLimits,
   resolveUploadSizeLimit,
 } from './validators/runtimeLimits';
+import { UPLOAD_POLICIES } from '@/shared/config/imageValidation';
 import {
   getAllowedMimeTypes,
   validateMimeType,
@@ -31,6 +33,7 @@ import { loadImageMetadata } from './validators/imageMetadata';
 import { validateResolution } from './validators/resolutionValidation';
 import { validateGrayscaleImage } from './validators/grayscaleValidation';
 import {
+  optimizeImageForUpload,
   optimizeImageResolution,
   shouldOptimizeResolution,
 } from './validators/imageOptimization';
@@ -71,6 +74,148 @@ const validateFileSize = (file, limits, customMaxSizeMB = null) => {
   return null;
 };
 
+/** Apply the selected policy when decoded resolution exceeds the active limit. */
+const handleResolutionPolicy = async ({
+  file,
+  image,
+  metadata,
+  limits,
+  uploadPolicy,
+  requireGrayscale,
+}) => {
+  const resolutionLimit =
+    uploadPolicy.resolutionMode === 'warn'
+      ? uploadPolicy.warningPixels
+      : limits.upload.max_pixels;
+
+  if (!shouldOptimizeResolution(metadata, resolutionLimit)) {
+    return { file, image, metadata };
+  }
+
+  if (uploadPolicy.resolutionMode === 'warn') {
+    return {
+      result: validResult(file, metadata, {
+        requiresLargeImageConfirmation: true,
+        warningPixelThreshold: uploadPolicy.warningPixels,
+      }),
+    };
+  }
+
+  if (uploadPolicy.resolutionMode === 'confirm') {
+    if (requireGrayscale) {
+      const grayscaleError = validateGrayscaleImage(image);
+      if (grayscaleError) return { result: grayscaleError };
+    }
+
+    const { limitMB } = resolveUploadSizeLimit(limits);
+
+    return {
+      result: validResult(file, metadata, {
+        requiresResizeConfirmation: true,
+        fileSizeLimitMB: limitMB,
+        resolutionLimit: {
+          maxPixels: limits.upload.max_pixels,
+          maxMegapixels: limits.upload.max_megapixels,
+        },
+      }),
+    };
+  }
+
+  if (uploadPolicy.resolutionMode !== 'auto') {
+    return { file, image, metadata };
+  }
+
+  const optimized = await optimizeImageResolution(
+    file,
+    image,
+    metadata,
+    limits.upload.max_pixels,
+  );
+  const sizeError = validateFileSize(optimized.file, limits);
+
+  if (sizeError) return { result: sizeError };
+
+  const imageResult = await loadImageMetadata(optimized.file);
+  if (!imageResult.isValid) return { result: imageResult };
+
+  return {
+    file: optimized.file,
+    image: imageResult.image,
+    metadata: imageResult.metadata,
+    wasOptimized: true,
+    optimization: optimized.optimization,
+  };
+};
+
+const handleFileSizePolicy = async ({
+  file,
+  imageResult,
+  limits,
+  uploadPolicy,
+  requireGrayscale,
+}) => {
+  const exceedsFileSize =
+    uploadPolicy.usesBackendLimits &&
+    file.size > limits.upload.max_file_size_bytes;
+
+  if (uploadPolicy.fileSizeMode === 'confirm' && exceedsFileSize) {
+    if (requireGrayscale) {
+      const grayscaleError = validateGrayscaleImage(imageResult.image);
+      if (grayscaleError) return { result: grayscaleError };
+    }
+
+    return {
+      result: validResult(file, imageResult.metadata, {
+        requiresAiOptimizationConfirmation: true,
+        alsoExceedsResolution: shouldOptimizeResolution(
+          imageResult.metadata,
+          limits.upload.max_pixels,
+        ),
+        fileSizeLimitMB: limits.upload.max_file_size_mb,
+        fileSizeLimitBytes: limits.upload.max_file_size_bytes,
+        actualFileSizeBytes: file.size,
+        resolutionLimit: {
+          maxPixels: limits.upload.max_pixels,
+          maxMegapixels: limits.upload.max_megapixels,
+        },
+      }),
+    };
+  }
+
+  if (uploadPolicy.fileSizeMode !== 'optimize' || !exceedsFileSize) {
+    return { file, imageResult };
+  }
+
+  try {
+    const optimized = await optimizeImageForUpload(
+      file,
+      imageResult.image,
+      imageResult.metadata,
+      limits.upload.max_pixels,
+      limits.upload.max_file_size_bytes,
+    );
+    const optimizedImageResult = await loadImageMetadata(optimized.file);
+    if (!optimizedImageResult.isValid) {
+      return { result: optimizedImageResult };
+    }
+
+    return {
+      file: optimized.file,
+      imageResult: optimizedImageResult,
+      wasOptimized: true,
+      optimization: optimized.optimization,
+    };
+  } catch (error) {
+    return {
+      result: invalidResult(
+        error instanceof Error
+          ? error.message
+          : 'This image could not be optimized for AI upload.',
+      ),
+    };
+  }
+};
+
 /**
  * Validate whether an uploaded image is allowed.
  *
@@ -83,7 +228,8 @@ const validateFileSize = (file, limits, customMaxSizeMB = null) => {
  * ``{ isValid: false, error }``
  *
  * @param {File|Blob|null} file - File object from the dropzone/input.
- * @param {number|null} [customMaxSizeMB=null] - Optional max-size override in MB.
+ * @param {object} [uploadPolicy=UPLOAD_POLICIES.DEFAULT] - Tool-aware file-size
+ * and decoded-resolution handling.
  * @param {boolean} [requireGrayscale=false] - If true, rejects images that
  * already contain significant color data.
  * @returns {Promise<
@@ -93,68 +239,77 @@ const validateFileSize = (file, limits, customMaxSizeMB = null) => {
  */
 export const validateImageUpload = async (
   file,
-  customMaxSizeMB = null,
+  uploadPolicy = UPLOAD_POLICIES.DEFAULT,
   requireGrayscale = false,
 ) => {
   if (!file) {
     return invalidResult(ERROR_MESSAGES.DEFAULT);
   }
 
-  const limits = await getRuntimeLimits();
-
-  const sizeError = validateFileSize(file, limits, customMaxSizeMB);
-  if (sizeError) return sizeError;
+  const limits =
+    uploadPolicy.usesBackendLimits
+      ? await getRuntimeLimits()
+      : getFallbackLimits();
 
   const allowedMimeTypes = getAllowedMimeTypes(limits);
   const mimeError = validateMimeType(file, allowedMimeTypes);
   if (mimeError) return mimeError;
 
-  let workingFile = file;
-  let imageResult = await loadImageMetadata(workingFile);
+  const imageResult = await loadImageMetadata(file);
 
   if (!imageResult.isValid) return imageResult;
 
-  let { image, metadata } = imageResult;
-  let wasOptimized = false;
-  let optimization = null;
+  const sizePrepared = await handleFileSizePolicy({
+    file,
+    imageResult,
+    limits,
+    uploadPolicy,
+    requireGrayscale,
+  });
 
-  if (shouldOptimizeResolution(metadata, limits.upload.max_pixels)) {
-    const optimized = await optimizeImageResolution(
-      workingFile,
-      image,
-      metadata,
-      limits.upload.max_pixels,
-    );
+  if (sizePrepared.result) return sizePrepared.result;
 
-    workingFile = optimized.file;
-    wasOptimized = true;
-    optimization = optimized.optimization;
+  const {
+    file: workingFile,
+    imageResult: preparedImageResult,
+    wasOptimized: wasOptimizedForSize = false,
+    optimization: sizeOptimization = null,
+  } = sizePrepared;
 
-    const optimizedSizeError = validateFileSize(
-      workingFile,
-      limits,
-      customMaxSizeMB,
-    );
+  const prepared = await handleResolutionPolicy({
+    file: workingFile,
+    image: preparedImageResult.image,
+    metadata: preparedImageResult.metadata,
+    limits,
+    uploadPolicy,
+    requireGrayscale,
+  });
 
-    if (optimizedSizeError) return optimizedSizeError;
+  if (prepared.result) return prepared.result;
 
-    imageResult = await loadImageMetadata(workingFile);
-    if (!imageResult.isValid) return imageResult;
+  const {
+    file: validatedFile,
+    image,
+    metadata,
+    wasOptimized = false,
+    optimization = null,
+  } = prepared;
 
-    image = imageResult.image;
-    metadata = imageResult.metadata;
+  if (uploadPolicy.usesBackendLimits) {
+    const sizeError = validateFileSize(validatedFile, limits);
+    if (sizeError) return sizeError;
+
+    const resolutionError = validateResolution(metadata, limits);
+    if (resolutionError) return resolutionError;
   }
-
-  const resolutionError = validateResolution(metadata, limits);
-  if (resolutionError) return resolutionError;
 
   if (requireGrayscale) {
     const grayscaleError = validateGrayscaleImage(image);
     if (grayscaleError) return grayscaleError;
   }
 
-  return validResult(workingFile, metadata, {
-    wasOptimized,
-    optimization,
+  return validResult(validatedFile, metadata, {
+    wasOptimized: wasOptimized || wasOptimizedForSize,
+    optimization: optimization || sizeOptimization,
   });
 };

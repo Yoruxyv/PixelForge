@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import UploadCard from '@/shared/components/upload/UploadCard';
+import { BROWSER_UPLOAD_HELPER_TEXT } from '@/shared/config/imageValidation';
 import ToolWorkspaceShell from '@/shared/components/workspace/ToolWorkspaceShell';
 import ToolPageWrapper from '@/shared/components/workspace/ToolPageWrapper';
 import PreviewImageBox from '@/shared/components/workspace/PreviewImageBox';
@@ -118,8 +119,7 @@ export default function ColorPalette() {
                   inputId="palette-file-input"
                   inputRef={fileInputRef}
                   onChange={onFileChange}
-                  helperText="Any format up to 10MB"
-                  maxSizeMB={10}
+                  helperText={BROWSER_UPLOAD_HELPER_TEXT}
                   hasActiveFile={Boolean(file)}
                 />
               </div>

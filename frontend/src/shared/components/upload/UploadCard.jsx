@@ -8,6 +8,8 @@
 import PropTypes from 'prop-types';
 import { useFileUpload } from '@/shared/hooks/useFileUpload';
 import { AcceptableImageMimeTypes } from '@/shared/lib/fileUtils';
+import { UPLOAD_POLICIES } from '@/shared/config/imageValidation';
+import UploadPolicyDialog from './UploadPolicyDialog';
 
 /**
  * Render the standard upload card and hidden file input.
@@ -25,16 +27,25 @@ export default function UploadCard({
   heightClass = 'h-36',
   validate = true,
   clearErrorAfterMs = 5000,
-  maxSizeMB,
   hasActiveFile = false,
+  uploadPolicy = UPLOAD_POLICIES.DEFAULT,
 }) {
-  const { isDragging, error, inputRef, handlers } = useFileUpload({
+  const {
+    isDragging,
+    error,
+    inputRef,
+    handlers,
+    uploadConfirmation,
+    confirmUpload,
+    dismissUploadConfirmation,
+    chooseAnotherImage,
+  } = useFileUpload({
     externalInputRef: externalRef,
     validate,
-    maxSizeMB,
     clearErrorAfterMs,
     onValidationError,
     onFileSelect: (file) => onChange?.({ target: { files: [file] } }),
+    uploadPolicy,
   });
 
   let cardStateClass =
@@ -116,7 +127,8 @@ export default function UploadCard({
   };
 
   return (
-    <label
+    <>
+      <label
       htmlFor={inputId}
       aria-label={error || 'Upload image file'}
       onDragOver={handlers.onDragOver}
@@ -150,7 +162,14 @@ export default function UploadCard({
         onClick={(e) => e.stopPropagation()}
         className="hidden"
       />
-    </label>
+      </label>
+      <UploadPolicyDialog
+        confirmation={uploadConfirmation}
+        onConfirm={confirmUpload}
+        onChooseAnother={chooseAnotherImage}
+        onClose={dismissUploadConfirmation}
+      />
+    </>
   );
 }
 
@@ -168,6 +187,11 @@ UploadCard.propTypes = {
   heightClass: PropTypes.string,
   validate: PropTypes.bool,
   clearErrorAfterMs: PropTypes.number,
-  maxSizeMB: PropTypes.number,
   hasActiveFile: PropTypes.bool,
+  uploadPolicy: PropTypes.shape({
+    fileSizeMode: PropTypes.oneOf(['none', 'backend', 'confirm', 'optimize'])
+      .isRequired,
+    resolutionMode: PropTypes.oneOf(['auto', 'confirm', 'warn']).isRequired,
+    warningPixels: PropTypes.number,
+  }),
 };

@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { validateImageUpload } from '@/shared/validation/fileValidation';
+import { UPLOAD_POLICIES } from '@/shared/config/imageValidation';
 import { useImagePaste } from './useImagePaste';
 
 /**
@@ -9,7 +10,6 @@ import { useImagePaste } from './useImagePaste';
  * @param {Function} params.onFileSelect - Callback triggered with the selected file and validation result.
  * @param {Function} [params.onValidationError] - Callback triggered when file validation fails.
  * @param {boolean} [params.validate=true] - Whether file validation should be applied.
- * @param {number} [params.maxSizeMB] - Maximum allowed file size in megabytes.
  * @param {boolean} [params.requireGrayscale=false] - Whether uploaded images must be grayscale.
  * @param {number} [params.clearErrorAfterMs=5000] - Duration before clearing validation errors automatically.
  * @param {React.RefObject<HTMLInputElement>|null} [params.externalInputRef=null] - External file input reference.
@@ -25,13 +25,14 @@ export function useFileUpload({
   onFileSelect,
   onValidationError,
   validate = true,
-  maxSizeMB,
   requireGrayscale = false,
   clearErrorAfterMs = 5000,
   externalInputRef = null,
+  uploadPolicy = UPLOAD_POLICIES.DEFAULT,
 }) {
   const [error, setError] = useState('');
   const [isDragging, setIsDragging] = useState(false);
+  const [uploadConfirmation, setUploadConfirmation] = useState(null);
 
   const internalRef = useRef(null);
   const inputRef = externalInputRef || internalRef;
@@ -68,9 +69,14 @@ export function useFileUpload({
   }, []);
 
   const processFile = useCallback(
-    async (file) => {
+    async (
+      file,
+      activePolicy = uploadPolicy,
+      confirmationAccepted = false,
+    ) => {
       if (!file) return;
       clearError();
+      setUploadConfirmation(null);
 
       if (!validate) {
         onFileSelect?.(file);
@@ -80,7 +86,7 @@ export function useFileUpload({
 
       const result = await validateImageUpload(
         file,
-        maxSizeMB,
+        activePolicy,
         requireGrayscale,
       );
 
@@ -90,19 +96,80 @@ export function useFileUpload({
         return;
       }
 
-      onFileSelect?.(result.file || file, result);
+      if (
+        result.requiresResizeConfirmation ||
+        result.requiresAiOptimizationConfirmation ||
+        result.requiresLargeImageConfirmation
+      ) {
+        setUploadConfirmation({ file, ...result });
+        if (inputRef.current) inputRef.current.value = '';
+        return;
+      }
+
+      onFileSelect?.(result.file || file, {
+        ...result,
+        resizeConfirmed:
+          confirmationAccepted && activePolicy.resolutionMode === 'auto',
+      });
       if (inputRef.current) inputRef.current.value = '';
     },
     [
       validate,
       onFileSelect,
-      maxSizeMB,
       requireGrayscale,
       clearError,
       handleError,
       inputRef,
+      uploadPolicy,
     ],
   );
+
+  const confirmUpload = useCallback(() => {
+    if (!uploadConfirmation?.file) return;
+
+    if (uploadConfirmation.requiresAiOptimizationConfirmation) {
+      processFile(
+        uploadConfirmation.file,
+        {
+          ...uploadPolicy,
+          fileSizeMode: 'optimize',
+          resolutionMode: 'auto',
+        },
+        true,
+      );
+      return;
+    }
+
+    if (uploadConfirmation.requiresResizeConfirmation) {
+      processFile(
+        uploadConfirmation.file,
+        {
+          ...uploadPolicy,
+          fileSizeMode: 'backend',
+          resolutionMode: 'auto',
+        },
+        true,
+      );
+      return;
+    }
+
+    const confirmed = uploadConfirmation;
+    setUploadConfirmation(null);
+    onFileSelect?.(confirmed.file, {
+      ...confirmed,
+      requiresLargeImageConfirmation: false,
+      warningConfirmed: true,
+    });
+  }, [onFileSelect, processFile, uploadConfirmation, uploadPolicy]);
+
+  const dismissUploadConfirmation = useCallback(() => {
+    setUploadConfirmation(null);
+  }, []);
+
+  const chooseAnotherImage = useCallback(() => {
+    setUploadConfirmation(null);
+    inputRef.current?.click();
+  }, [inputRef]);
 
   useImagePaste(processFile);
 
@@ -144,6 +211,10 @@ export function useFileUpload({
     error,
     inputRef,
     clearError,
+    uploadConfirmation,
+    confirmUpload,
+    dismissUploadConfirmation,
+    chooseAnotherImage,
     handlers: {
       onDragOver: handleDragOver,
       onDragLeave: handleDragLeave,

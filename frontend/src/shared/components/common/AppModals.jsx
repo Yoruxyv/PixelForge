@@ -18,7 +18,13 @@ const prefersReducedMotion = () =>
  * @param {React.ReactNode} props.children - The content to display inside the modal.
  * @returns {JSX.Element}
  */
-export default function AppModals({ isOpen, onClose, title, children }) {
+export default function AppModals({
+  isOpen,
+  onClose,
+  title,
+  children,
+  footer = null,
+}) {
   const dialogRef = useRef(null);
   const titleId = useId();
 
@@ -122,13 +128,15 @@ export default function AppModals({ isOpen, onClose, title, children }) {
           </div>
 
           <div className="flex justify-end border-t border-pf-editorial-line bg-pf-editorial-raised px-6 py-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-pf-control bg-pf-editorial-ink px-5 py-2 font-bold text-pf-editorial-base transition-colors hover:bg-pf-editorial-accent"
-            >
-              Got it
-            </button>
+            {footer || (
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-pf-control bg-pf-editorial-ink px-5 py-2 font-bold text-pf-editorial-base transition-colors hover:bg-pf-editorial-accent"
+              >
+                Got it
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -177,4 +185,5 @@ AppModals.propTypes = {
   onClose: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
+  footer: PropTypes.node,
 };

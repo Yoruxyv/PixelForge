@@ -1,8 +1,16 @@
-import { useId } from 'react';
+import { useEffect, useId, useState } from 'react';
 import PropTypes from 'prop-types';
-import { FILE_LIMITS } from '@/shared/config/imageValidation';
+import {
+  FILE_LIMITS,
+  UPLOAD_POLICIES,
+} from '@/shared/config/imageValidation';
 import { useFileUpload } from '@/shared/hooks/useFileUpload';
 import { AcceptableImageMimeTypes } from '@/shared/lib/fileUtils';
+import UploadPolicyDialog from './UploadPolicyDialog';
+import {
+  getFallbackLimits,
+  getRuntimeLimits,
+} from '@/shared/validation/validators/runtimeLimits';
 
 const AllowedFormatsText = FILE_LIMITS.ALLOWED_EXTENSIONS.map((e) =>
   e.toUpperCase(),
@@ -23,13 +31,42 @@ export default function UploadDropzone({
   requireGrayscale = false,
   variant = 'default',
   compact = false,
+  uploadPolicy = UPLOAD_POLICIES.DEFAULT,
 }) {
   const errorId = useId();
-  const { isDragging, error, inputRef, handlers } = useFileUpload({
+  const [limits, setLimits] = useState(getFallbackLimits);
+  const {
+    isDragging,
+    error,
+    inputRef,
+    handlers,
+    uploadConfirmation,
+    confirmUpload,
+    dismissUploadConfirmation,
+    chooseAnotherImage,
+  } = useFileUpload({
     onFileSelect,
     requireGrayscale,
     clearErrorAfterMs: 5000,
+    uploadPolicy,
   });
+
+  useEffect(() => {
+    if (!uploadPolicy.showAiLimits) return undefined;
+
+    let active = true;
+    getRuntimeLimits().then((runtimeLimits) => {
+      if (active) setLimits(runtimeLimits);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [uploadPolicy.showAiLimits]);
+
+  const helperText = uploadPolicy.showAiLimits
+    ? `${AllowedFormatsText} · File size: up to ${limits.upload.max_file_size_mb}MB · AI resolution: up to ${limits.upload.max_megapixels}MP`
+    : `${AllowedFormatsText} · Processed locally in your browser`;
 
   const getDropzoneStateClasses = () => {
     if (variant === 'editorial') {
@@ -144,7 +181,7 @@ export default function UploadDropzone({
                       : 'text-pf-ink-muted'
                   }`}
                 >
-                  {AllowedFormatsText} · Max {FILE_LIMITS.MAX_FILE_SIZE_MB}MB
+                  {helperText}
                 </p>
               </>
             )}
@@ -155,6 +192,13 @@ export default function UploadDropzone({
       <span id={errorId} className="sr-only" role="alert" aria-atomic="true">
         {error}
       </span>
+
+      <UploadPolicyDialog
+        confirmation={uploadConfirmation}
+        onConfirm={confirmUpload}
+        onChooseAnother={chooseAnotherImage}
+        onClose={dismissUploadConfirmation}
+      />
     </div>
   );
 }
@@ -164,4 +208,11 @@ UploadDropzone.propTypes = {
   requireGrayscale: PropTypes.bool,
   variant: PropTypes.oneOf(['default', 'editorial']),
   compact: PropTypes.bool,
+  uploadPolicy: PropTypes.shape({
+    fileSizeMode: PropTypes.oneOf(['none', 'backend', 'confirm', 'optimize'])
+      .isRequired,
+    resolutionMode: PropTypes.oneOf(['auto', 'confirm', 'warn']).isRequired,
+    showAiLimits: PropTypes.bool,
+    warningPixels: PropTypes.number,
+  }),
 };

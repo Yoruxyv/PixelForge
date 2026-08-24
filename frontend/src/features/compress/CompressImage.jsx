@@ -11,10 +11,10 @@ import ClientSideHeader from '@/shared/components/workspace/ClientSideHeader';
 import { useWorkspaceFile } from '@/shared/hooks/useWorkspaceFile';
 import { generateSafeFilename } from '@/shared/lib/fileUtils';
 import useImageCompression from './useImageCompression';
+import { UPLOAD_POLICIES } from '@/shared/config/imageValidation';
 
 /** @constant {number} DEFAULT_QUALITY - Default JPEG quality value used for compression. */
 const DEFAULT_QUALITY = 0.6;
-const COMPRESS_MAX_SIZE_MB = 15;
 
 /**
  * Page component for compressing image files entirely on the client side.
@@ -100,8 +100,8 @@ export default function CompressImage() {
                 inputId="compress-file-input"
                 inputRef={fileInputRef}
                 onChange={onFileChange}
-                helperText={`Any format up to ${COMPRESS_MAX_SIZE_MB}MB`}
-                maxSizeMB={COMPRESS_MAX_SIZE_MB}
+                helperText="Large files welcome · Processed locally in your browser"
+                uploadPolicy={UPLOAD_POLICIES.COMPRESSION}
                 hasActiveFile={Boolean(file)}
               />
               <WorkspaceFileSummary file={file} />
