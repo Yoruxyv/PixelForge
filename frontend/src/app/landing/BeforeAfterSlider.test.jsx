@@ -21,7 +21,7 @@ describe('BeforeAfterSlider image loading', () => {
     expect(after).not.toHaveAttribute('fetchpriority');
   });
 
-  it('prioritizes only the after image for an initial comparison', () => {
+  it('eager loads the initial comparison without overriding browser priority', () => {
     render(
       <BeforeAfterSlider
         beforeImage="/before.webp"
@@ -37,7 +37,7 @@ describe('BeforeAfterSlider image loading', () => {
     expect(before).toHaveAttribute('loading', 'eager');
     expect(after).toHaveAttribute('loading', 'eager');
     expect(before).not.toHaveAttribute('fetchpriority');
-    expect(after).toHaveAttribute('fetchpriority', 'high');
+    expect(after).not.toHaveAttribute('fetchpriority');
   });
 
   it('applies responsive attributes only when provided', () => {

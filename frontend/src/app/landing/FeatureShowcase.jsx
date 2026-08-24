@@ -1,4 +1,4 @@
-import 'animate.css';
+import './feature-showcase.css';
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -18,7 +18,7 @@ const FEATURES = [
     navId: 'upscale',
     name: 'Upscale',
     copy: 'Recover useful detail and enlarge an image for higher-resolution output.',
-    before: '/demo/upscale_before.jpg',
+    before: '/demo/upscale_before.webp',
     after: '/demo/upscale_after.webp',
     afterSrcSet:
       '/demo/upscale_after-768.webp 768w, /demo/upscale_after.webp 1024w',
