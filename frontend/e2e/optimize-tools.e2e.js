@@ -17,6 +17,29 @@ async function uploadDropzoneFile(page, filePath) {
   await chooser.setFiles(filePath);
 }
 
+async function uploadGeneratedCompressionSource(page) {
+  await page.locator('input[type="file"]').evaluate(async (input) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 2000;
+    canvas.height = 2000;
+    const context = canvas.getContext('2d');
+    context.fillStyle = '#777';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    const image = await new Promise((resolve) =>
+      canvas.toBlob(resolve, 'image/png'),
+    );
+    const file = new File(
+      [image, new Uint8Array(11 * 1024 * 1024)],
+      'large-compression-source.png',
+      { type: 'image/png' },
+    );
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    input.files = transfer.files;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+}
+
 test.describe('browser-side optimize tools', () => {
   test.beforeEach(async ({ page }) => {
     await mockPixelForgeApi(page);
@@ -26,6 +49,11 @@ test.describe('browser-side optimize tools', () => {
     page,
   }) => {
     await page.goto('/compress-image');
+    await expect(
+      page.getByText(
+        'Large files welcome · Processed locally in your browser',
+      ),
+    ).toBeVisible();
     await uploadCardFile(page, fixturePaths.colorJpeg);
 
     await page.getByLabel('Compression Level').fill('0.75');
@@ -46,6 +74,22 @@ test.describe('browser-side optimize tools', () => {
     const download = await downloadPromise;
 
     expect(download.suggestedFilename()).toMatch(/min.*\.jpg$/i);
+  });
+
+  test('compress accepts sources above AI limits without changing them on selection', async ({
+    page,
+  }) => {
+    await page.goto('/compress-image');
+
+    await uploadGeneratedCompressionSource(page);
+
+    await expect(page.getByText('large-compression-source.png')).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Compress Image', exact: true }),
+    ).toBeEnabled();
+    await expect(
+      page.getByRole('link', { name: 'Download Compressed Image' }),
+    ).not.toBeVisible();
   });
 
   test('convert format produces the selected output type', async ({
@@ -101,7 +145,9 @@ test.describe('browser-side optimize tools', () => {
     await expect(
       page.getByRole('heading', { name: 'What PixelForge inspects' }),
     ).toBeVisible();
-    await expect(page.getByText('Processed locally')).toBeVisible();
+    await expect(
+      page.getByText('Processed locally', { exact: true }),
+    ).toBeVisible();
     await expect(
       page.getByRole('button', { name: 'Upload image file' }),
     ).toBeVisible();

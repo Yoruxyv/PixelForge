@@ -17,6 +17,35 @@ async function uploadDropzoneFile(page, filePath) {
   await chooser.setFiles(filePath);
 }
 
+async function uploadGeneratedLocalImage(page, paddingBytes = 0) {
+  await page
+    .getByRole('button', { name: 'Upload image file' })
+    .locator('input[type="file"]')
+    .evaluate(
+    async (input, padding) => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 2000;
+      canvas.height = 2000;
+      const context = canvas.getContext('2d');
+      context.fillStyle = '#777';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      const image = await new Promise((resolve) =>
+        canvas.toBlob(resolve, 'image/png'),
+      );
+      const file = new File(
+        [image, new Uint8Array(padding)],
+        'large-local.png',
+        { type: 'image/png' },
+      );
+      const transfer = new DataTransfer();
+      transfer.items.add(file);
+      input.files = transfer.files;
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    },
+    paddingBytes,
+  );
+}
+
 test.describe('browser-side edit tools', () => {
   test.beforeEach(async ({ page }) => {
     await mockPixelForgeApi(page);
@@ -131,6 +160,56 @@ test.describe('browser-side edit tools', () => {
     const download = await downloadPromise;
 
     expect(download.suggestedFilename()).toMatch(/crop.*\.jpg$/i);
+  });
+
+  test('crop accepts local images above AI file-size and resolution limits', async ({
+    page,
+  }) => {
+    await page.goto('/crop-image');
+
+    await uploadGeneratedLocalImage(page, 11 * 1024 * 1024);
+
+    await expect(page.getByAltText('Crop preview')).toBeVisible();
+    await expect(page.getByText(/File size exceeds/)).not.toBeVisible();
+  });
+
+  test('very-high-resolution local images warn and preserve user choice', async ({
+    page,
+  }) => {
+    await page.goto('/crop-image');
+    await page.evaluate(() => {
+      Object.defineProperties(HTMLImageElement.prototype, {
+        naturalWidth: { configurable: true, get: () => 12000 },
+        naturalHeight: { configurable: true, get: () => 10000 },
+      });
+    });
+
+    await uploadDropzoneFile(page, fixturePaths.colorJpeg);
+    await expect(
+      page.getByRole('heading', { name: 'Very large image' }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Choose another image' }),
+    ).toBeFocused();
+
+    await page.keyboard.press('Escape');
+    await expect(
+      page.getByRole('heading', { name: 'Very large image' }),
+    ).not.toBeVisible();
+
+    await uploadDropzoneFile(page, fixturePaths.colorJpeg);
+
+    const chooserPromise = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: 'Choose another image' }).click();
+    const chooser = await chooserPromise;
+    await chooser.setFiles([]);
+    await expect(
+      page.getByRole('heading', { name: 'Very large image' }),
+    ).not.toBeVisible();
+
+    await uploadDropzoneFile(page, fixturePaths.colorJpeg);
+    await page.getByRole('button', { name: 'Continue anyway' }).click();
+    await expect(page.getByAltText('Crop preview')).toBeVisible();
   });
 
   test('rotate and flip updates preview state and exports', async ({
