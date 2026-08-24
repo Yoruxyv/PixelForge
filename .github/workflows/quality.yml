@@ -69,6 +69,68 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+  frontend-lighthouse:
+    name: Frontend Lighthouse Budget
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Run Lighthouse budget
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p lighthouse-reports
+
+          ./node_modules/.bin/vite preview --host 127.0.0.1 --port 4173 --strictPort > /tmp/pixelforge-preview.log 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid" 2>/dev/null || true; wait "$preview_pid" 2>/dev/null || true' EXIT
+
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:4173/ > /dev/null
+
+          for run in {1..5}; do
+            ./node_modules/.bin/lighthouse http://127.0.0.1:4173/ \
+              --preset=desktop \
+              --output=json \
+              --output-path="lighthouse-reports/desktop-$run.json" \
+              --chrome-flags="--headless --no-sandbox" \
+              --quiet
+          done
+
+          for run in {1..5}; do
+            ./node_modules/.bin/lighthouse http://127.0.0.1:4173/ \
+              --output=json \
+              --output-path="lighthouse-reports/mobile-$run.json" \
+              --chrome-flags="--headless --no-sandbox" \
+              --quiet
+          done
+
+          npm run lighthouse:check -- lighthouse-reports
+      - name: Upload Lighthouse diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-${{ github.run_id }}-${{ github.run_attempt }}
+          path: frontend/lighthouse-reports/
+          if-no-files-found: ignore
+          retention-days: 7
+
   backend-quality:
     name: Backend quality
     runs-on: ubuntu-latest
@@ -194,14 +256,15 @@ jobs:
   quality-gate:
     name: Quality gate
     if: ${{ always() }}
-    needs: [frontend-quality, frontend-e2e, backend-quality, backend-baseline, backend-compatibility]
+    needs: [frontend-quality, frontend-e2e, frontend-lighthouse, backend-quality, backend-baseline, backend-compatibility]
     runs-on: ubuntu-latest
     steps:
       - name: Confirm required checks passed
         env:
           FRONTEND: ${{ needs.frontend-quality.result }}
           E2E: ${{ needs.frontend-e2e.result }}
+          LIGHTHOUSE: ${{ needs.frontend-lighthouse.result }}
           BACKEND: ${{ needs.backend-quality.result }}
           TYPING: ${{ needs.backend-baseline.result }}
           COMPATIBILITY: ${{ needs.backend-compatibility.result }}
-        run: '[[ "$FRONTEND" == success && "$E2E" == success && "$BACKEND" == success && "$TYPING" == success && "$COMPATIBILITY" == success ]]'
+        run: '[[ "$FRONTEND" == success && "$E2E" == success && "$LIGHTHOUSE" == success && "$BACKEND" == success && "$TYPING" == success && "$COMPATIBILITY" == success ]]'
