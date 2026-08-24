@@ -8,25 +8,25 @@ The backend directory and ``.env`` file are resolved from this script's path,
 so the command is independent of the current working directory.
 """
 
-from __future__ import annotations
+from __future__ import annotations # noqa
 
 import asyncio
 import logging
-import sys
 from pathlib import Path
+import sys
 
 from dotenv import load_dotenv
-
-from core.config import settings
-from database.db_pool import close_db_pool, get_db_pool, init_db_pool
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
-
+# Load .env before settings evaluate environment variables
 load_dotenv(BACKEND_DIR / ".env", override=False)
+
+from core.config import settings  # noqa: E402
+from database.db_pool import close_db_pool, get_db_pool, init_db_pool  # noqa: E402
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -60,7 +60,9 @@ async def reset_usage_limits() -> None:
             raise SystemExit(1)
 
         async with pool.acquire() as conn:
-            await conn.execute(f"TRUNCATE TABLE {TABLE_TO_TRUNCATE} RESTART IDENTITY CASCADE;")
+            await conn.execute(
+                f"TRUNCATE TABLE {TABLE_TO_TRUNCATE} RESTART IDENTITY CASCADE;"
+            )
 
         logger.info("Developer usage limits successfully reset.")
 

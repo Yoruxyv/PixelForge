@@ -30,7 +30,7 @@
 <div style="max-width: 720px;">
 
 PixelForge started as a single-purpose AI upscaler and evolved into a full-stack image-processing workstation.
-It combines **AI-powered cloud processing** (upscale, background removal, restoration) with fast **client-side editing tools** (resize, compress, transform, metadata cleaning).
+It combines **AI-powered cloud processing** (upscale, background removal, restoration, object removal) with fast **client-side editing tools** (resize, compress, transform, metadata cleaning).
 The system is designed to handle real-world constraints such as rate limits, long-running AI jobs, and storage lifecycle management through an async queue-based architecture.</div>
 
 <br>
@@ -41,6 +41,19 @@ The system is designed to handle real-world constraints such as rate limits, lon
 - 🎨 Image-first workspaces with before/after comparison and clear processing states  
 - 🛠️ Open-source and extensible provider architecture  
 
+## 🖼️ Product Preview
+
+**Homepage — desktop, dark theme**
+
+![PixelForge homepage on desktop in dark theme](docs/assets/screenshots/homepage-desktop-dark.png)
+
+**AI object-removal workspace**
+
+![PixelForge object-removal workspace with an image ready for masking](docs/assets/screenshots/ai-workspace.png)
+
+**Browser image editor**
+
+![PixelForge browser image editor with live adjustment controls](docs/assets/screenshots/editor-workspace.png)
 
 ## 🎯 Features
 
@@ -329,12 +342,17 @@ uv run mypy
 Pull requests and pushes to `master` run:
 
 - frontend ESLint, Vitest, production build, and Playwright Chromium tests;
+- frontend Lighthouse against the production build/preview with 5 desktop and
+  5 mobile runs: Performance arithmetic mean ≥ 95 per profile, every
+  individual Performance run ≥ 90, and Accessibility, Best Practices, and SEO
+  each equal to 100;
 - backend dependency-lock validation, Ruff lint/format checks, pytest, and mypy;
 - backend pytest compatibility on Python 3.11, 3.12, and 3.13;
 - cross-platform script/tooling validation; and
 - documentation link checking.
 
-The aggregate **Quality gate** succeeds only when all required quality jobs pass.
+The aggregate **Quality gate** succeeds only when all required quality jobs,
+including the Lighthouse budget, pass.
 
 ## 🔒 Security Notes
 
