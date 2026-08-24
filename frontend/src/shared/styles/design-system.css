@@ -176,6 +176,7 @@ html:has([data-theme='dark']) {
     color: var(--color-pf-ink);
     font-family: var(--font-sans);
     font-synthesis: none;
+    scroll-behavior: smooth;
     text-rendering: optimizeLegibility;
   }
 

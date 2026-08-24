@@ -150,7 +150,7 @@ const COMPOSITIONS = {
 /** Editorial overview of the non-AI tool families. */
 export default function CategoryShowcases() {
   return (
-    <section id="tools" className="border-y border-pf-editorial-line bg-pf-editorial-surface py-16 sm:py-20">
+    <section id="tools" className="scroll-mt-20 border-y border-pf-editorial-line bg-pf-editorial-surface py-16 target:border-pf-editorial-accent sm:py-20">
       <div className="mx-auto max-w-pf-workspace px-pf-gutter">
         <div className="mb-10 grid gap-5 border-b border-pf-editorial-line pb-7 sm:grid-cols-2 sm:items-end">
           <div>
