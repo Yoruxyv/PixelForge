@@ -29,8 +29,33 @@ if not exist "%BACKEND%\pyproject.toml" (
 
 echo [INFO] Project root: %ROOT%
 
+pushd "%FRONTEND%"
+call npm ls --depth=0 >nul 2>nul
+if errorlevel 1 (
+  echo [INFO] Frontend dependencies not found. Installing from package-lock.json...
+  call npm ci
+  if errorlevel 1 (
+    popd
+    echo [ERROR] Frontend dependency installation failed.
+    exit /b 1
+  )
+) else (
+  echo [INFO] Frontend dependencies found.
+)
+popd
+
+echo [INFO] Verifying backend environment from uv.lock...
+pushd "%BACKEND%"
+uv sync --locked
+if errorlevel 1 (
+  popd
+  echo [ERROR] Backend dependency installation failed.
+  exit /b 1
+)
+popd
+
 start "PixelForge React Frontend" cmd /k "cd /d ""%FRONTEND%"" && npm run dev"
-start "PixelForge FastAPI Backend" cmd /k "cd /d ""%BACKEND%"" && uv sync --locked && uv run python run.py"
+start "PixelForge FastAPI Backend" cmd /k "cd /d ""%BACKEND%"" && uv run python run.py"
 
 endlocal
 exit /b 0

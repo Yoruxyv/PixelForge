@@ -12,6 +12,36 @@ command -v npm >/dev/null 2>&1 || {
   exit 1
 }
 
+if [[ ! -f "$repo_root/frontend/package.json" ]]; then
+  echo "[ERROR] frontend/package.json not found." >&2
+  exit 1
+fi
+if [[ ! -f "$repo_root/backend/pyproject.toml" ]]; then
+  echo "[ERROR] backend/pyproject.toml not found." >&2
+  exit 1
+fi
+
+echo "[INFO] Project root: $repo_root"
+
+if ! (
+  cd "$repo_root/frontend"
+  npm ls --depth=0 >/dev/null 2>&1
+); then
+  echo "[INFO] Frontend dependencies not found. Installing from package-lock.json..."
+  (
+    cd "$repo_root/frontend"
+    npm ci
+  )
+else
+  echo "[INFO] Frontend dependencies found."
+fi
+
+echo "[INFO] Verifying backend environment from uv.lock..."
+(
+  cd "$repo_root/backend"
+  uv sync --locked
+)
+
 frontend_pid=""
 backend_pid=""
 
@@ -33,7 +63,6 @@ frontend_pid=$!
 
 (
   cd "$repo_root/backend"
-  uv sync --locked
   uv run python run.py
 ) &
 backend_pid=$!
