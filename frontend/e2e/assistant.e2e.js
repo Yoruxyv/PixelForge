@@ -4,12 +4,21 @@ test.describe('PixelForge assistant', () => {
   test('launcher opens, closes, and completes an FAQ search flow', async ({
     page,
   }) => {
+    const assistantAssetRequests = [];
+    page.on('request', (request) => {
+      if (request.url().includes('PixelForgeChatbot')) {
+        assistantAssetRequests.push(request.url());
+      }
+    });
+
     await page.goto('/');
+    expect(assistantAssetRequests).toHaveLength(0);
 
     await page.getByRole('button', { name: 'Open help' }).click();
     await expect(
       page.getByRole('heading', { name: 'PixelForge Assistant' }),
     ).toBeVisible();
+    expect(assistantAssetRequests.length).toBeGreaterThan(0);
 
     await page.getByRole('button', { name: 'Close help' }).click();
     await expect(
