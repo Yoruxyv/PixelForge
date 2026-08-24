@@ -76,6 +76,38 @@ test.describe('browser-side optimize tools', () => {
     expect(download.suggestedFilename()).toMatch(/min.*\.jpg$/i);
   });
 
+  test('compresses toward a target size and reports the actual output', async ({
+    page,
+  }) => {
+    await page.goto('/compress-image');
+    await uploadGeneratedCompressionSource(page);
+
+    await page.getByRole('button', { name: 'Target Size' }).click();
+    await page.getByLabel('Target size').fill('5');
+    await page.getByRole('button', {
+      name: 'Compress Image',
+      exact: true,
+    }).click();
+
+    const downloadLink = page.getByRole('link', {
+      name: 'Download Compressed Image',
+    });
+    await expect(downloadLink).toBeVisible();
+
+    const outputBytes = await downloadLink.evaluate(async (link) => {
+      const response = await fetch(link.href);
+      return (await response.blob()).size;
+    });
+    const outputMB = (outputBytes / (1024 * 1024)).toFixed(2);
+
+    expect(outputBytes).toBeLessThanOrEqual(5 * 1024 * 1024);
+    await expect(
+      page.getByText(`Target 5.00 MB · Output ${outputMB} MB`, {
+        exact: true,
+      }),
+    ).toBeVisible();
+  });
+
   test('compress accepts sources above AI limits without changing them on selection', async ({
     page,
   }) => {
