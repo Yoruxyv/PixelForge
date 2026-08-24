@@ -37,7 +37,6 @@ const BeforeAfterSlider = ({
         alt={`${altText} - After`}
         className={`pointer-events-none absolute inset-0 h-full w-full ${imageClassName}`}
         loading={prioritizeImages ? 'eager' : 'lazy'}
-        fetchPriority={prioritizeImages ? 'high' : undefined}
         srcSet={afterSrcSet}
         sizes={afterSizes}
       />

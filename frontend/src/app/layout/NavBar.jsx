@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import logoIcon from '@/assets/PixelForgeNav.png';
+import logoIcon from '@/assets/PixelForgeNav.webp';
 import { NavLinks } from '../navigation/navConfig';
 
 const Icon = ({ d, className = 'h-5 w-5' }) => (

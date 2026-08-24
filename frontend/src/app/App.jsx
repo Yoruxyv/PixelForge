@@ -28,7 +28,7 @@ import { readThemePreference, resolveTheme, THEME_STORAGE_KEY } from './theme';
  */
 const PageLoader = () => (
   <div
-    className="flex min-h-75 w-full flex-1 items-center justify-center"
+    className="flex min-h-screen w-full flex-1 items-center justify-center"
     role="status"
     aria-label="Loading page"
   >

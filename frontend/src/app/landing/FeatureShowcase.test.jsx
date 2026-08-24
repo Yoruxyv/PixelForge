@@ -21,7 +21,7 @@ describe('FeatureShowcase', () => {
 
   afterEach(() => vi.useRealTimers());
 
-  it('prioritizes only the initial Upscale comparison', () => {
+  it('eager loads only the initial Upscale comparison', () => {
     renderShowcase();
 
     const upscaleBefore = screen.getByAltText('Upscale example - Before');
@@ -30,7 +30,7 @@ describe('FeatureShowcase', () => {
     expect(upscaleBefore).toHaveAttribute('loading', 'eager');
     expect(upscaleAfter).toHaveAttribute('loading', 'eager');
     expect(upscaleBefore).not.toHaveAttribute('fetchpriority');
-    expect(upscaleAfter).toHaveAttribute('fetchpriority', 'high');
+    expect(upscaleAfter).not.toHaveAttribute('fetchpriority');
     expect(upscaleAfter).toHaveAttribute(
       'srcset',
       '/demo/upscale_after-768.webp 768w, /demo/upscale_after.webp 1024w',

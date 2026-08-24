@@ -4,9 +4,11 @@
 </div>
 
 <p align="center">
+  <a href="https://github.com/Yoruxyv/PixelForge/actions/workflows/quality.yml"><img src="https://github.com/Yoruxyv/PixelForge/actions/workflows/quality.yml/badge.svg" alt="Quality"></a>
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white" alt="React">
   <img src="https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white" alt="Vite">
   <img src="https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white" alt="FastAPI">
+  <img src="https://img.shields.io/badge/Playwright-E2E-2EAD33?logo=playwright&logoColor=white" alt="Playwright end-to-end tests">
   <img src="https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL">
   <img src="https://img.shields.io/badge/Azure-0078D4?logo=microsoft-azure&logoColor=white" alt="Microsoft Azure">
   <img src="https://img.shields.io/badge/Cloudflare-Turnstile-F38020?logo=cloudflare&logoColor=white" alt="Cloudflare Turnstile">
@@ -42,74 +44,47 @@ The system is designed to handle real-world constraints such as rate limits, lon
 
 ## 🎯 Features
 
-### A) Core Image Tools
+### AI workflows
 
-1. 🔍 **Upscale Image (AI)** — Real-ESRGAN enhancement
+- **Upscale Image** — increase resolution while preserving sharp details and clarity.
+- **Remove Background** — create a clean, transparent subject cutout.
+- **Restore Color** — bring grayscale or faded photos back with natural-looking color.
+- **Remove Objects** — paint over an unwanted object and remove it from the image.
 
+### Edit
 
-2. 🧍 **Remove Background (AI)** — clean subject extraction
+- **Image Editor** — adjust brightness, contrast, saturation, blur, sharpness, and vignette.
+- **Resize Image** — set exact dimensions with aspect-ratio locking and presets.
+- **Crop Image** — reframe an image with freeform or preset aspect ratios.
+- **Rotate & Flip** — correct orientation and composition with focused transform controls.
 
+### Optimize
 
-3. 🎨 **Restore Color (AI)** — revive grayscale & faded photos
+- **Compress Image** — reduce file size with direct quality control.
+- **Convert Format** — export PNG, JPEG, or WebP images.
+- **Remove Metadata** — strip EXIF and hidden metadata before sharing.
 
+### Utilities and support
 
-4. 🎨 **Object Remover (AI)** — brush over unwanted objects and erase them cleanly
+- **Color Palette** — sample an image and extract a practical working palette.
+- **Add Watermark** — apply a text or image watermark with live preview.
+- **PixelForge Assistant** — search the FAQ and open guided product shortcuts.
+- **Feedback** — submit improvement ideas and bug reports from the application.
 
+The responsive navigation uses a shared SVG tool-icon system rather than emoji or
+external icon fonts. System, light, and dark themes share the same application
+shell, and the browser/PWA identity includes optimized favicons, an Apple touch
+icon, and 192 px/512 px install icons.
 
+### Platform and system capabilities
 
-5. 🎛️ **Image Editor** — brightness, contrast, saturation, blur, vignette
-
-
-6. 📐 **Resize Image** — custom size, aspect lock, presets
-
-
-7. 🔄 **Rotate & Flip** — quick transform controls
-
-
-8. 🗜️ **Compress Image** — reduce size with quality control
-
-
-9. 🔁 **Convert Format** — PNG / JPG / WEBP
-
-
-10. 🧹 **Remove Metadata** — clean EXIF data
-
-
-11. 🎯 **Color Palette Extractor** — draggable sampling points
-
-
-12. 🏷️ **Add Watermark** — text/image with live preview
-
-
-13. ✂️ **Crop Image** — freeform or preset aspect ratios
-
-
-14. 🤖 **Chatbot** — Interactive FAQ assistant for quick answers and guided platform help
-
-
-15. 📝 **Feedback System** — user input for improvements and bug reports
-
-
-### B) Platform & System Capabilities
-
-16. 🛡️ **Turnstile Verification** — bot protection layer  
-17. 📊 **Usage Limits** — per-feature daily caps  
-18. 🚦 **Rate Limiting** — controlled API flow  
-19. ⚙️ **Async Job Queue** — safe background processing  
-20. 🔄 **Status Polling** — processing / ready / failed  
-21. 💾 **Session Persistence** — IndexedDB + localStorage  
-22. 🔁 **Session Restore** — recover after refresh  
-23. ⏳ **Expiration Handling** — results & drafts lifecycle  
-24. 🧽 **Azure Cleanup** — expired result janitor  
-25. 🧹 **DB Cleanup** — usage data maintenance  
-26. 🔑 **Signed URLs** — secure upload & access  
-27. 🔍 **File Validation** — type, size, spoof detection, and resolution safety  
-28. 📉 **Auto-Resize for Oversized Images** — browser-side downscaling for images above the public pixel limit  
-29. 🏷️ **Filename Sanitization** — safe file handling  
-30. 🧩 **Workspace System** — reusable UI shell  
-31. 📢 **Modal System** — legal & alert handling  
-32. 🆚 **Comparison Slider** — before/after preview  
-33. 🎬 **Progress UX** — staged loading feedback  
+- Turnstile verification, per-feature usage limits, and rate limiting
+- Async AI jobs with queue capacity management and status polling
+- IndexedDB/localStorage persistence and session restoration
+- Signed Azure upload/result URLs and automated retention cleanup
+- File type, size, spoofing, and resolution validation
+- Browser-side downscaling for images above the public pixel limit
+- Reusable image workspaces, comparison views, progress states, and export flows
 
 ## 🧠 Architecture Highlights
 PixelForge is designed to balance performance, cost, and reliability while working with external AI APIs that have strict rate and concurrency limits. Key architectural decisions include:
@@ -171,8 +146,8 @@ The frontend handles all lightweight transformations directly in the browser for
 
 PixelForge uses a split architecture:
 
-- **Frontend (React + Vite + Tailwind)**  
-  Handles tool UI, previews, client-side transforms, session persistence (IndexedDB/localStorage), and interaction flow.
+- **Frontend (React + Vite + Tailwind CSS)**
+  Handles theme-aware workspaces, SVG tool navigation, previews, client-side transforms, session persistence (IndexedDB/localStorage), and interaction flow. Vitest covers components and hooks; Playwright validates complete Chromium workflows.
 
 - **Backend (FastAPI + asyncpg + aiohttp)**  
   Handles secure AI orchestration, Turnstile verification, usage/rate limits, signed upload/result URLs, and polling endpoints.
@@ -245,14 +220,14 @@ Need help setting up external services? See [SETUP.md](./SETUP.md) for step-by-s
 
 ## 🚀 Local Development
 
-## 1) Clone
+### 1) Clone
 
 ```bash
 git clone https://github.com/Yoruxyv/PixelForge.git
 cd PixelForge
 ```
 
-## 2) Run backend
+### 2) Run backend
 
 Install [uv](https://docs.astral.sh/uv/getting-started/installation/) first. The
 backend workflow is the same on Windows PowerShell, Linux, and macOS:
@@ -263,7 +238,7 @@ uv sync --locked
 uv run python run.py  # starts Uvicorn with proxy header rewriting disabled
 ```
 
-## 3) Run frontend
+### 3) Run frontend
 
 ```bash
 cd frontend
@@ -271,7 +246,26 @@ npm install
 npm run dev
 ```
 
-## 4) Backend quality checks
+### 4) Frontend quality checks
+
+The same blocking frontend checks run in GitHub Actions. Install Playwright's
+Chromium browser once before the first end-to-end run:
+
+```bash
+cd frontend
+npm ci
+npx playwright install chromium
+npm run lint
+npm run test -- --run
+npm run build
+npm run test:e2e
+```
+
+Use `npm run test:e2e:ui` when debugging Playwright scenarios interactively.
+Failed CI runs upload the Playwright report, screenshots, and traces when they
+are available.
+
+### 5) Backend quality checks
 
 ```bash
 cd backend
@@ -282,6 +276,18 @@ uv run ruff format --check .
 uv run pytest
 uv run mypy
 ```
+
+### Continuous integration quality gate
+
+Pull requests and pushes to `master` run:
+
+- frontend ESLint, Vitest, production build, and Playwright Chromium tests;
+- backend dependency-lock validation, Ruff lint/format checks, pytest, and mypy;
+- backend pytest compatibility on Python 3.11, 3.12, and 3.13;
+- cross-platform script/tooling validation; and
+- documentation link checking.
+
+The aggregate **Quality gate** succeeds only when all required quality jobs pass.
 
 ## 🔒 Security Notes
 
@@ -314,7 +320,7 @@ Licensed under the MIT License. See [LICENSE](./LICENSE) for details.
 How to add a new AI feature to PixelForge:
 - [Adding a New AI Feature](docs/ADDING_AI_FEATURE.md)
 
-Backend and AI test scripts:
+Frontend, Playwright, backend, and AI testing guidance:
 - [Testing PixelForge](docs/TESTING.md) ([ID](docs/translation/dev/TESTING_ID.md), [ZH](docs/translation/dev/TESTING_ZH.md))
 
 Developer helper scripts:

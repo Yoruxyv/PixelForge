@@ -5,8 +5,7 @@ import { FAQ_DATA } from './chatBotdata';
  * Manages state and interaction flow for the FAQ chatbot widget.
  * @returns {Object} Chatbot state and control functions.
  */
-export function useFaqChatBot() {
-  const [isOpen, setIsOpen] = useState(false);
+export function useFaqChatBot(setIsOpen) {
   const [view, setView] = useState('home');
   const [activeCategory, setActiveCategory] = useState(null);
   const [activeQuestion, setActiveQuestion] = useState(null);
@@ -140,8 +139,6 @@ export function useFaqChatBot() {
   };
 
   return {
-    isOpen,
-    setIsOpen,
     view,
     setView,
     activeCategory,
