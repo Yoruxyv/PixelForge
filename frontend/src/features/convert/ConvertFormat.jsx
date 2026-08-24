@@ -1,6 +1,9 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FILE_LIMITS } from '@/shared/config/imageValidation';
+import {
+  BROWSER_UPLOAD_HELPER_TEXT,
+  FILE_LIMITS,
+} from '@/shared/config/imageValidation';
 import AppModals from '@/shared/components/common/AppModals';
 import FormatDropdown from '@/shared/components/forms/FormatDropdown';
 import UploadCard from '@/shared/components/upload/UploadCard';
@@ -127,7 +130,7 @@ export default function ConvertFormat() {
                 inputId="convert-file-input"
                 inputRef={fileInputRef}
                 onChange={onFileChange}
-                helperText={`Any format up to ${FILE_LIMITS.MAX_FILE_SIZE_MB}MB`}
+                helperText={BROWSER_UPLOAD_HELPER_TEXT}
                 hasActiveFile={Boolean(file)}
               />
               <WorkspaceFileSummary file={file} />

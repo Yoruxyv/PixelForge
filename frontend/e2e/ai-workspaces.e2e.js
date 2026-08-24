@@ -45,6 +45,30 @@ async function uploadDropzoneFile(page, filePath) {
   await chooser.setFiles(filePath);
 }
 
+async function uploadGeneratedAiImage(
+  page,
+  { width = 2000, height = 2000, paddingBytes = 0 } = {},
+) {
+  await page.locator('input[type="file"]').evaluate(async (input, options) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = options.width;
+    canvas.height = options.height;
+    const context = canvas.getContext('2d');
+    context.fillStyle = '#777';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+    const transfer = new DataTransfer();
+    transfer.items.add(
+      new File([blob, new Uint8Array(options.paddingBytes)], 'oversized.png', {
+        type: 'image/png',
+      }),
+    );
+    input.files = transfer.files;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  }, { width, height, paddingBytes });
+}
+
 async function paintObjectMask(page) {
   const canvas = page.getByLabel('Object removal mask');
   await expect(canvas).toBeVisible();
@@ -126,6 +150,95 @@ test.describe('AI workspaces', () => {
           'This image already has color! Please upload a black and white image.',
         ),
     ).toBeVisible();
+  });
+
+  test('all AI tools require consent before resizing oversized input', async ({
+    page,
+  }) => {
+    await mockPixelForgeApi(page);
+
+    for (const aiCase of AI_CASES) {
+      await page.goto(aiCase.route);
+      await uploadGeneratedAiImage(page);
+
+      await expect(
+        page.getByRole('heading', { name: 'Resize for AI processing?' }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole('button', { name: 'Resize & continue' }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole('button', { name: 'Choose another image' }),
+      ).toBeVisible();
+      await expect(page.getByAltText('Upload preview')).not.toBeVisible();
+
+      if (aiCase.feature === 'upscale') {
+        await page.getByRole('button', { name: 'Resize & continue' }).click();
+        await expect(page.getByAltText('Upload preview')).toBeVisible();
+      } else if (aiCase.feature === 'rembg') {
+        const chooserPromise = page.waitForEvent('filechooser');
+        await page
+          .getByRole('button', { name: 'Choose another image' })
+          .click();
+        const chooser = await chooserPromise;
+        await chooser.setFiles([]);
+        await expect(
+          page.getByRole('heading', { name: 'Resize for AI processing?' }),
+        ).not.toBeVisible();
+      }
+    }
+  });
+
+  test('AI file-size overflow is optimized only after consent', async ({
+    page,
+  }) => {
+    const api = await mockPixelForgeApi(page, {
+      usageSequences: { upscale: [2] },
+    });
+    await page.goto('/upscale');
+
+    await uploadGeneratedAiImage(page, {
+      width: 1200,
+      height: 1000,
+      paddingBytes: 11 * 1024 * 1024,
+    });
+
+    await expect(
+      page.getByRole('heading', { name: 'Image exceeds the upload limit' }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Optimize & continue' }),
+    ).toBeVisible();
+    expect(api.state.initBodies.upscale ?? []).toHaveLength(0);
+
+    await page.getByRole('button', { name: 'Optimize & continue' }).click();
+
+    await expect(page.getByAltText('Upload preview')).toBeVisible();
+    expect(api.state.initBodies.upscale ?? []).toHaveLength(0);
+  });
+
+  test('combined AI file-size and resolution overflow uses one confirmation', async ({
+    page,
+  }) => {
+    await mockPixelForgeApi(page, {
+      usageSequences: { upscale: [2] },
+    });
+    await page.goto('/upscale');
+
+    await uploadGeneratedAiImage(page, {
+      paddingBytes: 11 * 1024 * 1024,
+    });
+
+    await expect(
+      page.getByRole('heading', { name: 'Image exceeds the upload limit' }),
+    ).toBeVisible();
+    await expect(page.getByText(/resolution also exceeds/)).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Resize for AI processing?' }),
+    ).not.toBeVisible();
+
+    await page.getByRole('button', { name: 'Optimize & continue' }).click();
+    await expect(page.getByAltText('Upload preview')).toBeVisible();
   });
 
   for (const aiCase of AI_CASES) {

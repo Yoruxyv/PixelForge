@@ -117,7 +117,7 @@ export function usePipeline(
     setResultUrl(null);
     setJobId(null);
 
-    if (validationResult?.wasOptimized) {
+    if (validationResult?.wasOptimized && !validationResult.resizeConfirmed) {
       setAppAlert({
         show: true,
         type: 'auto_downscaled',

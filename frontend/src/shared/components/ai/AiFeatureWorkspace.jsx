@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import UploadDropzone from '@/shared/components/upload/UploadDropzone';
-import { FILE_LIMITS } from '@/shared/config/imageValidation';
+import {
+  FILE_LIMITS,
+  UPLOAD_POLICIES,
+} from '@/shared/config/imageValidation';
 import ResultActions from './ResultActions';
 import ResultViewer from './ResultViewer';
 import StagedFileCard from './StagedFileCard';
@@ -83,6 +86,7 @@ export default function AiFeatureWorkspace({
         onFileSelect={onFileSelect}
         requireGrayscale={requireGrayscale}
         variant="editorial"
+        uploadPolicy={UPLOAD_POLICIES.AI}
       />
     );
   }
