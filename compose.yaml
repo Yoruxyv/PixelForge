@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-pixelforge}
       POSTGRES_USER: ${POSTGRES_USER:-pixelforge}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pixelforge-local}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
     environment:
       ENVIRONMENT: development
-      DATABASE_URL: postgresql://${POSTGRES_USER:-pixelforge}:${POSTGRES_PASSWORD:-pixelforge-local}@db:5432/${POSTGRES_DB:-pixelforge}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-pixelforge}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}@db:5432/${POSTGRES_DB:-pixelforge}
       AZURE_CONNECTION_STRING: ${AZURE_CONNECTION_STRING:-}
       REPLICATE_API_TOKEN: ${REPLICATE_API_TOKEN:-}
       CLOUDFLARE_TURNSTILE_SECRET_KEY: ${CLOUDFLARE_TURNSTILE_SECRET_KEY:-}
