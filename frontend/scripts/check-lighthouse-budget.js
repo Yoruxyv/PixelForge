@@ -80,19 +80,45 @@ export function evaluateProfile(profile, reports, budget = LIGHTHOUSE_BUDGET) {
   };
 }
 
-const formatResult = (result) => {
-  const lines = [result.profile];
+const formatTable = (rows) => {
+  const headers = ['Run', 'Perf', 'A11y', 'BP', 'SEO'];
+  const values = rows.map((row) => [
+    row.run.toString(),
+    displayScore(row.performance),
+    displayScore(row.accessibility),
+    displayScore(row.bestPractices),
+    displayScore(row.seo),
+  ]);
+  const widths = headers.map((header, index) =>
+    Math.max(header.length, ...values.map((row) => row[index].length)),
+  );
+  const border = (left, middle, right) =>
+    `${left}${widths.map((width) => '─'.repeat(width + 2)).join(middle)}${right}`;
+  const line = (cells, alignRight = false) =>
+    `│ ${cells
+      .map((cell, index) =>
+        alignRight ? cell.padStart(widths[index]) : cell.padEnd(widths[index]),
+      )
+      .join(' │ ')} │`;
 
-  for (const row of result.rows) {
-    lines.push(
-      `Run ${row.run}: Perf ${displayScore(row.performance)} | A11y ${displayScore(row.accessibility)} | BP ${displayScore(row.bestPractices)} | SEO ${displayScore(row.seo)}`,
-    );
-  }
+  return [
+    border('┌', '┬', '┐'),
+    line(headers),
+    border('├', '┼', '┤'),
+    ...values.map((row) => line(row, true)),
+    border('└', '┴', '┘'),
+  ].join('\n');
+};
+
+export const formatResult = (result) => {
+  const lines = [result.profile, '', formatTable(result.rows)];
 
   lines.push(
     '',
-    `Performance mean: ${result.performanceMean.toFixed(1)}`,
-    `Required mean:    ${LIGHTHOUSE_BUDGET.performanceMeanMin}`,
+    `Performance mean : ${result.performanceMean.toFixed(1)}`,
+    `Required mean    : ${LIGHTHOUSE_BUDGET.performanceMeanMin}`,
+    `Per-run minimum  : ${LIGHTHOUSE_BUDGET.performanceRunMin}`,
+    '',
   );
 
   if (result.passed) {

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { evaluateProfile } from './check-lighthouse-budget';
+import {
+  evaluateProfile,
+  formatResult,
+  LIGHTHOUSE_BUDGET,
+} from './check-lighthouse-budget';
 
 const report = ({ performance = 100, accessibility = 100, bestPractices = 100, seo = 100 } = {}) => ({
   categories: {
@@ -19,6 +23,17 @@ const evaluate = (overrides = {}) =>
   );
 
 describe('Lighthouse budget evaluation', () => {
+  it('keeps the blocking budget unchanged', () => {
+    expect(LIGHTHOUSE_BUDGET).toEqual({
+      runCount: 5,
+      performanceMeanMin: 95,
+      performanceRunMin: 90,
+      accessibilityMin: 100,
+      bestPracticesMin: 100,
+      seoMin: 100,
+    });
+  });
+
   it('passes an arithmetic performance mean of 95', () => {
     const scores = [90, 95, 95, 95, 100];
     const result = evaluate((index) => ({ performance: scores[index] }));
@@ -54,5 +69,34 @@ describe('Lighthouse budget evaluation', () => {
     const result = evaluate(overrides);
 
     expect(result.failures.some((failure) => failure.includes(`${label} 99`))).toBe(true);
+  });
+
+  it('formats passing results as a deterministic plain-text table', () => {
+    expect(formatResult(evaluate())).toBe(`Mobile
+
+┌─────┬──────┬──────┬─────┬─────┐
+│ Run │ Perf │ A11y │ BP  │ SEO │
+├─────┼──────┼──────┼─────┼─────┤
+│   1 │  100 │  100 │ 100 │ 100 │
+│   2 │  100 │  100 │ 100 │ 100 │
+│   3 │  100 │  100 │ 100 │ 100 │
+│   4 │  100 │  100 │ 100 │ 100 │
+│   5 │  100 │  100 │ 100 │ 100 │
+└─────┴──────┴──────┴─────┴─────┘
+
+Performance mean : 100.0
+Required mean    : 95
+Per-run minimum  : 90
+
+PASS`);
+  });
+
+  it('keeps failure details below the table', () => {
+    const output = formatResult(evaluate({ accessibility: 99 }));
+
+    expect(output).toContain('\nFAIL:\n');
+    expect(output).toContain(
+      '- Mobile run 1 Accessibility 99 < required 100',
+    );
   });
 });

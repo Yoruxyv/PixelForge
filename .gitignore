@@ -265,3 +265,6 @@ skills-lock.json
 # Playwright
 frontend/playwright-report/
 frontend/test-results/
+
+# Lighthouse
+frontend/lighthouse-reports/
