@@ -105,7 +105,7 @@
 
 [data-theme='light'] {
   color-scheme: light;
-  --color-pf-editorial-base: #f3f0e9;
+  --color-pf-editorial-base: #eceef1;
   --color-pf-editorial-surface: #e7e7e4;
   --color-pf-editorial-raised: #dcdedc;
   --color-pf-editorial-footer: #d4d1ca;
@@ -130,6 +130,104 @@ html:has([data-theme='dark']) {
   --pf-scrollbar-track: var(--color-pf-editorial-base);
   --pf-scrollbar-thumb: var(--color-pf-line-inverse);
   --pf-scrollbar-thumb-hover: var(--color-pf-ink-inverse-muted);
+}
+
+.pf-theme-surface {
+  transition-duration: 180ms;
+  transition-property: background-color, color, border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pf-theme-celestial {
+  opacity: 0;
+  transform: translateY(160%) rotate(var(--pf-theme-celestial-rotation));
+  transition-duration: 200ms;
+  transition-property: transform, opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pf-theme-celestial--moon {
+  --pf-theme-celestial-rotation: -15deg;
+}
+
+.pf-theme-celestial--sun {
+  --pf-theme-celestial-rotation: 15deg;
+}
+
+.pf-theme-celestial.is-visible {
+  opacity: 1;
+  transform: translateY(0) rotate(0deg);
+  transition-delay: 70ms;
+  transition-duration: 220ms;
+}
+
+.pf-mobile-menu-icon {
+  position: relative;
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.pf-mobile-menu-line {
+  position: absolute;
+  left: 0.25rem;
+  width: 1rem;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transform: translateY(0) rotate(0deg);
+  transition-duration: 150ms;
+  transition-property: transform, opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pf-mobile-menu-line--top {
+  top: 0.375rem;
+}
+
+.pf-mobile-menu-line--middle {
+  top: 0.6875rem;
+}
+
+.pf-mobile-menu-line--bottom {
+  top: 1rem;
+}
+
+.pf-mobile-menu-icon.is-open .pf-mobile-menu-line--top {
+  transform: translateY(0.3125rem) rotate(45deg);
+}
+
+.pf-mobile-menu-icon.is-open .pf-mobile-menu-line--middle {
+  opacity: 0;
+}
+
+.pf-mobile-menu-icon.is-open .pf-mobile-menu-line--bottom {
+  transform: translateY(-0.3125rem) rotate(-45deg);
+}
+
+.pf-mobile-navigation {
+  display: none;
+  opacity: 0;
+  transform: translateY(-0.5rem);
+  transition-duration: 130ms;
+  transition-property: opacity, transform, display;
+  transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+  transition-behavior: allow-discrete;
+}
+
+.pf-mobile-navigation.is-open {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+
+@starting-style {
+  .pf-mobile-navigation.is-open {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
 }
 
 @media (forced-colors: none) {
@@ -230,6 +328,13 @@ html:has([data-theme='dark']) {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .pf-theme-surface,
+  .pf-theme-celestial,
+  .pf-mobile-menu-line,
+  .pf-mobile-navigation {
+    transition: none !important;
   }
 }
 

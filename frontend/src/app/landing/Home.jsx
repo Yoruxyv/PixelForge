@@ -5,7 +5,7 @@ import FeatureShowcase from './FeatureShowcase';
 /** Editorial, image-led entry point for the PixelForge workstation. */
 export default function HomeHub() {
   return (
-    <div className="w-full flex-1 bg-pf-editorial-base text-pf-editorial-ink">
+    <div className="pf-theme-surface w-full flex-1 bg-pf-editorial-base text-pf-editorial-ink">
       <section className="mx-auto max-w-pf-workspace px-pf-gutter pb-16 pt-6 sm:pb-20 lg:pb-24">
         <div className="flex items-center justify-between border-b border-pf-editorial-line pb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-pf-editorial-muted sm:text-xs">
           <span>PixelForge / Image workstation</span>

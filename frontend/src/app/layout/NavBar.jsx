@@ -143,196 +143,63 @@ NavDropdown.propTypes = {
   triggerRef: PropTypes.func.isRequired,
 };
 
-const themeOptions = [
-  { value: 'system', label: 'System' },
-  { value: 'light', label: 'Light' },
-  { value: 'dark', label: 'Dark' },
-];
-
-const ThemeGlyph = ({ value }) => {
-  if (value === 'system') {
-    return <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="1" /><path d="M8 21h8M12 17v4" /></svg>;
-  }
-
-  if (value === 'dark') {
-    return <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z" /></svg>;
-  }
-
-  return <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41" /></svg>;
-};
-
-ThemeGlyph.propTypes = {
-  value: PropTypes.oneOf(['system', 'dark', 'light']).isRequired,
-};
-
-const ThemeControl = ({
-  theme,
-  value,
-  onChange,
-  className = '',
-  inline = false,
-  isOpen = false,
-  onOpen,
-  onScheduleClose,
-  onToggle,
-  onClose,
-  triggerRef,
-}) => {
-  const openedByHoverRef = useRef(false);
-
-  useEffect(() => {
-    if (!isOpen) {
-      openedByHoverRef.current = false;
-    }
-  }, [isOpen]);
-
-  const selectedLabel =
-    themeOptions.find((option) => option.value === value)?.label ?? 'System';
-
-  const renderOptions = ({ desktop = false } = {}) =>
-    themeOptions.map((option) => (
-      <button
-        key={option.value}
-        type="button"
-        onClick={(event) => {
-          onChange(option.value);
-          if (desktop) {
-            onClose?.();
-          } else {
-            event.currentTarget.closest('details')?.removeAttribute('open');
-          }
-        }}
-        aria-pressed={value === option.value}
-        tabIndex={desktop && !isOpen ? -1 : undefined}
-        className={`grid w-full grid-cols-[1rem_1.25rem_1fr] items-center gap-2 rounded-[6px] px-3 py-2.5 text-left text-sm font-semibold transition-colors ${
-          value === option.value
-            ? 'bg-pf-editorial-accent-soft text-pf-editorial-ink'
-            : 'text-pf-editorial-muted hover:bg-pf-editorial-raised hover:text-pf-editorial-ink'
-        }`}
-      >
-        <span className="text-pf-editorial-accent" aria-hidden="true">
-          {value === option.value ? '✓' : ''}
-        </span>
-        <ThemeGlyph value={option.value} />
-        {option.label}
-      </button>
-    ));
-
-  if (inline) {
-    return (
-      <details className={`group/theme relative ${className}`}>
-        <summary className="flex w-full cursor-pointer list-none items-center justify-between gap-2 rounded-pf-control px-2 py-2 text-xs font-bold uppercase tracking-[0.1em] text-pf-editorial-muted transition-colors hover:bg-pf-editorial-raised hover:text-pf-editorial-ink [&::-webkit-details-marker]:hidden">
-          <span className="flex items-center gap-2">
-            <ThemeGlyph value={value === 'system' ? theme : value} />
-            <span>{selectedLabel}</span>
-          </span>
-          <svg className="h-3 w-3 transition-transform group-open/theme:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
-        </summary>
-        <div className="relative mt-2 w-full rounded-[8px] border border-pf-editorial-line bg-pf-editorial-surface p-1.5">
-          {renderOptions()}
-        </div>
-      </details>
-    );
-  }
-
-  const menuKey = 'theme';
-  const menuId = 'desktop-theme-menu';
-  const triggerId = `${menuId}-trigger`;
-
-  const handlePointerEnter = (event) => {
-    if (event.pointerType === 'mouse') {
-      if (!isOpen) {
-        openedByHoverRef.current = true;
-      }
-      onOpen?.(menuKey);
-    }
-  };
-
-  const handlePointerLeave = (event) => {
-    if (event.pointerType === 'mouse') {
-      onScheduleClose?.();
-    }
-  };
+const ThemeControl = ({ theme, onChange, className = '' }) => {
+  const isDark = theme === 'dark';
 
   return (
-    <div
-      className={`relative ${className}`}
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
-    >
+    <div className={className}>
       <button
-        ref={triggerRef}
-        id={triggerId}
         type="button"
-        aria-expanded={isOpen}
-        aria-haspopup="true"
-        aria-controls={menuId}
-        onClick={() => {
-          if (isOpen && openedByHoverRef.current) {
-            openedByHoverRef.current = false;
-            onOpen?.(menuKey);
-            return;
-          }
-          onToggle?.(menuKey);
-        }}
-        className="flex items-center gap-2 rounded-pf-control px-2 py-2 text-xs font-bold uppercase tracking-[0.1em] text-pf-editorial-muted transition-colors hover:bg-pf-editorial-raised hover:text-pf-editorial-ink"
+        aria-label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
+        onClick={() => onChange(isDark ? 'light' : 'dark')}
+        className="flex w-full min-w-[6.25rem] items-center gap-2 rounded-pf-control px-2 py-2 text-xs font-bold uppercase tracking-[0.1em] text-pf-editorial-muted hover:bg-pf-editorial-raised hover:text-pf-editorial-ink"
       >
-        <ThemeGlyph value={value === 'system' ? theme : value} />
-        <span>{selectedLabel}</span>
-        <svg
-          className={`h-3 w-3 transition-transform duration-150 motion-reduce:transition-none ${
-            isOpen ? 'rotate-180' : ''
-          }`}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
+        <span
+          className="relative h-4 w-4 shrink-0 overflow-hidden"
           aria-hidden="true"
         >
-          <path d="m7 10 5 5 5-5" />
-        </svg>
+          <svg
+            data-theme-icon="moon"
+            aria-hidden="true"
+            className={`pf-theme-celestial pf-theme-celestial--moon absolute inset-0 h-4 w-4 ${
+              isDark ? 'is-visible' : ''
+            }`}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
+          >
+            <path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z" />
+          </svg>
+          <svg
+            data-theme-icon="sun"
+            aria-hidden="true"
+            className={`pf-theme-celestial pf-theme-celestial--sun absolute inset-0 h-4 w-4 ${
+              isDark ? '' : 'is-visible'
+            }`}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
+          >
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41" />
+          </svg>
+        </span>
+        <span className="w-11 text-left">{isDark ? 'Dark' : 'Light'}</span>
       </button>
-
-      <div
-        id={menuId}
-        aria-labelledby={triggerId}
-        aria-hidden={!isOpen}
-        onPointerEnter={(event) => {
-          if (event.pointerType === 'mouse') {
-            openedByHoverRef.current = false;
-            onOpen?.(menuKey);
-          }
-        }}
-        className={`absolute right-0 top-full z-30 min-w-40 pt-2 transition-[opacity,transform,visibility] duration-150 ease-out motion-reduce:transform-none motion-reduce:transition-none ${
-          isOpen
-            ? 'visible translate-y-0 opacity-100'
-            : 'pointer-events-none invisible -translate-y-[3px] opacity-0'
-        }`}
-      >
-        <div className="rounded-[8px] border border-pf-editorial-line bg-pf-editorial-surface p-1.5 shadow-pf-float">
-          {renderOptions({ desktop: true })}
-        </div>
-      </div>
     </div>
   );
 };
 
 ThemeControl.propTypes = {
   theme: PropTypes.oneOf(['dark', 'light']).isRequired,
-  value: PropTypes.oneOf(['system', 'dark', 'light']).isRequired,
   onChange: PropTypes.func.isRequired,
   className: PropTypes.string,
-  inline: PropTypes.bool,
-  isOpen: PropTypes.bool,
-  onOpen: PropTypes.func,
-  onScheduleClose: PropTypes.func,
-  onToggle: PropTypes.func,
-  onClose: PropTypes.func,
-  triggerRef: PropTypes.func,
 };
 
 /** Persistent product navigation for PixelForge tools. */
-export default function Navbar({ theme, themePreference, onThemeChange }) {
+export default function Navbar({ theme, onThemeChange }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null);
   const closeTimerRef = useRef(null);
@@ -413,7 +280,7 @@ export default function Navbar({ theme, themePreference, onThemeChange }) {
   }, [activeMenu, closeMenu]);
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-pf-editorial-line bg-pf-editorial-base/95 backdrop-blur-lg" aria-label="Primary navigation">
+    <nav className="pf-theme-surface sticky top-0 z-50 w-full border-b border-pf-editorial-line bg-pf-editorial-base/95 backdrop-blur-lg" aria-label="Primary navigation">
       <div className="mx-auto flex h-16 max-w-pf-workspace items-center justify-between px-pf-gutter">
         <Link to="/" className="flex items-center gap-2.5" aria-label="PixelForge home">
           <img src={logoIcon} alt="" className="h-8 w-10 object-contain" />
@@ -440,17 +307,8 @@ export default function Navbar({ theme, themePreference, onThemeChange }) {
             ))}
             <ThemeControl
               theme={theme}
-              value={themePreference}
               onChange={onThemeChange}
               className="ml-2 border-l border-pf-editorial-line pl-4"
-              isOpen={activeMenu === 'theme'}
-              onOpen={openMenu}
-              onScheduleClose={scheduleCloseMenu}
-              onToggle={toggleMenu}
-              onClose={closeMenu}
-              triggerRef={(node) => {
-                triggerRefs.current.theme = node;
-              }}
             />
           </div>
           <a href="https://github.com/Yoruxyv/PixelForge" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm font-semibold text-pf-editorial-muted transition-colors hover:text-pf-editorial-ink">
@@ -469,31 +327,40 @@ export default function Navbar({ theme, themePreference, onThemeChange }) {
           aria-controls="mobile-navigation"
           aria-label={isMobileMenuOpen ? 'Close tool menu' : 'Open tool menu'}
         >
-          <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMobileMenuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'} />
-          </svg>
+          <span
+            className={`pf-mobile-menu-icon ${isMobileMenuOpen ? 'is-open' : ''}`}
+            aria-hidden="true"
+          >
+            <span className="pf-mobile-menu-line pf-mobile-menu-line--top" />
+            <span className="pf-mobile-menu-line pf-mobile-menu-line--middle" />
+            <span className="pf-mobile-menu-line pf-mobile-menu-line--bottom" />
+          </span>
         </button>
       </div>
 
-      {isMobileMenuOpen && (
-        <div id="mobile-navigation" className="max-h-[calc(100vh-4rem)] overflow-y-auto border-t border-pf-editorial-line bg-pf-editorial-base px-pf-gutter py-5 lg:hidden">
-          <div className="mx-auto grid max-w-pf-workspace gap-6 sm:grid-cols-2">
-            {categories.map((category) => (
-              <section key={category.title} aria-labelledby={`mobile-${category.title}`}>
-                <h2 id={`mobile-${category.title}`} className="mb-2 px-3 text-xs font-bold uppercase tracking-[0.16em] text-pf-editorial-muted">{category.title}</h2>
-                {category.items.map((item) => <ToolLink key={item.id} item={item} onClick={() => setIsMobileMenuOpen(false)} />)}
-              </section>
-            ))}
-          </div>
-          <ThemeControl theme={theme} value={themePreference} onChange={onThemeChange} className="mt-5 border-t border-pf-editorial-line px-3 pt-5" inline />
+      <div
+        id="mobile-navigation"
+        aria-hidden={!isMobileMenuOpen}
+        inert={!isMobileMenuOpen}
+        className={`pf-mobile-navigation absolute inset-x-0 top-full max-h-[calc(100vh-4rem)] overflow-y-auto border-t border-pf-editorial-line bg-pf-editorial-base px-pf-gutter py-5 lg:hidden ${
+          isMobileMenuOpen ? 'is-open' : ''
+        }`}
+      >
+        <div className="mx-auto grid max-w-pf-workspace gap-6 sm:grid-cols-2">
+          {categories.map((category) => (
+            <section key={category.title} aria-labelledby={`mobile-${category.title}`}>
+              <h2 id={`mobile-${category.title}`} className="mb-2 px-3 text-xs font-bold uppercase tracking-[0.16em] text-pf-editorial-muted">{category.title}</h2>
+              {category.items.map((item) => <ToolLink key={item.id} item={item} onClick={() => setIsMobileMenuOpen(false)} />)}
+            </section>
+          ))}
         </div>
-      )}
+        <ThemeControl theme={theme} onChange={onThemeChange} className="mt-5 border-t border-pf-editorial-line px-3 pt-5" />
+      </div>
     </nav>
   );
 }
 
 Navbar.propTypes = {
   theme: PropTypes.oneOf(['dark', 'light']).isRequired,
-  themePreference: PropTypes.oneOf(['system', 'dark', 'light']).isRequired,
   onThemeChange: PropTypes.func.isRequired,
 };
