@@ -4,15 +4,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import Navbar from './NavBar';
 
 const renderNavbar = ({
-  theme = 'light',
-  themePreference = 'system',
+  theme = 'dark',
   onThemeChange = vi.fn(),
 } = {}) =>
   render(
     <MemoryRouter>
       <Navbar
         theme={theme}
-        themePreference={themePreference}
         onThemeChange={onThemeChange}
       />
     </MemoryRouter>,
@@ -194,93 +192,129 @@ describe('Navbar desktop dropdown interactions', () => {
   });
 });
 
-describe('Navbar theme menu', () => {
-  const getThemeTrigger = () => getTrigger('System');
-
-  it('opens on desktop mouse hover and stays open while entering the menu', () => {
-    vi.useFakeTimers();
+describe('Navbar mobile navigation', () => {
+  it('opens and closes with synchronized accessible state', () => {
     renderNavbar();
-    const trigger = getThemeTrigger();
-    const region = getDropdownRegion(trigger);
-    const menu = getMenu(trigger);
 
-    hover(region);
-    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    const openButton = getTrigger('Open tool menu');
+    const mobileNavigation = document.getElementById('mobile-navigation');
 
-    leave(region);
-    hover(menu);
+    expect(openButton).toHaveAttribute('aria-expanded', 'false');
+    expect(mobileNavigation).toHaveAttribute('aria-hidden', 'true');
+    expect(mobileNavigation).toHaveAttribute('inert');
 
-    act(() => {
-      vi.advanceTimersByTime(150);
-    });
+    fireEvent.click(openButton);
 
-    expect(trigger).toHaveAttribute('aria-expanded', 'true');
-    expect(menu).toHaveAttribute('aria-hidden', 'false');
+    const closeButton = getTrigger('Close tool menu');
+    expect(closeButton).toHaveAttribute('aria-expanded', 'true');
+    expect(mobileNavigation).toHaveClass('is-open');
+    expect(mobileNavigation).toHaveAttribute('aria-hidden', 'false');
+    expect(mobileNavigation).not.toHaveAttribute('inert');
+
+    fireEvent.click(closeButton);
+
+    expect(getTrigger('Open tool menu')).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+    expect(mobileNavigation).not.toHaveClass('is-open');
+    expect(mobileNavigation).toHaveAttribute('aria-hidden', 'true');
+    expect(mobileNavigation).toHaveAttribute('inert');
   });
 
-  it('closes after leaving the desktop theme trigger and menu region', () => {
-    vi.useFakeTimers();
+  it('closes when a mobile navigation destination is activated', () => {
     renderNavbar();
-    const trigger = getThemeTrigger();
-    const region = getDropdownRegion(trigger);
+    fireEvent.click(getTrigger('Open tool menu'));
 
-    hover(region);
-    leave(region);
-
-    act(() => {
-      vi.advanceTimersByTime(110);
-    });
-
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-  });
-
-  it('keeps click toggle and second-click close behavior', () => {
-    renderNavbar();
-    const trigger = getThemeTrigger();
-
-    fireEvent.click(trigger);
-    expect(trigger).toHaveAttribute('aria-expanded', 'true');
-
-    fireEvent.click(trigger);
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-  });
-
-  it('closes on Escape and restores focus to the desktop theme trigger', () => {
-    renderNavbar();
-    const trigger = getThemeTrigger();
-
-    fireEvent.click(trigger);
-    const darkOption = screen.getByRole('button', { name: 'Dark', exact: true });
-    darkOption.focus();
-
-    fireEvent.keyDown(document, { key: 'Escape' });
-
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(trigger).toHaveFocus();
-  });
-
-  it.each([
-    ['Light', 'light'],
-    ['Dark', 'dark'],
-    ['System', 'system'],
-  ])('selects %s and closes the desktop theme menu', (label, value) => {
-    const onThemeChange = vi.fn();
-    renderNavbar({ onThemeChange });
-    const trigger = getThemeTrigger();
-
-    fireEvent.click(trigger);
+    const mobileNavigation = document.getElementById('mobile-navigation');
     fireEvent.click(
-      within(getMenu(trigger)).getByRole('button', {
-        name: label,
+      within(mobileNavigation).getByRole('link', {
+        name: 'Color Palette',
         exact: true,
       }),
     );
 
-    expect(onThemeChange).toHaveBeenCalledWith(value);
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(getTrigger('Open tool menu')).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+    expect(mobileNavigation).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('keeps mobile theme selection click-driven without hover', () => {
+  it('stays open after a rapid open, close, and open sequence', () => {
+    renderNavbar();
+
+    fireEvent.click(getTrigger('Open tool menu'));
+    fireEvent.click(getTrigger('Close tool menu'));
+    fireEvent.click(getTrigger('Open tool menu'));
+
+    expect(getTrigger('Close tool menu')).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    expect(document.getElementById('mobile-navigation')).toHaveClass('is-open');
+  });
+});
+
+describe('Navbar theme toggle', () => {
+  it('shows the dark state and toggles directly to light', () => {
+    const onThemeChange = vi.fn();
+    renderNavbar({ onThemeChange });
+
+    const toggle = getTrigger('Switch to light theme');
+    expect(toggle).toHaveTextContent('Dark');
+    expect(toggle.querySelectorAll('[data-theme-icon]')).toHaveLength(2);
+    expect(toggle.querySelector('[data-theme-icon="moon"]')).toHaveClass(
+      'is-visible',
+    );
+    expect(toggle.querySelector('[data-theme-icon="sun"]')).not.toHaveClass(
+      'is-visible',
+    );
+    expect(toggle.querySelector('[data-theme-icon="moon"]')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
+    expect(toggle.querySelector('[data-theme-icon="sun"]')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
+
+    fireEvent.click(toggle);
+
+    expect(onThemeChange).toHaveBeenCalledWith('light');
+  });
+
+  it('shows the light state and toggles directly to dark', () => {
+    const onThemeChange = vi.fn();
+    renderNavbar({ theme: 'light', onThemeChange });
+
+    const toggle = getTrigger('Switch to dark theme');
+    expect(toggle).toHaveTextContent('Light');
+    expect(toggle.querySelector('[data-theme-icon="sun"]')).toHaveClass(
+      'is-visible',
+    );
+    expect(toggle.querySelector('[data-theme-icon="moon"]')).not.toHaveClass(
+      'is-visible',
+    );
+
+    fireEvent.click(toggle);
+
+    expect(onThemeChange).toHaveBeenCalledWith('dark');
+  });
+
+  it('uses a native button without theme-menu ARIA or System UI', () => {
+    renderNavbar();
+
+    const toggle = getTrigger('Switch to light theme');
+    expect(toggle).toHaveAttribute('type', 'button');
+    expect(toggle).not.toHaveAttribute('aria-expanded');
+    expect(toggle).not.toHaveAttribute('aria-haspopup');
+    expect(toggle).not.toHaveAttribute('aria-controls');
+    expect(document.getElementById('desktop-theme-menu')).not.toBeInTheDocument();
+    expect(screen.queryByText('System')).not.toBeInTheDocument();
+  });
+
+  it('uses the same direct toggle in mobile navigation', () => {
     const onThemeChange = vi.fn();
     renderNavbar({ onThemeChange });
 
@@ -289,15 +323,13 @@ describe('Navbar theme menu', () => {
     );
 
     const mobileNavigation = document.getElementById('mobile-navigation');
-    const themeDetails = mobileNavigation.querySelector('details');
-    const summary = themeDetails.querySelector('summary');
+    const toggle = within(mobileNavigation).getByRole('button', {
+      name: 'Switch to light theme',
+    });
 
-    fireEvent.click(summary);
-    fireEvent.click(
-      within(themeDetails).getByRole('button', { name: 'Dark' }),
-    );
+    expect(mobileNavigation.querySelector('details')).not.toBeInTheDocument();
+    fireEvent.click(toggle);
 
-    expect(onThemeChange).toHaveBeenCalledWith('dark');
-    expect(themeDetails).not.toHaveAttribute('open');
+    expect(onThemeChange).toHaveBeenCalledWith('light');
   });
 });

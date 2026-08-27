@@ -54,14 +54,19 @@ test.describe('application shell', () => {
     const openMenu = page.getByRole('button', {
       name: 'Open tool menu',
     });
+    const mobileNavigation = page.locator('#mobile-navigation');
+    await expect(mobileNavigation).toHaveAttribute('aria-hidden', 'true');
+    await expect(mobileNavigation).toHaveAttribute('inert', '');
+
     await openMenu.click();
 
-    await expect(
-      page.getByRole('button', { name: 'Close tool menu' }),
-    ).toBeVisible();
+    const closeMenu = page.getByRole('button', { name: 'Close tool menu' });
+    await expect(closeMenu).toBeVisible();
+    await expect(closeMenu).toHaveAttribute('aria-expanded', 'true');
+    await expect(mobileNavigation).toHaveAttribute('aria-hidden', 'false');
+    await expect(mobileNavigation).not.toHaveAttribute('inert');
 
-    await page
-      .locator('#mobile-navigation')
+    await mobileNavigation
       .getByRole('link', { name: 'Color Palette', exact: true })
       .click();
 
@@ -69,6 +74,28 @@ test.describe('application shell', () => {
     await expect(
       page.getByRole('heading', { name: 'Sampling controls' }),
     ).toBeVisible();
+  });
+
+  test('mobile navigation handles rapid toggles with reduced motion', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+
+    const mobileNavigation = page.locator('#mobile-navigation');
+    const openMenu = page.getByRole('button', { name: 'Open tool menu' });
+
+    await openMenu.click();
+    await page.getByRole('button', { name: 'Close tool menu' }).click();
+    await openMenu.click();
+
+    await expect(mobileNavigation).toBeVisible();
+    await expect(mobileNavigation).toHaveAttribute('aria-hidden', 'false');
+    await expect(mobileNavigation).toHaveCSS('transition-duration', '0s');
+    await expect(
+      page.locator('.pf-mobile-menu-line').first(),
+    ).toHaveCSS('transition-duration', '0s');
   });
 
   test('unknown routes render the 404 experience', async ({ page }) => {

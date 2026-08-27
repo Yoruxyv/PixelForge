@@ -8,7 +8,7 @@
  * - Lazily render page routes with lightweight suspense loaders.
  */
 
-import { useEffect, useState, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import { legalModalData } from './layout/legalModalData';
@@ -19,7 +19,7 @@ import GlobalHeader from './layout/GlobalHeader';
 import Footer from './layout/Footer';
 import AppModals from '@/shared/components/common/AppModals';
 import FaqChatbotWidget from '@/features/chatbot/FaqChatbotWidget';
-import { readThemePreference, resolveTheme, THEME_STORAGE_KEY } from './theme';
+import { readThemePreference, THEME_STORAGE_KEY } from './theme';
 
 /**
  * Generic fallback shown while non-workspace pages are loading.
@@ -63,10 +63,7 @@ const WorkspaceLoader = () => (
  * @returns {JSX.Element} Fully routed application shell.
  */
 export default function App() {
-  const [themePreference, setThemePreference] = useState(readThemePreference);
-  const [prefersDark, setPrefersDark] = useState(() =>
-    window.matchMedia('(prefers-color-scheme: dark)').matches,
-  );
+  const [theme, setTheme] = useState(readThemePreference);
   const [modalState, setModalState] = useState({
     isOpen: false,
     type: 'privacy',
@@ -77,23 +74,14 @@ export default function App() {
     setModalState((prev) => ({ ...prev, isOpen: false }));
 
   const activeModalData = legalModalData[modalState.type];
-  const theme = resolveTheme(themePreference, prefersDark);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const updateSystemTheme = (event) => setPrefersDark(event.matches);
-    mediaQuery.addEventListener('change', updateSystemTheme);
-    return () => mediaQuery.removeEventListener('change', updateSystemTheme);
-  }, []);
-
-  const changeTheme = (preference) => {
-    setThemePreference(preference);
-    localStorage.setItem(THEME_STORAGE_KEY, preference);
+  const changeTheme = (nextTheme) => {
+    setTheme(nextTheme);
+    localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
   };
 
   return (
     <BrowserRouter>
-      <div data-theme={theme} className="flex min-h-screen flex-col bg-pf-editorial-base text-pf-editorial-ink selection:bg-pf-editorial-accent-soft">
+      <div data-theme={theme} className="pf-theme-surface flex min-h-screen flex-col bg-pf-editorial-base text-pf-editorial-ink selection:bg-pf-editorial-accent-soft">
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[var(--pf-z-toast)] focus:rounded-pf-control focus:bg-pf-editorial-ink focus:px-4 focus:py-3 focus:text-sm focus:font-bold focus:text-pf-editorial-base"
@@ -103,7 +91,6 @@ export default function App() {
 
         <Navbar
           theme={theme}
-          themePreference={themePreference}
           onThemeChange={changeTheme}
         />
 

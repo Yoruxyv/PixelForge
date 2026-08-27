@@ -15,7 +15,7 @@ const legalButtonClass =
  */
 export default function Footer({ openModal }) {
   return (
-    <footer className="w-full border-t border-pf-editorial-line bg-pf-editorial-footer">
+    <footer className="pf-theme-surface w-full border-t border-pf-editorial-line bg-pf-editorial-footer">
       <div className="mx-auto max-w-pf-workspace px-pf-gutter py-10 sm:py-12">
         <div className="grid grid-cols-2 gap-x-8 gap-y-9 sm:grid-cols-4 lg:grid-cols-12 lg:gap-x-10">
           <div className="col-span-2 sm:col-span-4 lg:col-span-5">

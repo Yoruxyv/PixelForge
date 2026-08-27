@@ -11,6 +11,7 @@
     "test": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "lighthouse": "node scripts/run-lighthouse.js",
     "lighthouse:check": "node scripts/check-lighthouse-budget.js"
   },
   "dependencies": {
