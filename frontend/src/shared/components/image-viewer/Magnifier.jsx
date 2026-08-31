@@ -98,7 +98,7 @@ export default function Magnifier({
         {typeof children === 'function' ? children({ isZoomed }) : children}
       </div>
 
-      {renderControls && renderControls({ isZoomed, toggleZoom })}
+      {renderControls?.({ isZoomed, toggleZoom })}
     </div>
   );
 }

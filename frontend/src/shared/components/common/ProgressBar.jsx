@@ -23,21 +23,27 @@ function getStatusLabel(progress) {
  */
 export default function ProgressBar({ progress, customText }) {
   const displayText = customText || getStatusLabel(progress);
+  const roundedProgress = Math.round(progress);
 
   return (
     <div className="w-full space-y-3" role="status" aria-live="polite">
       <div className="flex items-start justify-between gap-3 text-xs font-semibold text-pf-editorial-muted">
         <span className="whitespace-nowrap">{displayText}</span>
         <span className="shrink-0 font-mono text-pf-editorial-ink">
-          {Math.round(progress)}%
+          {roundedProgress}%
         </span>
       </div>
+      <progress
+        className="sr-only"
+        value={roundedProgress}
+        max="100"
+        aria-label="Processing progress"
+      >
+        {roundedProgress}%
+      </progress>
       <div
         className="h-1 w-full bg-pf-editorial-line"
-        role="progressbar"
-        aria-valuemin="0"
-        aria-valuemax="100"
-        aria-valuenow={Math.round(progress)}
+        aria-hidden="true"
       >
         <div
           className="h-1 bg-pf-editorial-accent transition-[width] duration-300 ease-out"

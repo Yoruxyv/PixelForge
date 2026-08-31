@@ -27,6 +27,8 @@ const FEATURES_BY_JOB = Object.freeze(
   ),
 );
 
+const RESULT_PATH_PATTERN = /^\/api\/result\/([a-f0-9]{32})$/;
+
 const RUNTIME_LIMITS = Object.freeze({
   upload: {
     max_file_size_mb: 10,
@@ -216,9 +218,7 @@ export async function mockPixelForgeApi(page, options = {}) {
       return;
     }
 
-    const resultMatch = pathname.match(
-      /^\/api\/result\/([a-f0-9]{32})$/,
-    );
+    const resultMatch = RESULT_PATH_PATTERN.exec(pathname);
 
     if (resultMatch) {
       const jobId = resultMatch[1];

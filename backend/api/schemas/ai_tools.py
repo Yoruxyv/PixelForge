@@ -18,6 +18,7 @@ by the service layer.
 from pydantic import BaseModel, Field
 
 INITIALIZED_JOB_ID_DESCRIPTION = "Initialized job identifier."
+SANITIZED_IMAGE_FILENAME_DESCRIPTION = "Sanitized uploaded image filename."
 
 
 class InitRequest(BaseModel):
@@ -60,7 +61,7 @@ class StartUpscaleRequest(BaseModel):
     )
     safe_filename: str = Field(
         ...,
-        description="Sanitized uploaded image filename.",
+        description=SANITIZED_IMAGE_FILENAME_DESCRIPTION,
     )
     scale: int = Field(
         default=2,
@@ -86,7 +87,7 @@ class StartRembgRequest(BaseModel):
     )
     safe_filename: str = Field(
         ...,
-        description="Sanitized uploaded image filename.",
+        description=SANITIZED_IMAGE_FILENAME_DESCRIPTION,
     )
 
 
@@ -106,7 +107,7 @@ class StartColorRestoreRequest(BaseModel):
     )
     safe_filename: str = Field(
         ...,
-        description="Sanitized uploaded image filename.",
+        description=SANITIZED_IMAGE_FILENAME_DESCRIPTION,
     )
 
 
