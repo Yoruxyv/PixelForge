@@ -20,6 +20,8 @@ import httpx
 
 FEATURES = ("upscale", "rembg", "colorrestore", "objectremove")
 DEFAULT_API_BASE = "http://127.0.0.1:8000/api"
+LIMITS_RESPONSE_LABEL = "/limits response"
+INIT_RESPONSE_LABEL = "Init response"
 
 
 class CheckFailure(RuntimeError):
@@ -216,8 +218,8 @@ def check_public_runtime(api_base: str, feature: str) -> None:
     print(f"Feature  : {feature}")
 
     _, limits_raw, _ = _json_request("GET", f"{base}/limits")
-    limits = _require_mapping(limits_raw, "/limits response")
-    _require_keys(limits, ("upload", "result", "upscale", "features"), "/limits response")
+    limits = _require_mapping(limits_raw, LIMITS_RESPONSE_LABEL)
+    _require_keys(limits, ("upload", "result", "upscale", "features"), LIMITS_RESPONSE_LABEL)
 
     upload = _require_mapping(limits["upload"], "/limits.upload")
     _require_keys(
@@ -323,8 +325,8 @@ def check_invalid_image(
             "cf_turnstile_response": "manual_test_bypass",
         },
     )
-    init = _require_mapping(init_raw, "Init response")
-    _require_keys(init, ("job_id", "upload_url", "safe_filename"), "Init response")
+    init = _require_mapping(init_raw, INIT_RESPONSE_LABEL)
+    _require_keys(init, ("job_id", "upload_url", "safe_filename"), INIT_RESPONSE_LABEL)
 
     fake_path = _repo_root() / ".pixelforge-invalid-image.tmp.png"
     try:
@@ -456,7 +458,7 @@ async def check_usage_limit(
     """Verify each selected feature returns RATE_LIMITED at its quota."""
     base = api_base.rstrip("/")
     _, limits_raw, _ = _json_request("GET", f"{base}/limits")
-    limits = _require_mapping(limits_raw, "/limits response")
+    limits = _require_mapping(limits_raw, LIMITS_RESPONSE_LABEL)
     feature_limits = _require_mapping(limits.get("features"), "/limits.features")
 
     print("PixelForge backend usage limit test")
@@ -507,6 +509,36 @@ async def check_usage_limit(
             _pass(f"Restored previous usage state for '{feature}'.")
 
 
+def _wait_for_ready_result(
+    base: str,
+    job_id: Any,
+    feature: str,
+    poll_interval_seconds: float,
+    max_poll_attempts: int,
+) -> None:
+    """Poll one AI job until it succeeds, fails, or times out."""
+    result_url = f"{base}/result/{job_id}"
+    for attempt in range(1, max_poll_attempts + 1):
+        _, result_raw, _ = _json_request("GET", result_url)
+        result = _require_mapping(result_raw, "Result response")
+        status = result.get("status")
+        print(f"Attempt {attempt}/{max_poll_attempts} -> status={status}")
+
+        if status == "ready":
+            url = result.get("url")
+            if not isinstance(url, str) or not url.strip():
+                _fail("Ready result did not contain a downloadable URL.")
+            _pass(f"AI feature success test passed for '{feature}'.")
+            return
+
+        if status == "failed":
+            _fail(f"Job failed. code='{result.get('code')}' message='{result.get('message')}'")
+
+        time.sleep(poll_interval_seconds)
+
+    _fail(f"Job did not become ready after {max_poll_attempts} polling attempts.")
+
+
 def check_ai_success(
     api_base: str,
     feature: str,
@@ -538,8 +570,8 @@ def check_ai_success(
             "cf_turnstile_response": "manual_test_bypass",
         },
     )
-    init = _require_mapping(init_raw, "Init response")
-    _require_keys(init, ("job_id", "safe_filename", "upload_url"), "Init response")
+    init = _require_mapping(init_raw, INIT_RESPONSE_LABEL)
+    _require_keys(init, ("job_id", "safe_filename", "upload_url"), INIT_RESPONSE_LABEL)
     _upload_blob(str(init["upload_url"]), source)
     _pass("Uploaded source image.")
 
@@ -562,26 +594,13 @@ def check_ai_success(
     _json_request("POST", f"{base}/{feature}/start", payload=start_payload)
     _pass("Started background job.")
 
-    result_url = f"{base}/result/{init['job_id']}"
-    for attempt in range(1, max_poll_attempts + 1):
-        _, result_raw, _ = _json_request("GET", result_url)
-        result = _require_mapping(result_raw, "Result response")
-        status = result.get("status")
-        print(f"Attempt {attempt}/{max_poll_attempts} -> status={status}")
-
-        if status == "ready":
-            url = result.get("url")
-            if not isinstance(url, str) or not url.strip():
-                _fail("Ready result did not contain a downloadable URL.")
-            _pass(f"AI feature success test passed for '{feature}'.")
-            return
-
-        if status == "failed":
-            _fail(f"Job failed. code='{result.get('code')}' message='{result.get('message')}'")
-
-        time.sleep(poll_interval_seconds)
-
-    _fail(f"Job did not become ready after {max_poll_attempts} polling attempts.")
+    _wait_for_ready_result(
+        base,
+        init["job_id"],
+        feature,
+        poll_interval_seconds,
+        max_poll_attempts,
+    )
 
 
 def _parse_features(value: str) -> tuple[str, ...]:

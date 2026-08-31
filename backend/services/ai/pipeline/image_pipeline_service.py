@@ -238,6 +238,19 @@ class ImagePipelineService:
             PipelineResult:
                 Failed result with a stable code and safe user-facing message.
         """
+        provider_failure = self._provider_failure_from_exception(exc)
+        if provider_failure is not None:
+            return provider_failure
+
+        if isinstance(exc, HTTPException):
+            http_failure = self._http_failure_from_exception(exc)
+            if http_failure is not None:
+                return http_failure
+
+        return self._failure_from_error_text(str(exc).lower())
+
+    def _provider_failure_from_exception(self, exc: Exception) -> PipelineResult | None:
+        """Map known provider exceptions to stable public failures."""
         if isinstance(exc, ReplicateRateLimitError):
             return PipelineResult.failed(
                 codes.PROVIDER_RATE_LIMITED,
@@ -256,46 +269,51 @@ class ImagePipelineService:
                 get_default_message(codes.PROVIDER_FAILED),
             )
 
-        if isinstance(exc, HTTPException):
-            detail = exc.detail
+        return None
 
-            if isinstance(detail, dict):
-                code = str(detail.get("code") or codes.VALIDATION_ERROR)
-                message = str(detail.get("message") or get_default_message(code))
-                return PipelineResult.failed(code, message)
+    def _http_failure_from_exception(self, exc: HTTPException) -> PipelineResult | None:
+        """Map structured and validation HTTP exceptions to pipeline failures."""
+        detail = exc.detail
 
-            detail_text = str(detail or "")
-            detail_lower = detail_text.lower()
+        if isinstance(detail, dict):
+            code = str(detail.get("code") or codes.VALIDATION_ERROR)
+            message = str(detail.get("message") or get_default_message(code))
+            return PipelineResult.failed(code, message)
 
-            if exc.status_code == status.HTTP_413_REQUEST_ENTITY_TOO_LARGE:
-                return PipelineResult.failed(
-                    codes.IMAGE_TOO_LARGE,
-                    detail_text or get_default_message(codes.IMAGE_TOO_LARGE),
-                )
+        detail_text = str(detail or "")
+        detail_lower = detail_text.lower()
 
-            if exc.status_code == status.HTTP_415_UNSUPPORTED_MEDIA_TYPE:
+        if exc.status_code == status.HTTP_413_REQUEST_ENTITY_TOO_LARGE:
+            return PipelineResult.failed(
+                codes.IMAGE_TOO_LARGE,
+                detail_text or get_default_message(codes.IMAGE_TOO_LARGE),
+            )
+
+        if exc.status_code == status.HTTP_415_UNSUPPORTED_MEDIA_TYPE:
+            return PipelineResult.failed(
+                codes.UNSUPPORTED_FORMAT,
+                detail_text or get_default_message(codes.UNSUPPORTED_FORMAT),
+            )
+
+        if exc.status_code in {
+            status.HTTP_400_BAD_REQUEST,
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+        }:
+            if "unsupported format" in detail_lower:
                 return PipelineResult.failed(
                     codes.UNSUPPORTED_FORMAT,
                     detail_text or get_default_message(codes.UNSUPPORTED_FORMAT),
                 )
 
-            if exc.status_code in {
-                status.HTTP_400_BAD_REQUEST,
-                status.HTTP_422_UNPROCESSABLE_ENTITY,
-            }:
-                if "unsupported format" in detail_lower:
-                    return PipelineResult.failed(
-                        codes.UNSUPPORTED_FORMAT,
-                        detail_text or get_default_message(codes.UNSUPPORTED_FORMAT),
-                    )
+            return PipelineResult.failed(
+                codes.INVALID_IMAGE,
+                detail_text or get_default_message(codes.INVALID_IMAGE),
+            )
 
-                return PipelineResult.failed(
-                    codes.INVALID_IMAGE,
-                    detail_text or get_default_message(codes.INVALID_IMAGE),
-                )
+        return None
 
-        error_text = str(exc).lower()
-
+    def _failure_from_error_text(self, error_text: str) -> PipelineResult:
+        """Map established internal error text before using the safe fallback."""
         if "payload exceeds maximum size" in error_text:
             return PipelineResult.failed(
                 codes.UPLOAD_TOO_LARGE,
